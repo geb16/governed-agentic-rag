@@ -3,11 +3,11 @@ from __future__ import annotations
 import sqlite3
 from collections.abc import Iterator
 from contextlib import contextmanager
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Protocol
 
 from app.core.version import DATABASE_SCHEMA_VERSION
-
 from app.persistence.models import (
     AccessAccountRecord,
     ConsumedFault,
@@ -23,6 +23,11 @@ CREATE TABLE IF NOT EXISTS schema_metadata (
     key TEXT PRIMARY KEY,
     value TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS synthetic_cases (
+    case_id TEXT PRIMARY KEY,
+    created_at TEXT NOT NULL
+);
+
 """
 
 class SyntheticRepository(Protocol):
@@ -112,3 +117,48 @@ class SqliteSyntheticRepository:
                 """,
                 (str(DATABASE_SCHEMA_VERSION),),
             )
+
+    def create_case(self, fixture: SyntheticCaseFixture, *, replace: bool = False) -> None:
+        with self._connect() as connection:
+            if replace:
+                connection.execute(
+                    "DELETE FROM synthetic_cases WHERE case_id = ?", (fixture.case_id,)
+                )
+            connection.execute(
+                "INSERT INTO synthetic_cases(case_id, created_at) VALUES (?, ?)",
+                (fixture.case_id, datetime.now(UTC).isoformat()),
+            )
+            connection.executemany(
+                """
+                INSERT INTO tickets(case_id, ticket_id, status, category, summary, version)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                [
+                    (
+                        fixture.case_id,
+                        ticket.ticket_id,
+                        ticket.status,
+                        ticket.category,
+                        ticket.summary,
+                        ticket.version,
+                    )
+                    for ticket in fixture.tickets
+                ],
+            )
+            connection.executemany(
+                """
+                INSERT INTO access_accounts(case_id, subject_id, role, version)
+                VALUES (?, ?, ?, ?)
+                """,
+                [
+                    (
+                        fixture.case_id,
+                        account.subject_id,
+                        account.role,
+                        account.version,
+                    )
+                    for account in fixture.access_accounts
+                ],
+            )
+            for plan in fixture.fault_plans:
+                self._set_fault_plan(connection, fixture.case_id, plan)
