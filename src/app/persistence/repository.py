@@ -268,7 +268,18 @@ class SqliteSyntheticRepository:
                 (case_id, ticket_id),
             ).fetchone()
         return self._ticket_from_row(updated), changed
-
+   
+    def get_access_account(self, case_id: str, subject_id: str) -> AccessAccountRecord | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                """
+                SELECT subject_id, role, version FROM access_accounts
+                WHERE case_id = ? AND subject_id = ?
+                """,
+                (case_id, subject_id),
+            ).fetchone()
+        return self._access_from_row(row)
+    
     def issue_refund(
         self,
         case_id: str,
@@ -326,3 +337,9 @@ class SqliteSyntheticRepository:
         if row is None:
             return None
         return TicketRecord.model_validate(dict(row))
+
+    @staticmethod
+    def _access_from_row(row: sqlite3.Row | None) -> AccessAccountRecord | None:
+        if row is None:
+            return None
+        return AccessAccountRecord.model_validate(dict(row))
