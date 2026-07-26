@@ -58,3 +58,33 @@ class SyntheticCaseFixture(StrictModel):
     access_accounts: list[AccessAccountRecord] = Field(default_factory=list)
     fault_plans: list[FaultPlan] = Field(default_factory=list)
 
+DEFAULT_CASE_FIXTURE = SyntheticCaseFixture(
+    case_id="case_default",
+    tickets=[
+        TicketRecord(
+            ticket_id="TKT-1001",
+            status="open",
+            category="identity_access",
+            summary="Privileged access request awaiting IAM review.",
+            version=1,
+        ),
+        TicketRecord(
+            ticket_id="TKT-1002",
+            status="resolved",
+            category="customer_support",
+            summary="Customer identity verification completed.",
+            version=1,
+        ),
+        TicketRecord(
+            ticket_id="TKT-1003",
+            status="open",
+            category="refund",
+            summary="Refund request submitted with reason code.",
+            version=1,
+        ),
+    ],
+    access_accounts=[
+        AccessAccountRecord(subject_id="USR-1001", role="viewer", version=1),
+        AccessAccountRecord(subject_id="USR-1002", role="support_agent", version=1),
+    ],
+)
