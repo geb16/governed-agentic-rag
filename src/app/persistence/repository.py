@@ -61,6 +61,31 @@ CREATE TABLE IF NOT EXISTS refunds (
     UNIQUE (case_id, idempotency_key),
     FOREIGN KEY (case_id, ticket_id) REFERENCES tickets(case_id, ticket_id)
 );
+
+CREATE TABLE IF NOT EXISTS escalations (
+    case_id TEXT NOT NULL,
+    escalation_id TEXT NOT NULL,
+    ticket_id TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    requested_role TEXT NOT NULL,
+    status TEXT NOT NULL,
+    idempotency_key TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (case_id, escalation_id),
+    UNIQUE (case_id, idempotency_key),
+    FOREIGN KEY (case_id, ticket_id) REFERENCES tickets(case_id, ticket_id)
+);
+
+CREATE TABLE IF NOT EXISTS fault_plans (
+    case_id TEXT NOT NULL,
+    tool_name TEXT NOT NULL,
+    mode TEXT NOT NULL,
+    failures_remaining INTEGER NOT NULL,
+    failures_consumed INTEGER NOT NULL DEFAULT 0,
+    error_code TEXT NOT NULL,
+    PRIMARY KEY (case_id, tool_name),
+    FOREIGN KEY (case_id) REFERENCES synthetic_cases(case_id) ON DELETE CASCADE
+);
 """
 
 class SyntheticRepository(Protocol):
