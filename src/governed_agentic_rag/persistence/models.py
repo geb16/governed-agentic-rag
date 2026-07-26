@@ -1,8 +1,7 @@
 from enum import StrEnum
 
-from pydantic import Field
-
 from app.domain.schemas import StrictModel
+from pydantic import Field
 
 
 class FailureMode(StrEnum):
@@ -24,3 +23,19 @@ class RefundRecord(StrictModel):
     currency: str
     status: str
     idempotency_key: str
+class FaultPlan(StrictModel):
+    tool_name: str = Field(min_length=1, max_length=100)
+    mode: FailureMode
+    failures: int = Field(ge=1, le=20)
+    error_code: str = Field(min_length=3, max_length=100)
+class TicketRecord(StrictModel):
+    ticket_id: str = Field(pattern=r"^TKT-[0-9]{4}$")
+    status: str
+    category: str
+    summary: str
+    version: int = Field(ge=1)
+class SyntheticCaseFixture(StrictModel):
+    case_id: str = Field(pattern=r"^case_[a-zA-Z0-9_-]+$")
+    tickets: list[TicketRecord] = Field(default_factory=list)
+    access_accounts: list[AccessAccountRecord] = Field(default_factory=list)
+    fault_plans: list[FaultPlan] = Field(default_factory=list)
