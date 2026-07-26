@@ -6,6 +6,7 @@ from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Protocol
+from uuid import uuid4
 
 from app.core.version import DATABASE_SCHEMA_VERSION
 from app.persistence.models import (
@@ -268,6 +269,57 @@ class SqliteSyntheticRepository:
             ).fetchone()
         return self._ticket_from_row(updated), changed
 
+    def issue_refund(
+        self,
+        case_id: str,
+        ticket_id: str,
+        amount_minor: int,
+        currency: str,
+        idempotency_key: str,
+    ) -> tuple[RefundRecord | None, bool]:
+        with self._connect() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            existing = connection.execute(
+                """
+                SELECT refund_id, ticket_id, amount_minor, currency, status, idempotency_key
+                FROM refunds WHERE case_id = ? AND idempotency_key = ?
+                """,
+                (case_id, idempotency_key),
+            ).fetchone()
+            if existing is not None:
+                return self._refund_from_row(existing), False
+            ticket = connection.execute(
+                "SELECT 1 FROM tickets WHERE case_id = ? AND ticket_id = ?",
+                (case_id, ticket_id),
+            ).fetchone()
+            if ticket is None:
+                return None, False
+            refund_id = f"RFD-{uuid4().hex[:12].upper()}"
+            connection.execute(
+                """
+                INSERT INTO refunds(
+                    case_id, refund_id, ticket_id, amount_minor, currency, status,
+                    idempotency_key, created_at
+                ) VALUES (?, ?, ?, ?, ?, 'simulated_issued', ?, ?)
+                """,
+                (
+                    case_id,
+                    refund_id,
+                    ticket_id,
+                    amount_minor,
+                    currency,
+                    idempotency_key,
+                    datetime.now(UTC).isoformat(),
+                ),
+            )
+            row = connection.execute(
+                """
+                SELECT refund_id, ticket_id, amount_minor, currency, status, idempotency_key
+                FROM refunds WHERE case_id = ? AND refund_id = ?
+                """,
+                (case_id, refund_id),
+            ).fetchone()
+        return self._refund_from_row(row), True
     
     @staticmethod
     def _ticket_from_row(row: sqlite3.Row | None) -> TicketRecord | None:
