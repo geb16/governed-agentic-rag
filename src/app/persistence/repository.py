@@ -442,6 +442,33 @@ class SqliteSyntheticRepository:
             """,
             (case_id, plan.tool_name, plan.mode.value, plan.failures, plan.error_code),
         )
+    def consume_fault(self, case_id: str, tool_name: str) -> ConsumedFault | None:
+        with self._connect() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            row = connection.execute(
+                """
+                SELECT mode, failures_remaining, failures_consumed, error_code
+                FROM fault_plans WHERE case_id = ? AND tool_name = ?
+                """,
+                (case_id, tool_name),
+            ).fetchone()
+            if row is None or int(row["failures_remaining"]) <= 0:
+                return None
+            attempt_number = int(row["failures_consumed"]) + 1
+            connection.execute(
+                """
+                UPDATE fault_plans
+                SET failures_remaining = failures_remaining - 1,
+                    failures_consumed = failures_consumed + 1
+                WHERE case_id = ? AND tool_name = ?
+                """,
+                (case_id, tool_name),
+            )
+        return ConsumedFault(
+            mode=row["mode"],
+            error_code=row["error_code"],
+            attempt_number=attempt_number,
+        )
 
 
     @staticmethod
