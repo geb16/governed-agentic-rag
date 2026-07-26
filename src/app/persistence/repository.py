@@ -414,7 +414,17 @@ class SqliteSyntheticRepository:
             ).fetchone()
         return self._escalation_from_row(row), True
 
-
+    def set_fault_plan(self, case_id: str, plan: FaultPlan) -> None:
+        with self._connect() as connection:
+            if (
+                connection.execute(
+                    "SELECT 1 FROM synthetic_cases WHERE case_id = ?", (case_id,)
+                ).fetchone()
+                is None
+            ):
+                raise KeyError(f"Unknown synthetic case: {case_id}")
+            self._set_fault_plan(connection, case_id, plan)
+            
     @staticmethod
     def _ticket_from_row(row: sqlite3.Row | None) -> TicketRecord | None:
         if row is None:
