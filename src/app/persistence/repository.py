@@ -239,6 +239,35 @@ class SqliteSyntheticRepository:
             ).fetchone()
         return self._ticket_from_row(row)
 
+    def update_ticket_status(
+        self, case_id: str, ticket_id: str, new_status: str
+    ) -> tuple[TicketRecord | None, bool]:
+        with self._connect() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            row = connection.execute(
+                "SELECT status FROM tickets WHERE case_id = ? AND ticket_id = ?",
+                (case_id, ticket_id),
+            ).fetchone()
+            if row is None:
+                return None, False
+            changed = row["status"] != new_status
+            if changed:
+                connection.execute(
+                    """
+                    UPDATE tickets SET status = ?, version = version + 1
+                    WHERE case_id = ? AND ticket_id = ?
+                    """,
+                    (new_status, case_id, ticket_id),
+                )
+            updated = connection.execute(
+                """
+                SELECT ticket_id, status, category, summary, version
+                FROM tickets WHERE case_id = ? AND ticket_id = ?
+                """,
+                (case_id, ticket_id),
+            ).fetchone()
+        return self._ticket_from_row(updated), changed
+
     
     @staticmethod
     def _ticket_from_row(row: sqlite3.Row | None) -> TicketRecord | None:
