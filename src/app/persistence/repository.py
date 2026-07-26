@@ -426,3 +426,16 @@ class SqliteSyntheticRepository:
         if row is None:
             return None
         return AccessAccountRecord.model_validate(dict(row))
+
+
+    @staticmethod
+    def _refund_from_row(row: sqlite3.Row | None) -> RefundRecord | None:
+        if row is None:
+            return None
+        return RefundRecord.model_validate(dict(row))
+
+    @staticmethod
+    def _escalation_from_row(row: sqlite3.Row | None) -> EscalationRecord | None:
+        if row is None:
+            return None
+        return EscalationRecord.model_validate(dict(row))
