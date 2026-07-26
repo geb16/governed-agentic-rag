@@ -280,6 +280,35 @@ class SqliteSyntheticRepository:
             ).fetchone()
         return self._access_from_row(row)
     
+    def change_access_role(
+        self, case_id: str, subject_id: str, new_role: str
+    ) -> tuple[AccessAccountRecord | None, bool]:
+        with self._connect() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            row = connection.execute(
+                "SELECT role FROM access_accounts WHERE case_id = ? AND subject_id = ?",
+                (case_id, subject_id),
+            ).fetchone()
+            if row is None:
+                return None, False
+            changed = row["role"] != new_role
+            if changed:
+                connection.execute(
+                    """
+                    UPDATE access_accounts SET role = ?, version = version + 1
+                    WHERE case_id = ? AND subject_id = ?
+                    """,
+                    (new_role, case_id, subject_id),
+                )
+            updated = connection.execute(
+                """
+                SELECT subject_id, role, version FROM access_accounts
+                WHERE case_id = ? AND subject_id = ?
+                """,
+                (case_id, subject_id),
+            ).fetchone()
+        return self._access_from_row(updated), changed
+        
     def issue_refund(
         self,
         case_id: str,
