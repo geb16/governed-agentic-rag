@@ -227,3 +227,21 @@ class SqliteSyntheticRepository:
                 "SELECT 1 FROM synthetic_cases WHERE case_id = ?", (case_id,)
             ).fetchone()
         return row is not None
+
+    def get_ticket(self, case_id: str, ticket_id: str) -> TicketRecord | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                """
+                SELECT ticket_id, status, category, summary, version
+                FROM tickets WHERE case_id = ? AND ticket_id = ?
+                """,
+                (case_id, ticket_id),
+            ).fetchone()
+        return self._ticket_from_row(row)
+
+    
+    @staticmethod
+    def _ticket_from_row(row: sqlite3.Row | None) -> TicketRecord | None:
+        if row is None:
+            return None
+        return TicketRecord.model_validate(dict(row))
