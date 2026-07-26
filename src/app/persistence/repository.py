@@ -220,3 +220,10 @@ class SqliteSyntheticRepository:
             )
             for plan in fixture.fault_plans:
                 self._set_fault_plan(connection, fixture.case_id, plan)
+    
+    def case_exists(self, case_id: str) -> bool:
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT 1 FROM synthetic_cases WHERE case_id = ?", (case_id,)
+            ).fetchone()
+        return row is not None
