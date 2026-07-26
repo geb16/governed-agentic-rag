@@ -28,6 +28,16 @@ CREATE TABLE IF NOT EXISTS synthetic_cases (
     created_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS tickets (
+    case_id TEXT NOT NULL,
+    ticket_id TEXT NOT NULL,
+    status TEXT NOT NULL,
+    category TEXT NOT NULL,
+    summary TEXT NOT NULL,
+    version INTEGER NOT NULL,
+    PRIMARY KEY (case_id, ticket_id),
+    FOREIGN KEY (case_id) REFERENCES synthetic_cases(case_id) ON DELETE CASCADE
+);
 """
 
 class SyntheticRepository(Protocol):
