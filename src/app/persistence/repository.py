@@ -424,7 +424,26 @@ class SqliteSyntheticRepository:
             ):
                 raise KeyError(f"Unknown synthetic case: {case_id}")
             self._set_fault_plan(connection, case_id, plan)
-            
+
+    @staticmethod
+    def _set_fault_plan(
+        connection: sqlite3.Connection, case_id: str, plan: FaultPlan
+    ) -> None:
+        connection.execute(
+            """
+            INSERT INTO fault_plans(
+                case_id, tool_name, mode, failures_remaining, failures_consumed, error_code
+            ) VALUES (?, ?, ?, ?, 0, ?)
+            ON CONFLICT(case_id, tool_name) DO UPDATE SET
+                mode = excluded.mode,
+                failures_remaining = excluded.failures_remaining,
+                failures_consumed = 0,
+                error_code = excluded.error_code
+            """,
+            (case_id, plan.tool_name, plan.mode.value, plan.failures, plan.error_code),
+        )
+
+
     @staticmethod
     def _ticket_from_row(row: sqlite3.Row | None) -> TicketRecord | None:
         if row is None:
