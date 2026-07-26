@@ -308,7 +308,8 @@ class SqliteSyntheticRepository:
                 (case_id, subject_id),
             ).fetchone()
         return self._access_from_row(updated), changed
-        
+
+
     def issue_refund(
         self,
         case_id: str,
@@ -361,6 +362,59 @@ class SqliteSyntheticRepository:
             ).fetchone()
         return self._refund_from_row(row), True
     
+    def request_human_review(
+        self,
+        case_id: str,
+        ticket_id: str,
+        reason: str,
+        requested_role: str,
+        idempotency_key: str,
+    ) -> tuple[EscalationRecord | None, bool]:
+        with self._connect() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            existing = connection.execute(
+                """
+                SELECT escalation_id, ticket_id, reason, requested_role, status, idempotency_key
+                FROM escalations WHERE case_id = ? AND idempotency_key = ?
+                """,
+                (case_id, idempotency_key),
+            ).fetchone()
+            if existing is not None:
+                return self._escalation_from_row(existing), False
+            ticket = connection.execute(
+                "SELECT 1 FROM tickets WHERE case_id = ? AND ticket_id = ?",
+                (case_id, ticket_id),
+            ).fetchone()
+            if ticket is None:
+                return None, False
+            escalation_id = f"ESC-{uuid4().hex[:12].upper()}"
+            connection.execute(
+                """
+                INSERT INTO escalations(
+                    case_id, escalation_id, ticket_id, reason, requested_role, status,
+                    idempotency_key, created_at
+                ) VALUES (?, ?, ?, ?, ?, 'pending_human_review', ?, ?)
+                """,
+                (
+                    case_id,
+                    escalation_id,
+                    ticket_id,
+                    reason,
+                    requested_role,
+                    idempotency_key,
+                    datetime.now(UTC).isoformat(),
+                ),
+            )
+            row = connection.execute(
+                """
+                SELECT escalation_id, ticket_id, reason, requested_role, status, idempotency_key
+                FROM escalations WHERE case_id = ? AND escalation_id = ?
+                """,
+                (case_id, escalation_id),
+            ).fetchone()
+        return self._escalation_from_row(row), True
+
+
     @staticmethod
     def _ticket_from_row(row: sqlite3.Row | None) -> TicketRecord | None:
         if row is None:
