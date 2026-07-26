@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 from enum import StrEnum
 
-from app.domain.schemas import StrictModel
 from pydantic import Field
+
+from app.domain.schemas import StrictModel
 
 
 class FailureMode(StrEnum):
