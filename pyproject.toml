@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=80,<82"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "governed-agentic-rag"
 version = "0.1.0"
@@ -15,7 +19,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-  "httpx2>=2,<3",
+  "httpx>=0.28,<1",
   "mypy>=1.19,<2",
   "pytest>=9.0,<10",
   "pytest-cov>=7,<8",
