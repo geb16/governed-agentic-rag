@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import Field, SecretStr
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 from app.core.version import APP_VERSION
 
@@ -26,6 +26,13 @@ class Settings(BaseSettings):
     execution_profile: Literal["development", "test", "experiment"] = "development"
 
     log_level: str = "INFO"
+
+    api_key: SecretStr | None = None
+    allowed_hosts: Annotated[list[str], NoDecode] = Field(
+        default_factory=lambda: ["localhost", "127.0.0.1", "testserver"]
+    )
+    max_request_bytes: int = Field(default=32_768, ge=1_024, le=1_048_576)
+    max_query_chars: int = Field(default=4_000, ge=100, le=20_000)
 
     openai_api_key: SecretStr | None = None
     openai_model: str = "gpt-5.6"
