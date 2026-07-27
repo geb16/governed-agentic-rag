@@ -63,3 +63,26 @@ class BaselineAgent:
                 safety=SafetyResult(blocked=False),
                 error_code="synthetic_case_not_found",
             )
+
+        decision = self.input_guardrail.inspect(
+            request.query,
+            max_chars=self.settings.max_query_chars,
+        )
+        if decision.blocked:
+            log_execution(
+                logger,
+                ExecutionEvent.INPUT_BLOCKED,
+                trace_id=trace_id,
+                request_id=request.request_id,
+                category=decision.category,
+            )
+            return self._response(
+                request=request,
+                trace_id=trace_id,
+                status=AgentStatus.REFUSED,
+                answer=(
+                    "I cannot process this request because it conflicts with "
+                    "baseline safety controls."
+                ),
+                safety=SafetyResult(blocked=True, category=decision.category),
+            )
