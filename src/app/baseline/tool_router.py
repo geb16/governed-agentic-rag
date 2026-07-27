@@ -93,8 +93,7 @@ class ToolRouter:
             fault = self._fault_injector.consume(context.case_id, name)
             if fault is not None:
                 message = (
-                    f"Injected {fault.mode.value} on deterministic attempt "
-                    f"{fault.attempt_number}."
+                    f"Injected {fault.mode.value} on deterministic attempt {fault.attempt_number}."
                 )
                 outcome = ActionOutcome(
                     outcome_id=call_id,
@@ -127,3 +126,55 @@ class ToolRouter:
                     ),
                     record,
                 )
+
+        try:
+            result = tool.execute(arguments, context)
+            result_json = result.model_dump_json()
+            result_data = result.model_dump(mode="json")
+            chunks = [
+                RetrievedChunk.model_validate(item) for item in result_data.get("matches", [])
+            ]
+            summary = result_json[:500]
+            outcome = ActionOutcome(
+                outcome_id=call_id,
+                status=result.outcome_status,
+                case_id=context.case_id,
+                message=result.message,
+                state_changed=result.state_changed,
+            )
+            record = ToolCallRecord(
+                call_id=call_id,
+                tool_name=name,
+                status=ToolStatus.SUCCEEDED,
+                arguments=proposal.arguments,
+                result_summary=summary,
+                duration_ms=round((perf_counter() - started) * 1_000, 3),
+                proposal=proposal,
+                outcome=outcome,
+                evidence=result.evidence,
+            )
+            return ToolExecution(result_json, record, chunks)
+        except Exception:
+            outcome = ActionOutcome(
+                outcome_id=call_id,
+                status=ActionResultStatus.FAILED,
+                case_id=context.case_id,
+                message="Tool execution failed.",
+                state_changed=False,
+                error_code="tool_execution_failed",
+                retryable=False,
+            )
+            record = ToolCallRecord(
+                call_id=call_id,
+                tool_name=name,
+                status=ToolStatus.FAILED,
+                arguments=proposal.arguments,
+                result_summary="Tool execution failed",
+                duration_ms=round((perf_counter() - started) * 1_000, 3),
+                proposal=proposal,
+                outcome=outcome,
+            )
+            return ToolExecution(
+                '{"error":"tool_execution_failed"}',
+                record,
+            )
