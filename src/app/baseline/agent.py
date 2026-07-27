@@ -335,3 +335,21 @@ class BaselineAgent:
             usage=Usage(input_tokens=input_tokens, output_tokens=output_tokens),
             safety=SafetyResult(blocked=True, category=category),
         )
+
+    def _failed(
+        self,
+        request: BaselineRequest,
+        trace_id: str,
+        tool_calls: list[ToolCallRecord],
+        input_tokens: int,
+        output_tokens: int,
+    ) -> BaselineResponse:
+        return self._response(
+            request=request,
+            trace_id=trace_id,
+            status=AgentStatus.FAILED,
+            answer="The baseline could not complete the request.",
+            tool_calls=tool_calls,
+            usage=Usage(input_tokens=input_tokens, output_tokens=output_tokens),
+            safety=SafetyResult(blocked=False),
+        )
