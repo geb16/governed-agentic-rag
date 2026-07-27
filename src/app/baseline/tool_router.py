@@ -8,9 +8,13 @@ from typing import Any
 from pydantic import ValidationError
 
 from app.domain.schemas import (
+    ActionOutcome,
+    ActionProposal,
+    ActionResultStatus,
     RetrievedChunk,
     ToolCallRecord,
     ToolExecutionContext,
+    ToolStatus,
 )
 from app.tools.base import ControlledTool
 from app.tools.faults import FaultInjector
@@ -79,3 +83,47 @@ class ToolRouter:
                 context,
                 started,
             )
+
+        proposal = ActionProposal(
+            proposal_id=call_id,
+            action_type=name,
+            arguments=arguments.model_dump(mode="json"),
+        )
+        if self._fault_injector is not None:
+            fault = self._fault_injector.consume(context.case_id, name)
+            if fault is not None:
+                message = (
+                    f"Injected {fault.mode.value} on deterministic attempt "
+                    f"{fault.attempt_number}."
+                )
+                outcome = ActionOutcome(
+                    outcome_id=call_id,
+                    status=ActionResultStatus.FAILED,
+                    case_id=context.case_id,
+                    message=message,
+                    state_changed=False,
+                    error_code=fault.error_code,
+                    retryable=fault.retryable,
+                )
+                record = ToolCallRecord(
+                    call_id=call_id,
+                    tool_name=name,
+                    status=ToolStatus.FAILED,
+                    arguments=proposal.arguments,
+                    result_summary=message,
+                    duration_ms=round((perf_counter() - started) * 1_000, 3),
+                    proposal=proposal,
+                    outcome=outcome,
+                )
+                return ToolExecution(
+                    json.dumps(
+                        {
+                            "error": fault.error_code,
+                            "failure_mode": fault.mode.value,
+                            "retryable": fault.retryable,
+                            "attempt_number": fault.attempt_number,
+                        },
+                        separators=(",", ":"),
+                    ),
+                    record,
+                )
