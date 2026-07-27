@@ -64,6 +64,20 @@ class ToolExecutionContext(StrictModel):
     request_id: str
     requester_id: str
 
+class Citation(StrictModel):
+    chunk_id: str
+    document_id: str
+    title: str
+    score: float = Field(ge=0.0, le=1.0)
+
+
+class EvidenceReference(StrictModel):
+    evidence_id: str = Field(min_length=1, max_length=300)
+    evidence_type: EvidenceType
+    source_id: str = Field(min_length=1, max_length=300)
+    title: str = Field(min_length=1, max_length=300)
+    content_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
+    score: float | None = Field(default=None, ge=0.0, le=1.0)
 
 class ActionProposal(StrictModel):
     """A model-proposed tool action recorded before deterministic dispatch."""
@@ -118,3 +132,12 @@ class ModelTurn(StrictModel):
     continuation_items: list[dict[str, Any]] = Field(default_factory=list)
     input_tokens: int = Field(default=0, ge=0)
     output_tokens: int = Field(default=0, ge=0)
+
+class RetrievedChunk(StrictModel):
+    chunk_id: str
+    document_id: str
+    title: str
+    content: str
+    source_path: str
+    score: float = Field(ge=0.0, le=1.0)
+    content_sha256: str
