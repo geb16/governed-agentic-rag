@@ -4,7 +4,6 @@ import logging
 from typing import Any
 from uuid import uuid4
 
-from app.core.security import stable_safety_identifier
 from app.rag.retriever import Retriever
 
 from app.baseline.guardrails import InputGuardrail, OutputGuardrail
@@ -13,6 +12,7 @@ from app.baseline.prompts import SYSTEM_PROMPT, build_user_prompt
 from app.baseline.tool_router import ToolRouter
 from app.core.config import Settings
 from app.core.logging import log_execution
+from app.core.security import stable_safety_identifier
 from app.domain.events import ExecutionEvent
 from app.domain.schemas import (
     AgentStatus,
@@ -23,6 +23,7 @@ from app.domain.schemas import (
     RetrievedChunk,
     SafetyResult,
     ToolCallRecord,
+    ToolExecutionContext,
 )
 from app.persistence.repository import SyntheticRepository
 
@@ -153,6 +154,39 @@ class BaselineAgent:
                     proposed_tool_calls=len(turn.tool_calls),
                     has_final=turn.final is not None,
                 )
+
+                if len(turn.tool_calls) > 1 or (turn.tool_calls and turn.final is not None):
+                    return self._blocked_model_output(
+                        request,
+                        trace_id,
+                        tool_records,
+                        total_input_tokens,
+                        total_output_tokens,
+                        "invalid_model_turn",
+                    )
+
+                if turn.tool_calls:
+                    if len(tool_records) >= self.settings.max_tool_calls:
+                        return self._blocked_model_output(
+                            request,
+                            trace_id,
+                            tool_records,
+                            total_input_tokens,
+                            total_output_tokens,
+                            "tool_call_limit",
+                        )
+
+                    call = turn.tool_calls[0]
+                    execution = self.tool_router.execute(
+                        call_id=call.call_id,
+                        name=call.name,
+                        arguments_json=call.arguments_json,
+                        context=ToolExecutionContext(
+                            case_id=request.case_id,
+                            request_id=request.request_id,
+                            requester_id=request.requester_id,
+                        ),
+                    )
 
         except Exception:
             logger.exception(
