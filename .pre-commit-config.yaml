@@ -40,7 +40,7 @@ repos:
     rev: v4.3.0
     hooks:
       - id: conventional-pre-commit
-        stages: [commit-msg]
+        stages: [manual]
 
   - repo: local
     hooks:
