@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from time import perf_counter
 from typing import Any
 from uuid import uuid4
 
@@ -18,12 +19,14 @@ from app.domain.schemas import (
     AgentStatus,
     BaselineRequest,
     BaselineResponse,
+    Citation,
     EvidenceReference,
     EvidenceType,
     RetrievedChunk,
     SafetyResult,
     ToolCallRecord,
     ToolExecutionContext,
+    Usage,
 )
 from app.persistence.repository import SyntheticRepository
 
@@ -55,7 +58,7 @@ class BaselineAgent:
 
     def invoke(self, request: BaselineRequest) -> BaselineResponse:
         trace_id = f"trace_{uuid4().hex}"
-        
+        started = perf_counter()
         log_execution(
             logger,
             ExecutionEvent.REQUEST_RECEIVED,
@@ -214,7 +217,71 @@ class BaselineAgent:
                         }
                     )
                     continue
-                
+                if turn.final is None:
+                    return self._failed(
+                        request,
+                        trace_id,
+                        tool_records,
+                        total_input_tokens,
+                        total_output_tokens,
+                    )
+
+                output_decision = self.output_guardrail.inspect(
+                    turn.final,
+                    allowed_chunk_ids=set(available),
+                )
+                if output_decision.blocked:
+                    return self._blocked_model_output(
+                        request,
+                        trace_id,
+                        tool_records,
+                        total_input_tokens,
+                        total_output_tokens,
+                        output_decision.category or "output_guardrail",
+                    )
+                citations = [
+                    Citation(
+                        chunk_id=chunk_id,
+                        document_id=available[chunk_id].document_id,
+                        title=available[chunk_id].title,
+                        score=available[chunk_id].score,
+                    )
+                    for chunk_id in turn.final.cited_chunk_ids
+                ]
+                response_evidence = [
+                    available_evidence[chunk_id] for chunk_id in turn.final.cited_chunk_ids
+                ]
+                seen_evidence_ids = {item.evidence_id for item in response_evidence}
+                for record in tool_records:
+                    for evidence in record.evidence:
+                        if evidence.evidence_id not in seen_evidence_ids:
+                            response_evidence.append(evidence)
+                            seen_evidence_ids.add(evidence.evidence_id)
+                response = self._response(
+                    request=request,
+                    trace_id=trace_id,
+                    status=AgentStatus.COMPLETED,
+                    answer=turn.final.answer,
+                    citations=citations,
+                    evidence=response_evidence,
+                    tool_calls=tool_records,
+                    usage=Usage(
+                        input_tokens=total_input_tokens,
+                        output_tokens=total_output_tokens,
+                    ),
+                    safety=SafetyResult(blocked=False),
+                )
+                log_execution(
+                    logger,
+                    ExecutionEvent.REQUEST_COMPLETED,
+                    trace_id=trace_id,
+                    request_id=request.request_id,
+                    status=response.status,
+                    duration_ms=round((perf_counter() - started) * 1_000, 3), #🚩perf_counter
+                    tool_call_count=len(tool_records),
+                )
+                return response
+
         except Exception:
             logger.exception(
                 "Baseline invocation failed",
