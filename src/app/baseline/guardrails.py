@@ -15,6 +15,25 @@ _INPUT_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
             r"(instruction|message|rule|control)s?\b"
         ),
     ),
+
+    (
+        "prompt_extraction",
+        re.compile(
+            r"(?is)\b(reveal|repeat|print|show|expose)\b.{0,40}\b"
+            r"(system prompt|hidden instruction|developer message|internal prompt)s?\b"
+        ),
+    ),
+    (
+        "control_bypass",
+        re.compile(
+            r"(?is)\b(bypass|disable|override|evade)\b.{0,40}\b"
+            r"(guardrail|safety|security|policy control|tool restriction)s?\b"
+        ),
+    ),
+    (
+        "encoded_injection",
+        re.compile(r"SWdub3JlIGFsbCBwcmV2aW91cyBpbnN0cnVjdGlvbnM", re.IGNORECASE),
+    ),
 )
 
 @dataclass(frozen=True, slots=True)
