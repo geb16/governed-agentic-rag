@@ -19,4 +19,3 @@ class ControlledTool(Protocol[ArgumentsT]):
         arguments: ArgumentsT,
         context: ToolExecutionContext,
     ) -> ControlledToolResult: ...
-

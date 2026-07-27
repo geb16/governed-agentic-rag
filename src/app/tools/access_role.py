@@ -71,9 +71,7 @@ class ChangeAccessRoleTool:
             version=record.version,
             evidence=[
                 evidence_reference(
-                    evidence_id=(
-                        f"access:{context.case_id}:{record.subject_id}:v{record.version}"
-                    ),
+                    evidence_id=(f"access:{context.case_id}:{record.subject_id}:v{record.version}"),
                     evidence_type=EvidenceType.BUSINESS_RECORD,
                     source_id=record.subject_id,
                     title=f"Synthetic access account {record.subject_id}",

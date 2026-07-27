@@ -1,1 +1,1 @@
-""" Stricktly read-only allowlisted tools for the baseline agent. """
+"""Stricktly read-only allowlisted tools for the baseline agent."""

@@ -58,9 +58,7 @@ class TicketLookupTool:
             **payload,
             evidence=[
                 evidence_reference(
-                    evidence_id=(
-                        f"ticket:{context.case_id}:{record.ticket_id}:v{record.version}"
-                    ),
+                    evidence_id=(f"ticket:{context.case_id}:{record.ticket_id}:v{record.version}"),
                     evidence_type=EvidenceType.BUSINESS_RECORD,
                     source_id=record.ticket_id,
                     title=f"Synthetic ticket {record.ticket_id}",

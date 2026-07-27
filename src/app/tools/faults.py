@@ -6,7 +6,7 @@ from app.persistence.models import ConsumedFault
 from app.persistence.repository import SyntheticRepository
 
 
-# This class defines a protocol for fault injectors, which are responsible for 
+# This class defines a protocol for fault injectors, which are responsible for
 # consuming deterministic, case-scoped fault plans from shared state.
 class FaultInjector(Protocol):
     def consume(self, case_id: str, tool_name: str) -> ConsumedFault | None: ...
@@ -15,7 +15,7 @@ class FaultInjector(Protocol):
 class RepositoryFaultInjector:
     """
     Consumes deterministic, case-scoped fault plans from shared state.
-    
+
     """
 
     def __init__(self, repository: SyntheticRepository) -> None:
@@ -23,4 +23,3 @@ class RepositoryFaultInjector:
 
     def consume(self, case_id: str, tool_name: str) -> ConsumedFault | None:
         return self._repository.consume_fault(case_id, tool_name)
-
