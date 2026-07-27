@@ -17,10 +17,34 @@ dependencies = [
   "uvicorn[standard]>=0.41,<1",
 ]
 
+[project.scripts]
+dev-task = "dev_tools.dev_tasks:main"
+app = "dev_tools.dev_tasks:main"
+serve = "dev_tools.dev_tasks:serve_cli"
+lint = "dev_tools.dev_tasks:lint_cli"
+lint-fix = "dev_tools.dev_tasks:lint_fix_cli"
+format = "dev_tools.dev_tasks:format_cli"
+format-check = "dev_tools.dev_tasks:format_check_cli"
+format-write = "dev_tools.dev_tasks:format_write_cli"
+test = "dev_tools.dev_tasks:test_cli"
+test-smoke = "dev_tools.dev_tasks:test_smoke_cli"
+coverage = "dev_tools.dev_tasks:coverage_cli"
+typecheck = "dev_tools.dev_tasks:typecheck_cli"
+fix = "dev_tools.dev_tasks:fix_cli"
+check = "dev_tools.dev_tasks:check_cli"
+ci = "dev_tools.dev_tasks:ci_cli"
+doctor = "dev_tools.dev_tasks:doctor_cli"
+clean = "dev_tools.dev_tasks:clean_cli"
+precommit-lint = "dev_tools.dev_tasks:precommit_lint_cli"
+precommit-format = "dev_tools.dev_tasks:precommit_format_cli"
+precommit-check = "dev_tools.dev_tasks:precommit_check_cli"
+
+
 [dependency-groups]
 dev = [
   "httpx>=0.28,<1",
   "mypy>=1.19,<2",
+  "pre-commit>=4.4,<5",
   "pytest>=9.0,<10",
   "pytest-cov>=7,<8",
   "ruff>=0.15,<1",
@@ -33,6 +57,9 @@ where = ["src"]
 pythonpath = ["src"]
 testpaths = ["tests"]
 addopts = "-q --strict-config --strict-markers"
+markers = [
+  "smoke: fast tests covering critical application startup and behavior",
+]
 
 [tool.ruff]
 line-length = 100
@@ -44,5 +71,7 @@ select = ["E", "F", "I", "B", "UP", "RUF"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
-packages = ["app"]
+mypy_path = ["src"]
+files = ["src"]
+explicit_package_bases = true
 plugins = ["pydantic.mypy"]
