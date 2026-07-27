@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     environment: Literal["development", "test", "production"] = "development"
     execution_profile: Literal["development", "test", "experiment"] = "development"
     
+    log_level: str = "INFO"
+    
 
     openai_api_key: SecretStr | None = None
     openai_model: str = "gpt-5.6"
