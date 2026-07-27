@@ -146,6 +146,7 @@ class BaselineAgent:
                         ),
                     ),
                 )
+
                 total_input_tokens += turn.input_tokens
                 total_output_tokens += turn.output_tokens
                 log_execution(
@@ -299,4 +300,12 @@ class BaselineAgent:
                 tool_records,
                 total_input_tokens,
                 total_output_tokens,
-            )     
+            )  
+
+        return self._failed(
+            request,
+            trace_id,
+            tool_records,
+            total_input_tokens,
+            total_output_tokens,
+        )
