@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 from uuid import uuid4
 
 from app.rag.retriever import Retriever
 
 from app.baseline.guardrails import InputGuardrail, OutputGuardrail
 from app.baseline.model import AgentModel
+from app.baseline.prompts import build_user_prompt
 from app.baseline.tool_router import ToolRouter
 from app.core.config import Settings
 from app.core.logging import log_execution
@@ -15,6 +17,9 @@ from app.domain.schemas import (
     AgentStatus,
     BaselineRequest,
     BaselineResponse,
+    EvidenceReference,
+    EvidenceType,
+    RetrievedChunk,
     SafetyResult,
 )
 from app.persistence.repository import SyntheticRepository
@@ -86,3 +91,19 @@ class BaselineAgent:
                 ),
                 safety=SafetyResult(blocked=True, category=decision.category),
             )
+
+        normalized_request = request.model_copy(update={"query": decision.normalized_text})
+        chunks = self.retriever.retrieve(normalized_request.query)
+        available: dict[str, RetrievedChunk] = {chunk.chunk_id: chunk for chunk in chunks}
+        available_evidence: dict[str, EvidenceReference] = {
+            chunk.chunk_id: EvidenceReference(
+                evidence_id=chunk.chunk_id,
+                evidence_type=EvidenceType.KNOWLEDGE_CHUNK,
+                source_id=chunk.document_id,
+                title=chunk.title,
+                content_sha256=chunk.content_sha256,
+                score=chunk.score,
+            )
+            for chunk in chunks
+        }
+
