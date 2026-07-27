@@ -178,3 +178,46 @@ class ToolRouter:
                 '{"error":"tool_execution_failed"}',
                 record,
             )
+
+    @staticmethod
+    def _denied(
+        call_id: str,
+        name: str,
+        arguments: dict[str, Any],
+        summary: str,
+        error_code: str,
+        context: ToolExecutionContext,
+        started: float,
+    ) -> ToolExecution:
+
+        proposal = ActionProposal(
+            proposal_id=call_id,
+            action_type=name,
+            arguments=arguments,
+        )
+        outcome = ActionOutcome(
+            outcome_id=call_id,
+            status=ActionResultStatus.DENIED,
+            case_id=context.case_id,
+            message=summary,
+            state_changed=False,
+            error_code=error_code,
+            retryable=False,
+        )
+        record = ToolCallRecord(
+            call_id=call_id,
+            tool_name=name,
+            status=ToolStatus.DENIED,
+            arguments=arguments,
+            result_summary=summary,
+            duration_ms=round((perf_counter() - started) * 1_000, 3),
+            proposal=proposal,
+            outcome=outcome,
+        )
+        return ToolExecution(
+            json.dumps(
+                {"error": error_code, "retryable": False},
+                separators=(",", ":"),
+            ),
+            record,
+        )
