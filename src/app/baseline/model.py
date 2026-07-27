@@ -46,6 +46,10 @@ class OpenAIResponsesModel:
             max_retries=settings.model_max_retries,
         )
 
+    @property
+    def model_name(self) -> str:
+        return self._settings.openai_model
+
     def complete(
         self,
         *,
