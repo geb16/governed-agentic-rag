@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -62,3 +63,36 @@ class ToolExecutionContext(StrictModel):
     case_id: str = Field(pattern=r"^case_[a-zA-Z0-9_-]+$")
     request_id: str
     requester_id: str
+
+
+class ActionProposal(StrictModel):
+    """A model-proposed tool action recorded before deterministic dispatch."""
+
+    proposal_id: str
+    action_type: str
+    arguments: dict[str, Any]
+
+
+class ActionOutcome(StrictModel):
+    """Governance-neutral result from controlled simulated tool execution."""
+
+    outcome_id: str
+    status: ActionResultStatus
+    case_id: str
+    message: str = Field(min_length=1, max_length=500)
+    state_changed: bool
+    simulated: bool = True
+    error_code: str | None = None
+    retryable: bool = False
+
+
+class ToolCallRecord(StrictModel):
+    call_id: str
+    tool_name: str
+    status: ToolStatus
+    arguments: dict[str, Any]
+    result_summary: str = Field(max_length=500)
+    duration_ms: float = Field(ge=0.0)
+    proposal: ActionProposal
+    outcome: ActionOutcome
+    evidence: list[EvidenceReference] = Field(default_factory=list)
