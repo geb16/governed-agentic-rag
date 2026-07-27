@@ -188,6 +188,33 @@ class BaselineAgent:
                         ),
                     )
 
+                    tool_records.append(execution.record)
+                    available.update(
+                        (chunk.chunk_id, chunk) for chunk in execution.retrieved_chunks
+                    )
+                    available_evidence.update(
+                        (evidence.evidence_id, evidence)
+                        for evidence in execution.record.evidence
+                    )
+                    log_execution(
+                        logger,
+                        ExecutionEvent.TOOL_EXECUTED,
+                        trace_id=trace_id,
+                        request_id=request.request_id,
+                        tool_name=call.name,
+                        tool_status=execution.record.status,
+                        duration_ms=execution.record.duration_ms,
+                    )
+                    input_items.extend(turn.continuation_items)
+                    input_items.append(
+                        {
+                            "type": "function_call_output",
+                            "call_id": call.call_id,
+                            "output": execution.output_json,
+                        }
+                    )
+                    continue
+                
         except Exception:
             logger.exception(
                 "Baseline invocation failed",
