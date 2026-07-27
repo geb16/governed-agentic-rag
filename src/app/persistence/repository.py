@@ -89,6 +89,7 @@ CREATE TABLE IF NOT EXISTS fault_plans (
 );
 """
 
+
 class SyntheticRepository(Protocol):
     def initialize(self) -> None: ...
 
@@ -129,6 +130,7 @@ class SyntheticRepository(Protocol):
     def set_fault_plan(self, case_id: str, plan: FaultPlan) -> None: ...
 
     def consume_fault(self, case_id: str, tool_name: str) -> ConsumedFault | None: ...
+
 
 class SqliteSyntheticRepository:
     """SQLite implementation of isolated synthetic business state.
@@ -221,7 +223,7 @@ class SqliteSyntheticRepository:
             )
             for plan in fixture.fault_plans:
                 self._set_fault_plan(connection, fixture.case_id, plan)
-    
+
     def case_exists(self, case_id: str) -> bool:
         with self._connect() as connection:
             row = connection.execute(
@@ -268,7 +270,7 @@ class SqliteSyntheticRepository:
                 (case_id, ticket_id),
             ).fetchone()
         return self._ticket_from_row(updated), changed
-   
+
     def get_access_account(self, case_id: str, subject_id: str) -> AccessAccountRecord | None:
         with self._connect() as connection:
             row = connection.execute(
@@ -279,7 +281,7 @@ class SqliteSyntheticRepository:
                 (case_id, subject_id),
             ).fetchone()
         return self._access_from_row(row)
-    
+
     def change_access_role(
         self, case_id: str, subject_id: str, new_role: str
     ) -> tuple[AccessAccountRecord | None, bool]:
@@ -308,7 +310,6 @@ class SqliteSyntheticRepository:
                 (case_id, subject_id),
             ).fetchone()
         return self._access_from_row(updated), changed
-
 
     def issue_refund(
         self,
@@ -361,7 +362,7 @@ class SqliteSyntheticRepository:
                 (case_id, refund_id),
             ).fetchone()
         return self._refund_from_row(row), True
-    
+
     def request_human_review(
         self,
         case_id: str,
@@ -426,9 +427,7 @@ class SqliteSyntheticRepository:
             self._set_fault_plan(connection, case_id, plan)
 
     @staticmethod
-    def _set_fault_plan(
-        connection: sqlite3.Connection, case_id: str, plan: FaultPlan
-    ) -> None:
+    def _set_fault_plan(connection: sqlite3.Connection, case_id: str, plan: FaultPlan) -> None:
         connection.execute(
             """
             INSERT INTO fault_plans(
@@ -442,6 +441,7 @@ class SqliteSyntheticRepository:
             """,
             (case_id, plan.tool_name, plan.mode.value, plan.failures, plan.error_code),
         )
+
     def consume_fault(self, case_id: str, tool_name: str) -> ConsumedFault | None:
         with self._connect() as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -470,7 +470,6 @@ class SqliteSyntheticRepository:
             attempt_number=attempt_number,
         )
 
-
     @staticmethod
     def _ticket_from_row(row: sqlite3.Row | None) -> TicketRecord | None:
         if row is None:
@@ -482,7 +481,6 @@ class SqliteSyntheticRepository:
         if row is None:
             return None
         return AccessAccountRecord.model_validate(dict(row))
-
 
     @staticmethod
     def _refund_from_row(row: sqlite3.Row | None) -> RefundRecord | None:

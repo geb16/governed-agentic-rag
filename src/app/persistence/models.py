@@ -26,6 +26,8 @@ class RefundRecord(StrictModel):
     currency: str
     status: str
     idempotency_key: str
+
+
 class EscalationRecord(StrictModel):
     escalation_id: str
     ticket_id: str
@@ -33,6 +35,8 @@ class EscalationRecord(StrictModel):
     requested_role: str
     status: str
     idempotency_key: str
+
+
 class FaultPlan(StrictModel):
     tool_name: str = Field(min_length=1, max_length=100)
     mode: FailureMode
@@ -47,6 +51,7 @@ class TicketRecord(StrictModel):
     summary: str
     version: int = Field(ge=1)
 
+
 class ConsumedFault(StrictModel):
     mode: FailureMode
     error_code: str
@@ -55,11 +60,14 @@ class ConsumedFault(StrictModel):
     @property
     def retryable(self) -> bool:
         return self.mode in {FailureMode.TRANSIENT_ERROR, FailureMode.TIMEOUT}
+
+
 class SyntheticCaseFixture(StrictModel):
     case_id: str = Field(pattern=r"^case_[a-zA-Z0-9_-]+$")
     tickets: list[TicketRecord] = Field(default_factory=list)
     access_accounts: list[AccessAccountRecord] = Field(default_factory=list)
     fault_plans: list[FaultPlan] = Field(default_factory=list)
+
 
 DEFAULT_CASE_FIXTURE = SyntheticCaseFixture(
     case_id="case_default",

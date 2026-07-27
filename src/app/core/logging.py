@@ -15,6 +15,7 @@ _SECRET_KEY_PATTERN = re.compile(
     r"(?i)^(api[_-]?key|authorization|password|secret|access[_-]?token|refresh[_-]?token)$"
 )
 
+
 # Redact sensitive information in logs and JSON output
 def _redact(value: Any) -> Any:
     if isinstance(value, dict):
@@ -55,5 +56,3 @@ def configure_logging(settings: Settings) -> None:
     root.handlers.clear()
     root.addHandler(handler)
     root.setLevel(settings.log_level.upper())
-
-
