@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import UTC, datetime
 from time import perf_counter
 from typing import Any
 from uuid import uuid4
@@ -118,7 +119,7 @@ class BaselineAgent:
             ExecutionEvent.RETRIEVAL_COMPLETED,
             trace_id=trace_id,
             request_id=request.request_id,
-            backend=self.retriever.backend_name,
+            backend=self.retriever.backend_name, # placeholder for retriever backend name
             result_count=len(chunks),
         )
         input_items: list[dict[str, Any]] = [
@@ -352,4 +353,35 @@ class BaselineAgent:
             tool_calls=tool_calls,
             usage=Usage(input_tokens=input_tokens, output_tokens=output_tokens),
             safety=SafetyResult(blocked=False),
+        )
+
+    def _response(
+        self,
+        *,
+        request: BaselineRequest,
+        trace_id: str,
+        status: AgentStatus,
+        answer: str,
+        citations: list[Citation] | None = None,
+        evidence: list[EvidenceReference] | None = None,
+        tool_calls: list[ToolCallRecord] | None = None,
+        usage: Usage | None = None,
+        safety: SafetyResult,
+        error_code: str | None = None,
+    ) -> BaselineResponse:
+        return BaselineResponse(
+            request_id=request.request_id,
+            case_id=request.case_id,
+            trace_id=trace_id,
+            status=status,
+            answer=answer,
+            citations=citations or [],
+            evidence=evidence or [],
+            tool_calls=tool_calls or [],
+            retrieval_backend=self.retriever.backend_name,
+            model=self.model.model_name,
+            usage=usage or Usage(),
+            safety=safety,
+            error_code=error_code,
+            created_at=datetime.now(UTC),
         )
