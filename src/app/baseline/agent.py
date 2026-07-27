@@ -4,11 +4,12 @@ import logging
 from typing import Any
 from uuid import uuid4
 
+from app.core.security import stable_safety_identifier
 from app.rag.retriever import Retriever
 
 from app.baseline.guardrails import InputGuardrail, OutputGuardrail
 from app.baseline.model import AgentModel
-from app.baseline.prompts import build_user_prompt
+from app.baseline.prompts import SYSTEM_PROMPT, build_user_prompt
 from app.baseline.tool_router import ToolRouter
 from app.core.config import Settings
 from app.core.logging import log_execution
@@ -21,6 +22,7 @@ from app.domain.schemas import (
     EvidenceType,
     RetrievedChunk,
     SafetyResult,
+    ToolCallRecord,
 )
 from app.persistence.repository import SyntheticRepository
 
@@ -107,3 +109,66 @@ class BaselineAgent:
             for chunk in chunks
         }
 
+        log_execution(
+            logger,
+            ExecutionEvent.RETRIEVAL_COMPLETED,
+            trace_id=trace_id,
+            request_id=request.request_id,
+            backend=self.retriever.backend_name,
+            result_count=len(chunks),
+        )
+        input_items: list[dict[str, Any]] = [
+            {
+                "role": "user",
+                "content": build_user_prompt(normalized_request, chunks),
+            }
+        ]
+        tool_records: list[ToolCallRecord] = []
+        total_input_tokens = 0
+        total_output_tokens = 0
+
+        try:
+            for turn_index in range(1, self.settings.max_agent_turns + 1):
+                turn = self.model.complete(
+                    input_items=input_items,
+                    instructions=SYSTEM_PROMPT,
+                    tools=self.tool_router.specs,
+                    safety_identifier=stable_safety_identifier(
+                        request.requester_id,
+                        (
+                            self.settings.api_key.get_secret_value()
+                            if self.settings.api_key is not None
+                            else "phase3-development-only"
+                        ),
+                    ),
+                )
+                total_input_tokens += turn.input_tokens
+                total_output_tokens += turn.output_tokens
+                log_execution(
+                    logger,
+                    ExecutionEvent.MODEL_TURN_COMPLETED,
+                    trace_id=trace_id,
+                    request_id=request.request_id,
+                    turn=turn_index,
+                    proposed_tool_calls=len(turn.tool_calls),
+                    has_final=turn.final is not None,
+                )
+
+        except Exception:
+            logger.exception(
+                "Baseline invocation failed",
+                extra={
+                    "context": {
+                        "event": ExecutionEvent.REQUEST_FAILED,
+                        "trace_id": trace_id,
+                        "request_id": request.request_id,
+                    }
+                },
+            )
+            return self._failed(
+                request,
+                trace_id,
+                tool_records,
+                total_input_tokens,
+                total_output_tokens,
+            )     
