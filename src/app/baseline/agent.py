@@ -309,3 +309,29 @@ class BaselineAgent:
             total_input_tokens,
             total_output_tokens,
         )
+
+    def _blocked_model_output(
+        self,
+        request: BaselineRequest,
+        trace_id: str,
+        tool_calls: list[ToolCallRecord],
+        input_tokens: int,
+        output_tokens: int,
+        category: str,
+    ) -> BaselineResponse:
+        log_execution(
+            logger,
+            ExecutionEvent.OUTPUT_BLOCKED,
+            trace_id=trace_id,
+            request_id=request.request_id,
+            category=category,
+        )
+        return self._response(
+            request=request,
+            trace_id=trace_id,
+            status=AgentStatus.REFUSED,
+            answer="The model output did not pass baseline safety validation.",
+            tool_calls=tool_calls,
+            usage=Usage(input_tokens=input_tokens, output_tokens=output_tokens),
+            safety=SafetyResult(blocked=True, category=category),
+        )
