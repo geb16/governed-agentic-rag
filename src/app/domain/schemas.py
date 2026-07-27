@@ -71,14 +71,6 @@ class Citation(StrictModel):
     score: float = Field(ge=0.0, le=1.0)
 
 
-class EvidenceReference(StrictModel):
-    evidence_id: str = Field(min_length=1, max_length=300)
-    evidence_type: EvidenceType
-    source_id: str = Field(min_length=1, max_length=300)
-    title: str = Field(min_length=1, max_length=300)
-    content_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
-    score: float | None = Field(default=None, ge=0.0, le=1.0)
-
 class ActionProposal(StrictModel):
     """A model-proposed tool action recorded before deterministic dispatch."""
 
