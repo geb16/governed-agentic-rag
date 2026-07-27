@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from typing import Literal
 
-from app.core.constants import APP_VERSION
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from app.core.version import APP_VERSION
 
 
 class Settings(BaseSettings):
