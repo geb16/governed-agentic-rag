@@ -4,6 +4,8 @@ import re
 import unicodedata
 from dataclasses import dataclass
 
+from app.domain.schemas import AgentDraft
+
 _CONTROL_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 
 _INPUT_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
@@ -36,6 +38,19 @@ _INPUT_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
     ),
 )
 
+_OUTPUT_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
+    
+    ("active_content", re.compile(r"(?is)<\s*(script|iframe|object|img)\b")),
+    (
+        "secret_like_output",
+        re.compile(r"(?i)\b(api[_-]?key|password|secret|bearer token)\s*[=:]\s*\S+"),
+    ),
+    (
+        "prompt_leakage",
+        re.compile(r"(?is)\b(system prompt|developer message)\b.{0,20}\b(is|says|contains)\b"),
+    ),
+)
+
 @dataclass(frozen=True, slots=True)
 class GuardrailDecision:
     blocked: bool
@@ -58,3 +73,20 @@ class InputGuardrail:
         return GuardrailDecision(False, normalized_text=normalized)
 
 
+class OutputGuardrail:
+    def inspect(
+        self,
+        draft: AgentDraft,
+        *,
+        allowed_chunk_ids: set[str],
+    ) -> GuardrailDecision:
+        if len(set(draft.cited_chunk_ids)) != len(draft.cited_chunk_ids):
+            return GuardrailDecision(True, "duplicate_citation")
+        if not set(draft.cited_chunk_ids).issubset(allowed_chunk_ids):
+            return GuardrailDecision(True, "fabricated_citation")
+        if draft.grounded and not draft.cited_chunk_ids:
+            return GuardrailDecision(True, "missing_citation")
+        for category, pattern in _OUTPUT_RULES:
+            if pattern.search(draft.answer):
+                return GuardrailDecision(True, category)
+        return GuardrailDecision(False, normalized_text=draft.answer)
