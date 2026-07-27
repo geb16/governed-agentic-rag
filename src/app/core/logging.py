@@ -30,7 +30,7 @@ def _redact(value: Any) -> Any:
         return _SECRET_PATTERN.sub(r"\1\2[REDACTED]", escaped)
     return value
 
-
+# Custom JSON formatter for logging
 class JsonFormatter(logging.Formatter):
     """One-line JSON logs suitable for collection without recording prompt bodies."""
 
@@ -56,3 +56,4 @@ def configure_logging(settings: Settings) -> None:
     root.handlers.clear()
     root.addHandler(handler)
     root.setLevel(settings.log_level.upper())
+
