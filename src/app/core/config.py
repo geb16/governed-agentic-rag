@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import lru_cache
 from typing import Literal
 
 from pydantic import Field, SecretStr
@@ -33,3 +34,7 @@ class Settings(BaseSettings):
     model_max_retries: int = Field(default=2, ge=0, le=5)
     model_max_output_tokens: int = Field(default=1_200, ge=128, le=8_192)
     max_agent_turns: int = Field(default=4, ge=1, le=8)
+
+@lru_cache(maxsize=1)
+def get_settings() -> Settings:
+    return Settings()
