@@ -36,6 +36,11 @@ class IssueRefundResult(ControlledToolResult):
 
 class IssueRefundTool:
     name = "issue_refund"
+    description = (
+        "Issue a refund only in the isolated synthetic ledger. This tool does not enforce "
+        "business approval policy; the baseline agent must interpret retrieved policy and may "
+        "request human review. No real payment is made."
+    )
     input_model = IssueRefundArguments
 
     def __init__(self, repository: SyntheticRepository) -> None:
