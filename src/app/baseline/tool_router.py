@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from time import perf_counter
 from typing import Any
 
 from app.domain.tool import ControlledTool
@@ -9,6 +10,7 @@ from app.domain.tool_router import FaultInjector
 from app.domain.schemas import (
     RetrievedChunk,
     ToolCallRecord,
+    ToolExecutionContext,
 )
 
 
@@ -23,7 +25,7 @@ class ToolExecution:
 
 class ToolRouter:
     """
-    Allowlist dispatcher. The model proposes calls; 
+    Allowlist dispatcher. The model proposes calls;
     And deterministic code authorizes them.
     """
 
@@ -38,3 +40,24 @@ class ToolRouter:
             raise ValueError("Tool names must be unique")
         self._tools = {tool.name: tool for tool in tools}
         self._fault_injector = fault_injector
+
+    def execute(
+        self,
+        *,
+        call_id: str,
+        name: str,
+        arguments_json: str,
+        context: ToolExecutionContext,
+    ) -> ToolExecution:
+        started = perf_counter()
+        tool = self._tools.get(name)
+        if tool is None:
+            return self._denied(
+                call_id,
+                name,
+                {},
+                "Tool is not in the allowlist",
+                "tool_not_allowlisted",
+                context,
+                started,
+            )
