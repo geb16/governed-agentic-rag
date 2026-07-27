@@ -1,17 +1,19 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, field
 from time import perf_counter
 from typing import Any
 
-from app.domain.tool import ControlledTool
-from app.domain.tool_router import FaultInjector
+from pydantic import ValidationError
 
 from app.domain.schemas import (
     RetrievedChunk,
     ToolCallRecord,
     ToolExecutionContext,
 )
+from app.tools.base import ControlledTool
+from app.tools.faults import FaultInjector
 
 
 # ToolEXecution dataclass to hold the output of a tool execution,
@@ -58,6 +60,22 @@ class ToolRouter:
                 {},
                 "Tool is not in the allowlist",
                 "tool_not_allowlisted",
+                context,
+                started,
+            )
+
+        try:
+            parsed_json = json.loads(arguments_json)
+            if not isinstance(parsed_json, dict):
+                raise ValueError("Tool arguments must be a JSON object")
+            arguments = tool.input_model.model_validate(parsed_json)
+        except (json.JSONDecodeError, ValidationError, ValueError):
+            return self._denied(
+                call_id,
+                name,
+                {},
+                "Tool arguments failed validation",
+                "tool_arguments_invalid",
                 context,
                 started,
             )
