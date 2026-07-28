@@ -6,8 +6,6 @@ from time import perf_counter
 from typing import Any
 from uuid import uuid4
 
-from app.rag.retriever import Retriever
-
 from app.baseline.guardrails import InputGuardrail, OutputGuardrail
 from app.baseline.model import AgentModel
 from app.baseline.prompts import SYSTEM_PROMPT, build_user_prompt
@@ -30,14 +28,14 @@ from app.domain.schemas import (
     Usage,
 )
 from app.persistence.repository import SyntheticRepository
+from app.rag.retriever import Retriever
 
 logger = logging.getLogger(__name__)
 
 
-# BaselineAgent  orchestrates the RAG process, including retrieval, model interaction, 
+# BaselineAgent  orchestrates the RAG process, including retrieval, model interaction,
 # tool execution, and guardrail enforcement.
 class BaselineAgent:
-
     def __init__(
         self,
         *,
@@ -119,7 +117,7 @@ class BaselineAgent:
             ExecutionEvent.RETRIEVAL_COMPLETED,
             trace_id=trace_id,
             request_id=request.request_id,
-            backend=self.retriever.backend_name, # placeholder for retriever backend name
+            backend=self.retriever.backend_name,  # placeholder for retriever backend name
             result_count=len(chunks),
         )
         input_items: list[dict[str, Any]] = [
@@ -198,8 +196,7 @@ class BaselineAgent:
                         (chunk.chunk_id, chunk) for chunk in execution.retrieved_chunks
                     )
                     available_evidence.update(
-                        (evidence.evidence_id, evidence)
-                        for evidence in execution.record.evidence
+                        (evidence.evidence_id, evidence) for evidence in execution.record.evidence
                     )
                     log_execution(
                         logger,
@@ -279,7 +276,7 @@ class BaselineAgent:
                     trace_id=trace_id,
                     request_id=request.request_id,
                     status=response.status,
-                    duration_ms=round((perf_counter() - started) * 1_000, 3), #🚩perf_counter
+                    duration_ms=round((perf_counter() - started) * 1_000, 3),  # 🚩perf_counter
                     tool_call_count=len(tool_records),
                 )
                 return response
@@ -301,7 +298,7 @@ class BaselineAgent:
                 tool_records,
                 total_input_tokens,
                 total_output_tokens,
-            )  
+            )
 
         return self._failed(
             request,
