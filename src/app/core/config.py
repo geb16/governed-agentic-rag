@@ -57,6 +57,13 @@ class Settings(BaseSettings):
     qdrant_collection: str = "phase3_enterprise_kb"
     qdrant_timeout_seconds: int = Field(default=10, ge=1, le=60)
 
+    synthetic_database_path: Path = Path("data/runtime/synthetic-support.db")
+    experiment_run_id: str | None = Field(
+        default=None,
+        pattern=r"^run_[a-zA-Z0-9_-]+$",
+    )
+    experiment_manifest_dir: Path = Path("artifacts/runs")
+
     @field_validator("allowed_hosts", mode="before")
     @classmethod
     def parse_allowed_hosts(cls, value: object) -> object:
