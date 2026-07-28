@@ -66,11 +66,13 @@ class ToolExecutionContext(StrictModel):
     request_id: str
     requester_id: str
 
+
 class Citation(StrictModel):
     chunk_id: str
     document_id: str
     title: str
     score: float = Field(ge=0.0, le=1.0)
+
 
 class TaskRequest(StrictModel):
     """Governance-neutral request shared by both experimental conditions."""
@@ -90,8 +92,10 @@ class TaskRequest(StrictModel):
             raise ValueError("query must contain at least two words")
         return value
 
+
 class BaselineRequest(TaskRequest):
     """Phase 3 API name for the shared task request contract."""
+
 
 class ActionProposal(StrictModel):
     """A model-proposed tool action recorded before deterministic dispatch."""
@@ -147,6 +151,7 @@ class ModelTurn(StrictModel):
     input_tokens: int = Field(default=0, ge=0)
     output_tokens: int = Field(default=0, ge=0)
 
+
 class RetrievedChunk(StrictModel):
     chunk_id: str
     document_id: str
@@ -155,10 +160,12 @@ class RetrievedChunk(StrictModel):
     source_path: str
     score: float = Field(ge=0.0, le=1.0)
     content_sha256: str
-    
+
+
 class Usage(StrictModel):
     input_tokens: int = Field(default=0, ge=0)
     output_tokens: int = Field(default=0, ge=0)
+
 
 class HealthResponse(StrictModel):
     service: str
