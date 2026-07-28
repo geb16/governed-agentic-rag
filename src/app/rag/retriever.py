@@ -91,7 +91,6 @@ class KnowledgeRetriever:
             if score >= self.settings.retrieval_min_score
         ]
 
-
     def retrieve(self, query: str, top_k: int | None = None) -> list[RetrievedChunk]:
         limit = min(top_k or self.settings.retrieval_top_k, 10)
         if self._vector_store is not None:
@@ -101,3 +100,8 @@ class KnowledgeRetriever:
                 if result.score >= self.settings.retrieval_min_score
             ]
         return self._lexical_search(query, limit)
+
+    # Chunk count property  to provide the number of chunks in the kb
+    @property
+    def chunk_count(self) -> int:
+        return len(self._chunks)
