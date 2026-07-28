@@ -5,7 +5,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Annotated, Literal
 
-from pydantic import Field, SecretStr, field_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 from app.core.version import APP_VERSION
@@ -76,6 +76,33 @@ class Settings(BaseSettings):
                 return decoded
             return [item.strip() for item in stripped.split(",") if item.strip()]
         return value
+
+    @model_validator(mode="after")
+    def validate_security_configuration(self) -> Settings:
+        if self.chunk_overlap_chars >= self.chunk_size_chars:
+            raise ValueError("chunk_overlap_chars must be smaller than chunk_size_chars")
+        if self.environment == "production":
+            if self.api_key is None or not self.api_key.get_secret_value():
+                raise ValueError("RAG_API_KEY is required in production")
+            if self.openai_api_key is None or not self.openai_api_key.get_secret_value():
+                raise ValueError("RAG_OPENAI_API_KEY is required in production")
+            if "*" in self.allowed_hosts:
+                raise ValueError("Wildcard hosts are not allowed in production")
+            if self.retrieval_backend == "qdrant":
+                if self.qdrant_url is None or not self.qdrant_url.lower().startswith("https://"):
+                    raise ValueError("Production Qdrant connections must use HTTPS")
+                if self.qdrant_read_api_key is None:
+                    raise ValueError("RAG_QDRANT_READ_API_KEY is required in production")
+        if self.retrieval_backend == "qdrant" and not self.qdrant_url:
+            raise ValueError("RAG_QDRANT_URL is required for the qdrant retrieval backend")
+        if self.execution_profile == "experiment":
+            if self.retrieval_backend != "qdrant":
+                raise ValueError("The experiment profile requires RAG_RETRIEVAL_BACKEND=qdrant")
+            if self.openai_api_key is None or not self.openai_api_key.get_secret_value():
+                raise ValueError("The experiment profile requires RAG_OPENAI_API_KEY")
+            if self.experiment_run_id is None:
+                raise ValueError("The experiment profile requires RAG_EXPERIMENT_RUN_ID")
+        return self
 
 
 @lru_cache(maxsize=1)
