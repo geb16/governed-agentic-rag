@@ -58,6 +58,7 @@ def configure_logging(settings: Settings) -> None:
     root.addHandler(handler)
     root.setLevel(settings.log_level.upper())
 
+
 def log_execution(logger: logging.Logger, event: str, **context: Any) -> None:
     """Emit an operational execution record, not a durable audit event."""
 

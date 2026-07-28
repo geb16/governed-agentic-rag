@@ -43,6 +43,7 @@ class Settings(BaseSettings):
     max_agent_turns: int = Field(default=4, ge=1, le=8)
     max_tool_calls: int = Field(default=3, ge=0, le=8)
 
+
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     return Settings()
