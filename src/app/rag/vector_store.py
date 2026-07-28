@@ -37,6 +37,10 @@ class QdrantVectorStore:
         self._collection = settings.qdrant_collection
         self._embeddings = embeddings
 
+    # Implementing a simple readiness check Qdrant collection existence.
+    def is_ready(self) -> bool:
+        return self._client.collection_exists(self._collection)
+
     def replace(self, chunks: list[KnowledgeChunk]) -> int:
         vectors = self._embeddings.embed([f"{chunk.title}\n\n{chunk.content}" for chunk in chunks])
         if len(vectors) != len(chunks) or not vectors:
