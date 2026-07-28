@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from functools import lru_cache
+from pathlib import Path
 from typing import Annotated, Literal
 
 from pydantic import Field, SecretStr, field_validator
@@ -43,6 +44,19 @@ class Settings(BaseSettings):
     model_max_output_tokens: int = Field(default=1_200, ge=128, le=8_192)
     max_agent_turns: int = Field(default=4, ge=1, le=8)
     max_tool_calls: int = Field(default=3, ge=0, le=8)
+
+
+    knowledge_base_dir: Path = Path("data/knowledge_base")
+    chunk_size_chars: int = Field(default=1_200, ge=300, le=4_000)
+    chunk_overlap_chars: int = Field(default=160, ge=0, le=800)
+    retrieval_top_k: int = Field(default=4, ge=1, le=10)
+    retrieval_min_score: float = Field(default=0.01, ge=0.0, le=1.0)
+    retrieval_backend: Literal["lexical", "qdrant"] = "lexical"
+    qdrant_url: str | None = None
+    qdrant_read_api_key: SecretStr | None = None
+    qdrant_admin_api_key: SecretStr | None = None
+    qdrant_collection: str = "phase3_enterprise_kb"
+    qdrant_timeout_seconds: int = Field(default=10, ge=1, le=60)
 
     @field_validator("allowed_hosts", mode="before")
     @classmethod
