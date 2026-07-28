@@ -167,6 +167,29 @@ class Usage(StrictModel):
     output_tokens: int = Field(default=0, ge=0)
 
 
+class SafetyResult(StrictModel):
+    blocked: bool
+    category: str | None = None
+
+
+# baselineResponse is the Phase 3 API response schema for the shared task contract.
+class BaselineResponse(StrictModel):
+    request_id: str
+    case_id: str
+    trace_id: str
+    status: AgentStatus
+    answer: str
+    citations: list[Citation] = Field(default_factory=list)
+    evidence: list[EvidenceReference] = Field(default_factory=list)
+    tool_calls: list[ToolCallRecord] = Field(default_factory=list)
+    retrieval_backend: str
+    model: str
+    usage: Usage = Field(default_factory=Usage)
+    safety: SafetyResult
+    error_code: str | None = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+
 class HealthResponse(StrictModel):
     service: str
     version: str
