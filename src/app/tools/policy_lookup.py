@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from app.rag.retriever import Retriever
 from pydantic import Field
 
 from app.domain.schemas import (
@@ -11,6 +10,7 @@ from app.domain.schemas import (
     StrictModel,
     ToolExecutionContext,
 )
+from app.rag.retriever import Retriever
 
 
 class PolicyLookupArguments(StrictModel):
