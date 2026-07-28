@@ -13,7 +13,7 @@ from app.core.logging import configure_logging
 logger = logging.getLogger(__name__)
 
 
-# create_app function initializes the FastAPI application  
+# create_app function initializes the FastAPI application
 def create_app(settings: Settings | None = None) -> FastAPI:
     resolved_settings = settings or get_settings()
     configure_logging(resolved_settings)
