@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import json
 from functools import lru_cache
 from typing import Annotated, Literal
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 from app.core.version import APP_VERSION
@@ -43,6 +44,18 @@ class Settings(BaseSettings):
     max_agent_turns: int = Field(default=4, ge=1, le=8)
     max_tool_calls: int = Field(default=3, ge=0, le=8)
 
+    @field_validator("allowed_hosts", mode="before")
+    @classmethod
+    def parse_allowed_hosts(cls, value: object) -> object:
+        if isinstance(value, str):
+            stripped = value.strip()
+            if stripped.startswith("["):
+                decoded = json.loads(stripped)
+                if not isinstance(decoded, list):
+                    raise ValueError("allowed_hosts JSON value must be an array")
+                return decoded
+            return [item.strip() for item in stripped.split(",") if item.strip()]
+        return value
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
