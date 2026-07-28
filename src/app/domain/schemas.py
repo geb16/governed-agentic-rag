@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from enum import StrEnum
-from typing import Any
+from typing import Any, Literal
+from uuid import uuid4
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class StrictModel(BaseModel):
@@ -70,6 +72,26 @@ class Citation(StrictModel):
     title: str
     score: float = Field(ge=0.0, le=1.0)
 
+class TaskRequest(StrictModel):
+    """Governance-neutral request shared by both experimental conditions."""
+
+    request_id: str = Field(
+        default_factory=lambda: f"req_{uuid4().hex}",
+        pattern=r"^req_[a-zA-Z0-9_-]+$",
+    )
+    case_id: str = Field(default="case_default", pattern=r"^case_[a-zA-Z0-9_-]+$")
+    requester_id: str = Field(min_length=2, max_length=128)
+    query: str = Field(min_length=5, max_length=4_000)
+
+    @field_validator("query")
+    @classmethod
+    def require_meaningful_query(cls, value: str) -> str:
+        if len(value.split()) < 2:
+            raise ValueError("query must contain at least two words")
+        return value
+
+class BaselineRequest(TaskRequest):
+    """Phase 3 API name for the shared task request contract."""
 
 class ActionProposal(StrictModel):
     """A model-proposed tool action recorded before deterministic dispatch."""
@@ -137,3 +159,9 @@ class RetrievedChunk(StrictModel):
 class Usage(StrictModel):
     input_tokens: int = Field(default=0, ge=0)
     output_tokens: int = Field(default=0, ge=0)
+
+class HealthResponse(StrictModel):
+    service: str
+    version: str
+    status: Literal["ok", "ready", "not_ready"]
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
