@@ -17,7 +17,6 @@ _INPUT_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
             r"(instruction|message|rule|control)s?\b"
         ),
     ),
-
     (
         "prompt_extraction",
         re.compile(
@@ -39,7 +38,6 @@ _INPUT_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
 )
 
 _OUTPUT_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
-    
     ("active_content", re.compile(r"(?is)<\s*(script|iframe|object|img)\b")),
     (
         "secret_like_output",
@@ -50,6 +48,7 @@ _OUTPUT_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
         re.compile(r"(?is)\b(system prompt|developer message)\b.{0,20}\b(is|says|contains)\b"),
     ),
 )
+
 
 @dataclass(frozen=True, slots=True)
 class GuardrailDecision:
