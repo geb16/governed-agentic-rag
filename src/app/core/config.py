@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     app_version: str = APP_VERSION
     environment: Literal["development", "test", "production"] = "development"
     execution_profile: Literal["development", "test", "experiment"] = "development"
-
+    api_prefix: str = "/api/v1"
     log_level: str = "INFO"
 
     api_key: SecretStr | None = None
@@ -44,7 +44,6 @@ class Settings(BaseSettings):
     model_max_output_tokens: int = Field(default=1_200, ge=128, le=8_192)
     max_agent_turns: int = Field(default=4, ge=1, le=8)
     max_tool_calls: int = Field(default=3, ge=0, le=8)
-
 
     knowledge_base_dir: Path = Path("data/knowledge_base")
     chunk_size_chars: int = Field(default=1_200, ge=300, le=4_000)
@@ -70,6 +69,7 @@ class Settings(BaseSettings):
                 return decoded
             return [item.strip() for item in stripped.split(",") if item.strip()]
         return value
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
