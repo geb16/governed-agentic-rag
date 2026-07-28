@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import re
 from collections import Counter
 from typing import Protocol
@@ -55,6 +56,42 @@ class KnowledgeRetriever:
             frequencies.update(set(_tokens(f"{chunk.title} {chunk.content}")))
         return frequencies
 
+    def _lexical_search(self, query: str, top_k: int) -> list[RetrievedChunk]:
+        query_terms = Counter(_tokens(query))
+        if not query_terms:
+            return []
+        total_chunks = len(self._chunks)
+        scored: list[tuple[float, KnowledgeChunk]] = []
+        for chunk in self._chunks:
+            document_terms = Counter(_tokens(f"{chunk.title} {chunk.content}"))
+            raw_score = 0.0
+            for term, query_frequency in query_terms.items():
+                term_frequency = document_terms[term]
+                if term_frequency == 0:
+                    continue
+                inverse_frequency = math.log(
+                    1 + (total_chunks + 1) / (self._doc_frequencies[term] + 1)
+                )
+                raw_score += query_frequency * (1 + math.log(term_frequency)) * inverse_frequency
+            if raw_score > 0:
+                normalized = raw_score / (raw_score + 4.0)
+                scored.append((min(1.0, normalized), chunk))
+        scored.sort(key=lambda item: (-item[0], item[1].chunk_id))
+        return [
+            RetrievedChunk(
+                chunk_id=chunk.chunk_id,
+                document_id=chunk.document_id,
+                title=chunk.title,
+                content=chunk.content,
+                source_path=chunk.source_path,
+                score=round(score, 6),
+                content_sha256=chunk.content_sha256,
+            )
+            for score, chunk in scored[:top_k]
+            if score >= self.settings.retrieval_min_score
+        ]
+
+
     def retrieve(self, query: str, top_k: int | None = None) -> list[RetrievedChunk]:
         limit = min(top_k or self.settings.retrieval_top_k, 10)
         if self._vector_store is not None:
@@ -63,4 +100,4 @@ class KnowledgeRetriever:
                 for result in self._vector_store.search(query, limit)
                 if result.score >= self.settings.retrieval_min_score
             ]
-        return (query, limit)
+        return self._lexical_search(query, limit)
