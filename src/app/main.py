@@ -14,6 +14,7 @@ from app.baseline.model import OpenAIResponsesModel
 from app.baseline.tool_router import ToolRouter
 from app.core.config import Settings, get_settings
 from app.core.logging import configure_logging
+from app.core.security import security_middleware
 from app.persistence.models import DEFAULT_CASE_FIXTURE
 from app.persistence.repository import SqliteSyntheticRepository
 from app.rag.retriever import KnowledgeRetriever
@@ -67,16 +68,21 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application = FastAPI(
         title=resolved_settings.app_name,
         version=resolved_settings.app_version,
+        description="Phase-3 conventional agentic RAG baseline.",
+        lifespan=lifespan,
     )
+
     application.state.settings = resolved_settings
     application.state.agent = None
     application.state.retriever = None
+    application.state.repository = None
+    application.middleware("http")(security_middleware)
     application.add_middleware(
         TrustedHostMiddleware,
         allowed_hosts=resolved_settings.allowed_hosts,
     )
-    application.include_router(health_router)
-    application.include_router(baseline_router)
+    application.include_router(health_router, prefix=resolved_settings.api_prefix)
+    application.include_router(baseline_router, prefix=resolved_settings.api_prefix)
     return application
 
 
