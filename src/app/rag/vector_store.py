@@ -5,6 +5,7 @@ from uuid import NAMESPACE_URL, uuid5
 from qdrant_client import QdrantClient, models
 
 from app.core.config import Settings
+from app.domain.schemas import RetrievedChunk
 from app.rag.chunking import KnowledgeChunk
 from app.rag.embeddings import EmbeddingProvider
 
@@ -70,3 +71,24 @@ class QdrantVectorStore:
         ]
         self._client.upsert(collection_name=self._collection, points=points, wait=True)
         return len(points)
+
+    # Implementing a simple search; no filtering or scoring beyond the top-k results.
+    def search(self, query: str, top_k: int) -> list[RetrievedChunk]:
+        vector = self._embeddings.embed([query])[0]
+        response = self._client.query_points(
+            collection_name=self._collection,
+            query=vector,
+            limit=top_k,
+            with_payload=True,
+            with_vectors=False,
+        )
+        results: list[RetrievedChunk] = []
+        for point in response.points:
+            payload = dict(point.payload or {})
+            results.append(
+                RetrievedChunk(
+                    **payload,
+                    score=max(0.0, min(1.0, float(point.score))),
+                )
+            )
+        return results
