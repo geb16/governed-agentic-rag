@@ -10,9 +10,11 @@ from app.domain.schemas import (
     AgentDraft,
     AgentStatus,
     BaselineRequest,
+    ModelToolCall,
     ModelTurn,
     RetrievedChunk,
 )
+from app.tools.response_drafter import ResponseDrafterTool
 
 SOURCE_ROOT = Path(__file__).parents[1] / "src" / "app"
 
@@ -24,6 +26,7 @@ class FakeRepository:
     def case_exists(self, case_id: str) -> bool:
         return self._case_exists
 
+
 class FakeRetriever:
     backend_name = "fake"
 
@@ -32,6 +35,7 @@ class FakeRetriever:
 
     def retrieve(self, query: str, top_k: int | None = None) -> list[RetrievedChunk]:
         return self._chunks
+
 
 class FakeModel:
     model_name = "fake-model"
@@ -51,6 +55,7 @@ class FakeModel:
         self.calls += 1
         return self._turns.pop(0)
 
+
 def _request() -> BaselineRequest:
     return BaselineRequest(
         case_id="case_default",
@@ -69,6 +74,7 @@ def _chunk() -> RetrievedChunk:
         score=0.9,
         content_sha256="a" * 64,
     )
+
 
 def _agent(
     *,
@@ -108,6 +114,7 @@ def test_compatibility_facade_completes_grounded_response() -> None:
     assert response.usage.input_tokens == 12
     assert [citation.chunk_id for citation in response.citations] == ["chunk-refund"]
 
+
 def test_missing_case_short_circuits_before_model_call() -> None:
     model = FakeModel([])
 
@@ -119,3 +126,44 @@ def test_missing_case_short_circuits_before_model_call() -> None:
     assert response.status == AgentStatus.FAILED
     assert response.error_code == "synthetic_case_not_found"
     assert model.calls == 0
+
+
+def test_tool_turn_continues_to_a_final_response() -> None:
+    model = FakeModel(
+        [
+            ModelTurn(
+                tool_calls=[
+                    ModelToolCall(
+                        call_id="call-1",
+                        name="response_drafter",
+                        arguments_json=(
+                            '{"audience":"customer","purpose":"Explain status",'
+                            '"key_points":["The request is under review"]}'
+                        ),
+                    )
+                ],
+                continuation_items=[{"type": "function_call", "call_id": "call-1"}],
+                input_tokens=5,
+                output_tokens=3,
+            ),
+            ModelTurn(
+                final=AgentDraft(
+                    answer="A simulated response draft was created.",
+                    grounded=False,
+                ),
+                input_tokens=8,
+                output_tokens=4,
+            ),
+        ]
+    )
+
+    response = _agent(
+        model=model,
+        tool_router=ToolRouter([ResponseDrafterTool()]),
+    ).invoke(_request())
+
+    assert response.status == AgentStatus.COMPLETED
+    assert response.usage.input_tokens == 13
+    assert len(response.tool_calls) == 1
+    assert response.tool_calls[0].tool_name == "response_drafter"
+    assert response.evidence[0].evidence_id.startswith("draft:case_default:")
