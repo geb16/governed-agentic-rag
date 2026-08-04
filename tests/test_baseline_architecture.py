@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 from pathlib import Path
 from typing import Any
 
@@ -181,3 +182,24 @@ def test_tool_router_exposes_strict_provider_specs() -> None:
             "strict": True,
         }
     ]
+
+def test_inner_layers_do_not_import_outbound_adapters() -> None:
+    forbidden = ("app.persistence", "app.rag", "app.tools", "app.baseline")
+    violations: list[str] = []
+
+    for layer in (SOURCE_ROOT / "application", SOURCE_ROOT / "domain"):
+        for source_path in layer.rglob("*.py"):
+            tree = ast.parse(source_path.read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    imported_names = [alias.name for alias in node.names]
+                elif isinstance(node, ast.ImportFrom) and node.module is not None:
+                    imported_names = [node.module]
+                else:
+                    continue
+                for imported_name in imported_names:
+                    if imported_name.startswith(forbidden):
+                        relative_path = source_path.relative_to(SOURCE_ROOT)
+                        violations.append(f"{relative_path}: {imported_name}")
+
+    assert violations == []
