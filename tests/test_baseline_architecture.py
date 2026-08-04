@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
-from app.domain.schemas import RetrievedChunk
+from app.domain.schemas import ModelTurn, RetrievedChunk
 
 SOURCE_ROOT = Path(__file__).parents[1] / "src" / "app"
 
@@ -22,3 +23,21 @@ class FakeRetriever:
 
     def retrieve(self, query: str, top_k: int | None = None) -> list[RetrievedChunk]:
         return self._chunks
+
+class FakeModel:
+    model_name = "fake-model"
+
+    def __init__(self, turns: list[ModelTurn]) -> None:
+        self._turns = turns
+        self.calls = 0
+
+    def complete(
+        self,
+        *,
+        input_items: list[dict[str, Any]],
+        instructions: str,
+        tools: list[dict[str, Any]],
+        safety_identifier: str,
+    ) -> ModelTurn:
+        self.calls += 1
+        return self._turns.pop(0)
