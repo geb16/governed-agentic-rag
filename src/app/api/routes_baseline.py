@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends
 from starlette.concurrency import run_in_threadpool
 
 from app.api.dependencies import get_agent
-from app.baseline.agent import BaselineAgent
+from app.application.baseline.ports import BaselineUseCase
 from app.core.security import require_api_key
 from app.domain.schemas import BaselineRequest, BaselineResponse
 
@@ -22,6 +22,6 @@ router = APIRouter(
 @router.post("/invoke", response_model=BaselineResponse)
 async def invoke_baseline(
     request: BaselineRequest,
-    agent: Annotated[BaselineAgent, Depends(get_agent)],
+    agent: Annotated[BaselineUseCase, Depends(get_agent)],
 ) -> BaselineResponse:
     return await run_in_threadpool(agent.invoke, request)
