@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field
 from time import perf_counter
 from typing import Any
 
 from pydantic import ValidationError
 
+from app.application.baseline.ports import ToolExecution
 from app.domain.schemas import (
     ActionOutcome,
     ActionProposal,
@@ -18,15 +18,6 @@ from app.domain.schemas import (
 )
 from app.tools.base import ControlledTool
 from app.tools.faults import FaultInjector
-
-
-# ToolEXecution dataclass to hold the output of a tool execution,
-# the record of the tool call, and any retrieved chunks.
-@dataclass(slots=True)
-class ToolExecution:
-    output_json: str
-    record: ToolCallRecord
-    retrieved_chunks: list[RetrievedChunk] = field(default_factory=list)
 
 
 class ToolRouter:
@@ -46,6 +37,21 @@ class ToolRouter:
             raise ValueError("Tool names must be unique")
         self._tools = {tool.name: tool for tool in tools}
         self._fault_injector = fault_injector
+
+    @property
+    def specs(self) -> list[dict[str, Any]]:
+        """Return strict Responses API function definitions for allowlisted tools."""
+
+        return [
+            {
+                "type": "function",
+                "name": tool.name,
+                "description": tool.description,
+                "parameters": tool.input_model.model_json_schema(),
+                "strict": True,
+            }
+            for tool in self._tools.values()
+        ]
 
     def execute(
         self,
