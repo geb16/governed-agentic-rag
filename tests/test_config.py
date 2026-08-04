@@ -9,6 +9,6 @@ def test_dotenv_accepts_documented_comma_separated_hosts(tmp_path) -> None:
         encoding="utf-8",
     )
     pass
-    settings = Settings(_env_file=env_file)
+    settings = Settings()
 
     assert settings.allowed_hosts == ["localhost", "127.0.0.1", "testserver"]
