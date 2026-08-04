@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from app.persistence.models import ConsumedFault
-from app.persistence.repository import SyntheticRepository
+from app.domain.repositories import SyntheticRepository
+from app.domain.support import ConsumedFault
 
 
 # This class defines a protocol for fault injectors, which are responsible for
