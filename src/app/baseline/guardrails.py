@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import re
 import unicodedata
-from dataclasses import dataclass
 
+from app.application.baseline.ports import SafetyDecision
 from app.domain.schemas import AgentDraft
 
 _CONTROL_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
@@ -50,11 +50,8 @@ _OUTPUT_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
 )
 
 
-@dataclass(frozen=True, slots=True)
-class GuardrailDecision:
-    blocked: bool
-    category: str | None = None
-    normalized_text: str = ""
+# Backward-compatible name retained for existing imports.
+GuardrailDecision = SafetyDecision
 
 
 class InputGuardrail:
