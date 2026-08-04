@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pydantic import Field
 
+from app.domain.repositories import SyntheticRepository
 from app.domain.schemas import (
     ActionResultStatus,
     ControlledToolResult,
@@ -9,7 +10,6 @@ from app.domain.schemas import (
     StrictModel,
     ToolExecutionContext,
 )
-from app.persistence.repository import SyntheticRepository
 from app.tools.evidence import evidence_reference
 
 

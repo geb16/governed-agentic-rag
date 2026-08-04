@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.persistence.repository import SyntheticRepository
+from app.domain.repositories import SyntheticRepository
 from app.rag.retriever import Retriever
 from app.tools.access_role import ChangeAccessRoleTool
 from app.tools.base import ControlledTool
