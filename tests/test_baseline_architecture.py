@@ -3,7 +3,14 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from app.domain.schemas import BaselineRequest, ModelTurn, RetrievedChunk
+from app.baseline.agent import BaselineAgent
+from app.baseline.tool_router import ToolRouter
+from app.core.config import Settings
+from app.domain.schemas import (
+    BaselineRequest,
+    ModelTurn,
+    RetrievedChunk,
+)
 
 SOURCE_ROOT = Path(__file__).parents[1] / "src" / "app"
 
@@ -60,3 +67,18 @@ def _chunk() -> RetrievedChunk:
         score=0.9,
         content_sha256="a" * 64,
     )
+
+def _agent(
+    *,
+    model: FakeModel,
+    repository: FakeRepository | None = None,
+    tool_router: ToolRouter | None = None,
+) -> BaselineAgent:
+    return BaselineAgent(
+        settings=Settings(),
+        retriever=FakeRetriever([_chunk()]),  # type: ignore[arg-type]
+        model=model,
+        tool_router=tool_router or ToolRouter([]),
+        repository=repository or FakeRepository(),  # type: ignore[arg-type]
+    )
+
