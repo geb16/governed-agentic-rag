@@ -92,3 +92,41 @@ def test_agent_executes_simulated_tool_and_returns_record(
     assert '"simulated":true' in response.tool_calls[0].result_summary
     assert model.calls[1]["input_items"][-1]["type"] == "function_call_output"
 
+
+def test_agent_denies_unknown_tool(
+    settings,
+    retriever: KnowledgeRetriever,
+) -> None:
+    model = ScriptedModel(
+        [
+            ModelTurn(
+                tool_calls=[
+                    ModelToolCall(
+                        call_id="call_bad",
+                        name="run_shell",
+                        arguments_json='{"command":"whoami"}',
+                    )
+                ],
+                continuation_items=[],
+            ),
+            ModelTurn(
+                final=AgentDraft(
+                    answer="That capability is not available.",
+                    cited_chunk_ids=[],
+                    grounded=False,
+                )
+            ),
+        ]
+    )
+    agent = build_agent(settings, retriever, model)
+
+    response = agent.invoke(
+        BaselineRequest(
+            requester_id="support_user",
+            query="Check whether shell execution is available.",
+        )
+    )
+
+    assert response.tool_calls[0].status == ToolStatus.DENIED
+    assert response.tool_calls[0].arguments == {}
+
