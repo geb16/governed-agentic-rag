@@ -110,3 +110,15 @@ def test_compatibility_facade_completes_grounded_response() -> None:
     assert response.usage.input_tokens == 12
     assert [citation.chunk_id for citation in response.citations] == ["chunk-refund"]
 
+
+def test_missing_case_short_circuits_before_model_call() -> None:
+    model = FakeModel([])
+
+    response = _agent(
+        model=model,
+        repository=FakeRepository(case_exists=False),
+    ).invoke(_request())
+
+    assert response.status == AgentStatus.FAILED
+    assert response.error_code == "synthetic_case_not_found"
+    assert model.calls == 0
