@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from app.application.baseline.policy import AgentRuntimePolicy
+from app.application.baseline.ports import ModelGateway
 from app.application.baseline.service import BaselineAgentService
 from app.baseline.guardrails import InputGuardrail, OutputGuardrail
-from app.baseline.model import AgentModel
 from app.baseline.tool_router import ToolRouter
 from app.core.config import Settings
 from app.domain.repositories import SyntheticRepository
@@ -22,7 +22,7 @@ class BaselineAgent(BaselineAgentService):
         *,
         settings: Settings,
         retriever: Retriever,
-        model: AgentModel,
+        model: ModelGateway,
         tool_router: ToolRouter,
         repository: SyntheticRepository,
         input_guardrail: InputGuardrail | None = None,
