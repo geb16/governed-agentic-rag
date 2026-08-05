@@ -2,7 +2,12 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.baseline.agent import BaselineAgent
+from app.baseline.tool_router import ToolRouter
+from app.core.config import Settings
 from app.domain.schemas import (
+    AgentDraft,
+    AgentStatus,
     BaselineRequest,
     ModelTurn,
     RetrievedChunk,
@@ -65,3 +70,43 @@ def _chunk() -> RetrievedChunk:
         score=0.9,
         content_sha256="a" * 64,
     )
+
+
+def _agent(
+    *,
+    model: FakeModel,
+    repository: FakeRepository | None = None,
+    tool_router: ToolRouter | None = None,
+) -> BaselineAgent:
+    return BaselineAgent(
+        settings=Settings(),
+        retriever=FakeRetriever([_chunk()]),
+        model=model,
+        tool_router=tool_router or ToolRouter([]),
+        repository=repository or FakeRepository(),
+    )
+
+
+def test_compatibility_facade_completes_grounded_response() -> None:
+    model = FakeModel(
+        [
+            ModelTurn(
+                final=AgentDraft(
+                    answer="Eligible refunds require a ticket.",
+                    cited_chunk_ids=["chunk-refund"],
+                    grounded=True,
+                ),
+                input_tokens=12,
+                output_tokens=7,
+            )
+        ]
+    )
+
+    response = _agent(model=model).invoke(_request())
+
+    assert response.status == AgentStatus.COMPLETED
+    assert response.retrieval_backend == "fake"
+    assert response.model == "fake-model"
+    assert response.usage.input_tokens == 12
+    assert [citation.chunk_id for citation in response.citations] == ["chunk-refund"]
+
