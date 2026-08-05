@@ -7,7 +7,7 @@ from app.application.baseline.ports import ModelGateway
 from app.baseline.agent import BaselineAgent
 from app.baseline.tool_router import ToolRouter
 from app.core.config import Settings
-from app.domain.schemas import ModelTurn
+from app.domain.schemas import ModelTurn, ToolExecutionContext
 from app.domain.support import DEFAULT_CASE_FIXTURE
 from app.persistence.repository import SqliteSyntheticRepository
 from app.rag.retriever import KnowledgeRetriever
@@ -43,6 +43,16 @@ class ScriptedModel(ModelGateway):
             }
         )
         return next(self._turns)
+
+
+def tool_context(case_id: str = "case_default") -> ToolExecutionContext:
+    """Build trusted invocation context for controlled-tool integration tests."""
+
+    return ToolExecutionContext(
+        case_id=case_id,
+        request_id="req_freeze_test",
+        requester_id="evaluation_user",
+    )
 
 
 def build_agent(
