@@ -149,3 +149,30 @@ def test_guardrail_blocks_before_model_invocation(
     assert response.safety.blocked is True
     assert model.calls == []
 
+
+def test_fabricated_model_citation_fails_closed(
+    settings,
+    retriever: KnowledgeRetriever,
+) -> None:
+    model = ScriptedModel(
+        [
+            ModelTurn(
+                final=AgentDraft(
+                    answer="Unsupported policy claim.",
+                    cited_chunk_ids=["fake:chunk:id"],
+                    grounded=True,
+                )
+            )
+        ]
+    )
+    agent = build_agent(settings, retriever, model)
+
+    response = agent.invoke(
+        BaselineRequest(
+            requester_id="pilot_user",
+            query="Explain the enterprise refund requirements.",
+        )
+    )
+
+    assert response.status == AgentStatus.REFUSED
+    assert response.safety.category == "fabricated_citation"
