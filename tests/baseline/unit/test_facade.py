@@ -165,3 +165,17 @@ def test_tool_turn_continues_to_a_final_response() -> None:
     assert len(response.tool_calls) == 1
     assert response.tool_calls[0].tool_name == "response_drafter"
     assert response.evidence[0].evidence_id.startswith("draft:case_default:")
+
+
+def test_tool_router_exposes_strict_provider_specs() -> None:
+    router = ToolRouter([ResponseDrafterTool()])
+
+    assert router.specs == [
+        {
+            "type": "function",
+            "name": "response_drafter",
+            "description": ResponseDrafterTool.description,
+            "parameters": ResponseDrafterTool.input_model.model_json_schema(),
+            "strict": True,
+        }
+    ]
