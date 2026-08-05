@@ -3,10 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from app.baseline.agent import BaselineAgent
-from app.baseline.model import OpenAIResponsesModel
 from app.baseline.tool_router import ToolRouter
 from app.core.config import Settings
 from app.domain.support import DEFAULT_CASE_FIXTURE
+from app.infrastructure.llm.openai_responses import OpenAIResponsesModel
 from app.persistence.repository import SqliteSyntheticRepository
 from app.rag.retriever import KnowledgeRetriever
 from app.tools.faults import RepositoryFaultInjector
