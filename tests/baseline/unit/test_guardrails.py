@@ -23,6 +23,7 @@ def test_input_guardrail_blocks_known_attack_classes(payload: str, category: str
     assert result.blocked is True
     assert result.category == category
 
+
 # Testing the input guardrail does not block normal policy questions
 def test_input_guardrail_does_not_block_normal_policy_question() -> None:
     result = InputGuardrail().inspect(
@@ -31,6 +32,7 @@ def test_input_guardrail_does_not_block_normal_policy_question() -> None:
     )
 
     assert result.blocked is False
+
 
 #  Testing the output guardrail blocks fabricated citations and active content
 def test_output_guardrail_rejects_fabricated_citation() -> None:

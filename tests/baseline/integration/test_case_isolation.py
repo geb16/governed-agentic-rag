@@ -6,7 +6,7 @@ from app.tools.ticket_update import TicketUpdateTool
 from tests.support.baseline import tool_context
 
 
-# Test that the state of a case is isolated by its case_id. 
+# Test that the state of a case is isolated by its case_id.
 def test_case_state_is_isolated_by_case_id(repository: SqliteSyntheticRepository) -> None:
     repository.create_case(
         SyntheticCaseFixture(

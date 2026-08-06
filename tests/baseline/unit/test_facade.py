@@ -49,7 +49,7 @@ class FakeModel:
         tools: list[dict[str, Any]],
         safety_identifier: str,
     ) -> ModelTurn:
-        del input_items, instructions, tools, safety_identifier # inused parameters
+        del input_items, instructions, tools, safety_identifier  # inused parameters
         self.calls += 1
         return self._turns.pop(0)
 
@@ -85,7 +85,7 @@ def _agent(
         retriever=FakeRetriever([_chunk()]),
         model=model,
         tool_router=tool_router or ToolRouter([]),
-        repository=repository or FakeRepository(), # type: ignore [arg-type]
+        repository=repository or FakeRepository(),  # type: ignore [arg-type]
     )
 
 

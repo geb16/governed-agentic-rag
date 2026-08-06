@@ -8,7 +8,7 @@ from app.tools.refund import IssueRefundTool
 from tests.support.baseline import tool_context
 
 
-# Testing the simulated action and the human escalation share a neutral outcome contract, 
+# Testing the simulated action and the human escalation share a neutral outcome contract,
 # - so that the baseline LLM can treat them interchangeably.
 def test_simulated_action_and_escalation_share_neutral_outcome_contract(
     repository: SqliteSyntheticRepository,
