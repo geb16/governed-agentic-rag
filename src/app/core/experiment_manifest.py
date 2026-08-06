@@ -34,6 +34,7 @@ def _canonical_sha256(value: Any) -> str:
     ).encode("utf-8")
     return _sha256_bytes(encoded)
 
+
 class ExperimentRunManifest(StrictModel):
     manifest_schema_version: int = 1
     freeze_id: str
@@ -55,6 +56,7 @@ class ExperimentRunManifest(StrictModel):
     retrieval_min_score: float
     package_versions: dict[str, str]
     configuration_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+
 
 def build_experiment_manifest(
     settings: Settings,
