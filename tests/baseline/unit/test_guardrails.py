@@ -1,6 +1,7 @@
 import pytest
 
-from app.baseline.guardrails import InputGuardrail
+from app.baseline.guardrails import InputGuardrail, OutputGuardrail
+from app.domain.schemas import AgentDraft
 
 
 @pytest.mark.parametrize(
@@ -30,3 +31,17 @@ def test_input_guardrail_does_not_block_normal_policy_question() -> None:
     )
 
     assert result.blocked is False
+
+#  Testing the output guardrail blocks fabricated citations and active content
+def test_output_guardrail_rejects_fabricated_citation() -> None:
+    result = OutputGuardrail().inspect(
+        AgentDraft(
+            answer="The policy requires review.",
+            cited_chunk_ids=["made-up:1"],
+            grounded=True,
+        ),
+        allowed_chunk_ids={"refund_policy:1:known"},
+    )
+
+    assert result.blocked is True
+    assert result.category == "fabricated_citation"
