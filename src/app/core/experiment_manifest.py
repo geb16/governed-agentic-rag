@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from datetime import UTC, datetime
 from importlib.metadata import version
+from typing import Any
 
 from pydantic import Field
 
@@ -16,6 +19,19 @@ from app.core.version import (
 )
 from app.domain.schemas import StrictModel
 
+
+def _sha256_bytes(value: bytes) -> str:
+    return hashlib.sha256(value).hexdigest()
+
+
+def _canonical_sha256(value: Any) -> str:
+    encoded = json.dumps(
+        value,
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    return _sha256_bytes(encoded)
 
 class ExperimentRunManifest(StrictModel):
     manifest_schema_version: int = 1
