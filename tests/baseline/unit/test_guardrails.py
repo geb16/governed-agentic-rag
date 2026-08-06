@@ -45,3 +45,20 @@ def test_output_guardrail_rejects_fabricated_citation() -> None:
 
     assert result.blocked is True
     assert result.category == "fabricated_citation"
+
+
+# active content must be blocked regardless of whether the URL looks suspicious
+def test_output_guardrail_rejects_benign_looking_active_content() -> None:
+    result = OutputGuardrail().inspect(
+        AgentDraft(
+            answer=(
+                '<img alt="Case status" '
+                'src="https://cdn.customer-support.example/assets/status-badge.png">'
+            ),
+            cited_chunk_ids=[],
+            grounded=False,
+        ),
+        allowed_chunk_ids=set(),
+    )
+    assert result.blocked is True
+    assert result.category == "active_content"
