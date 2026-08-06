@@ -4,6 +4,7 @@ import hashlib
 import json
 from datetime import UTC, datetime
 from importlib.metadata import version
+from pathlib import Path
 from typing import Any
 
 from pydantic import Field
@@ -90,3 +91,30 @@ def build_experiment_manifest(
         configuration_sha256=_canonical_sha256(config_payload),
         **config_payload,
     )
+
+
+# Record the experiment manifest to a file
+def record_experiment_manifest(
+    settings: Settings,
+    tool_router: ToolRouter,
+) -> tuple[ExperimentRunManifest, Path]:
+    manifest = build_experiment_manifest(settings, tool_router)
+    path = settings.experiment_manifest_dir / manifest.run_id / "manifest.json"
+
+    def validate_existing() -> tuple[ExperimentRunManifest, Path]:
+        existing = ExperimentRunManifest.model_validate_json(path.read_text(encoding="utf-8"))
+        if existing.configuration_sha256 != manifest.configuration_sha256:
+            raise RuntimeError(
+                f"Experiment run {manifest.run_id} already exists with different configuration"
+            )
+        return existing, path
+
+    if path.exists():
+        return validate_existing()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        with path.open("x", encoding="utf-8") as destination:
+            destination.write(manifest.model_dump_json(indent=2))
+    except FileExistsError:
+        return validate_existing()
+    return manifest, path
