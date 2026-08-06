@@ -63,3 +63,25 @@ def test_baseline_llm_can_choose_human_escalation_without_formal_router(
     assert response.tool_calls[0].outcome.state_changed is True
     assert response.evidence[0].evidence_type == EvidenceType.BUSINESS_RECORD
     assert "formal risk classifier" in model.calls[0]["instructions"]
+
+
+# Testing the baseline LLM fails gracefully when a case_id is unknown.
+# validate this happends before any model or tool execution occurs.
+def test_unknown_case_fails_before_model_or_tool_execution(
+    settings: Settings,
+    retriever: KnowledgeRetriever,
+) -> None:
+    model = ScriptedModel([])
+    agent = build_agent(settings, retriever, model)
+
+    response = agent.invoke(
+        BaselineRequest(
+            case_id="case_missing",
+            requester_id="support_user",
+            query="Look up ticket TKT-1001 in this case.",
+        )
+    )
+
+    assert response.status == AgentStatus.FAILED
+    assert response.error_code == "synthetic_case_not_found"
+    assert model.calls == []
