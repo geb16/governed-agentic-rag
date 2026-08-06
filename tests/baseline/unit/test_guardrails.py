@@ -21,3 +21,12 @@ def test_input_guardrail_blocks_known_attack_classes(payload: str, category: str
 
     assert result.blocked is True
     assert result.category == category
+
+# Testing the input guardrail does not block normal policy questions
+def test_input_guardrail_does_not_block_normal_policy_question() -> None:
+    result = InputGuardrail().inspect(
+        "What does the policy say about emergency access?",
+        max_chars=4_000,
+    )
+
+    assert result.blocked is False
