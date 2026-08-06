@@ -1,9 +1,19 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
+from importlib.metadata import version
 
 from pydantic import Field
 
+from app.application.baseline.prompts import SYSTEM_PROMPT
+from app.baseline.tool_router import ToolRouter
+from app.core.config import Settings
+from app.core.version import (
+    APP_VERSION,
+    BASELINE_FREEZE_ID,
+    DATABASE_SCHEMA_VERSION,
+    TOOL_CONTRACT_VERSION,
+)
 from app.domain.schemas import StrictModel
 
 
@@ -28,3 +38,39 @@ class ExperimentRunManifest(StrictModel):
     retrieval_min_score: float
     package_versions: dict[str, str]
     configuration_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+def build_experiment_manifest(
+    settings: Settings,
+    tool_router: ToolRouter,
+) -> ExperimentRunManifest:
+    if settings.execution_profile != "experiment" or settings.experiment_run_id is None:
+        raise ValueError("An experiment manifest can only be built for the experiment profile")
+    knowledge_manifest = settings.knowledge_base_dir / "manifest.json"
+    knowledge_manifest_sha256 = _sha256_bytes(knowledge_manifest.read_bytes())
+    config_payload = {
+        "freeze_id": BASELINE_FREEZE_ID,
+        "model": settings.openai_model,
+        "embedding_model": settings.openai_embedding_model,
+        "retrieval_backend": settings.retrieval_backend,
+        "qdrant_collection": settings.qdrant_collection,
+        "knowledge_manifest_sha256": knowledge_manifest_sha256,
+        "prompt_sha256": _sha256_bytes(SYSTEM_PROMPT.encode("utf-8")),
+        "tool_schema_sha256": _canonical_sha256(tool_router.specs),
+        "tool_contract_version": TOOL_CONTRACT_VERSION,
+        "database_schema_version": DATABASE_SCHEMA_VERSION,
+        "chunk_size_chars": settings.chunk_size_chars,
+        "chunk_overlap_chars": settings.chunk_overlap_chars,
+        "retrieval_top_k": settings.retrieval_top_k,
+        "retrieval_min_score": settings.retrieval_min_score,
+    }
+    return ExperimentRunManifest(
+        run_id=settings.experiment_run_id,
+        created_at=datetime.now(UTC),
+        app_version=APP_VERSION,
+        package_versions={
+            package: version(package)
+            for package in ("fastapi", "openai", "pydantic", "qdrant-client")
+        },
+        configuration_sha256=_canonical_sha256(config_payload),
+        **config_payload,
+    )
