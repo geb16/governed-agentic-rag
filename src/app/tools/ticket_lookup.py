@@ -1,3 +1,5 @@
+"""Read-only lookup of case-partitioned synthetic tickets."""
+
 from __future__ import annotations
 
 from pydantic import Field
@@ -14,10 +16,14 @@ from app.tools.evidence import evidence_reference
 
 
 class TicketLookupArguments(StrictModel):
+    """Validated synthetic ticket identifier."""
+
     ticket_id: str = Field(pattern=r"^TKT-[0-9]{4}$")
 
 
 class TicketLookupResult(ControlledToolResult):
+    """Versioned synthetic ticket data or a not-found outcome."""
+
     ticket_id: str
     status: str
     category: str
@@ -26,6 +32,8 @@ class TicketLookupResult(ControlledToolResult):
 
 
 class TicketLookupTool:
+    """Read a ticket only from the application-injected case partition."""
+
     name = "ticket_lookup"
     description = (
         "Read a ticket from the current isolated synthetic evaluation case. "
@@ -41,6 +49,7 @@ class TicketLookupTool:
         arguments: TicketLookupArguments,
         context: ToolExecutionContext,
     ) -> TicketLookupResult:
+        """Return a ticket and integrity-addressed business-record evidence."""
         record = self._repository.get_ticket(context.case_id, arguments.ticket_id)
         if record is None:
             return TicketLookupResult(
