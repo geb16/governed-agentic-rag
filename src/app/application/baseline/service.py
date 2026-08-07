@@ -1,3 +1,5 @@
+"""Application service coordinating validation, retrieval, and bounded turns."""
+
 from __future__ import annotations
 
 import logging
@@ -60,6 +62,18 @@ class BaselineAgentService:
         )
 
     def invoke(self, request: BaselineRequest) -> BaselineResponse:
+        """Execute one isolated baseline invocation.
+
+        The method validates trusted case context and user input, retrieves evidence,
+        delegates the bounded model/tool loop, and converts unexpected failures into a
+        stable response. It does not retain invocation state between calls.
+
+        Args:
+            request: Strict task request accepted by the application boundary.
+
+        Returns:
+            A completed, refused, or failed baseline response.
+        """
         trace_id = f"trace_{uuid4().hex}"
         started = perf_counter()
         self._log(ExecutionEvent.REQUEST_RECEIVED, request, trace_id)
