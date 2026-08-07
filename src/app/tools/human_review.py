@@ -1,3 +1,5 @@
+"""Controlled creation of synthetic human-review requests."""
+
 from __future__ import annotations
 
 from typing import Literal
@@ -16,6 +18,8 @@ from app.tools.evidence import evidence_reference
 
 
 class HumanReviewArguments(StrictModel):
+    """Validated reason, role, ticket, and idempotency key for review."""
+
     ticket_id: str = Field(pattern=r"^TKT-[0-9]{4}$")
     reason: str = Field(min_length=10, max_length=500)
     requested_role: Literal[
@@ -28,6 +32,8 @@ class HumanReviewArguments(StrictModel):
 
 
 class HumanReviewResult(ControlledToolResult):
+    """Synthetic escalation identity and pending-review state."""
+
     escalation_id: str | None = None
     ticket_id: str
     requested_role: str
@@ -35,6 +41,8 @@ class HumanReviewResult(ControlledToolResult):
 
 
 class HumanReviewTool:
+    """Create a review record without implementing an approval workflow."""
+
     name = "request_human_review"
     description = (
         "Create a pending human-review request in the isolated synthetic support system. "
@@ -51,6 +59,7 @@ class HumanReviewTool:
         arguments: HumanReviewArguments,
         context: ToolExecutionContext,
     ) -> HumanReviewResult:
+        """Create or return an idempotent review in the trusted case context."""
         record, changed = self._repository.request_human_review(
             context.case_id,
             arguments.ticket_id,
