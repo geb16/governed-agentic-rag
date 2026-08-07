@@ -25,7 +25,8 @@ class QdrantVectorStore:
         configured_key = (
             settings.qdrant_admin_api_key if write_access else settings.qdrant_read_api_key
         )
-        api_key = configured_key.get_secret_value() if configured_key is not None else None
+        raw_api_key = configured_key.get_secret_value() if configured_key is not None else None
+        api_key = raw_api_key if raw_api_key else None
         if api_key and not settings.qdrant_url.lower().startswith("https://"):
             raise ValueError("Qdrant API keys may only be sent over HTTPS")
         self._client = QdrantClient(
