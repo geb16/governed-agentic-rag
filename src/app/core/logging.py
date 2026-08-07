@@ -1,3 +1,5 @@
+"""Secret-redacting operational JSON logging for the baseline service."""
+
 from __future__ import annotations
 
 import json
@@ -31,11 +33,18 @@ def _redact(value: Any) -> Any:
     return value
 
 
-# Custom JSON formatter for logging
 class JsonFormatter(logging.Formatter):
     """One-line JSON logs suitable for collection without recording prompt bodies."""
 
     def format(self, record: logging.LogRecord) -> str:
+        """Serialize one log record without prompt bodies or secret values.
+
+        Args:
+            record: Standard-library log record.
+
+        Returns:
+            A single-line canonical JSON representation suitable for collection.
+        """
         payload: dict[str, Any] = {
             "timestamp": datetime.now(UTC).isoformat(),
             "level": record.levelname,
@@ -51,6 +60,11 @@ class JsonFormatter(logging.Formatter):
 
 
 def configure_logging(settings: Settings) -> None:
+    """Replace root handlers with the baseline JSON formatter.
+
+    Args:
+        settings: Configuration supplying the process log level.
+    """
     root = logging.getLogger()
     handler = logging.StreamHandler()
     handler.setFormatter(JsonFormatter())
