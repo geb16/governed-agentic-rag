@@ -1,3 +1,5 @@
+"""Composition root for concrete Phase 3 adapters and application services."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -23,7 +25,15 @@ class ApplicationRuntime:
 
 
 def build_runtime(settings: Settings) -> ApplicationRuntime:
-    """Composition root: instantiate concrete adapters at the process boundary."""
+    """Assemble adapters and initialize isolated synthetic state.
+
+    Args:
+        settings: Validated process configuration.
+
+    Returns:
+        A runtime containing retrieval, persistence, and an optional model-backed agent.
+        The agent is absent when no OpenAI credential is configured.
+    """
 
     retriever = KnowledgeRetriever(settings)
     repository = SqliteSyntheticRepository(settings.synthetic_database_path)
