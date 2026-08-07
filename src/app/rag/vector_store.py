@@ -1,3 +1,5 @@
+"""Qdrant adapter for approved knowledge vectors; never workflow state."""
+
 from __future__ import annotations
 
 from uuid import NAMESPACE_URL, uuid5
@@ -38,11 +40,22 @@ class QdrantVectorStore:
         self._collection = settings.qdrant_collection
         self._embeddings = embeddings
 
-    # Implementing a simple readiness check Qdrant collection existence.
     def is_ready(self) -> bool:
+        """Return whether the configured collection exists."""
         return self._client.collection_exists(self._collection)
 
     def replace(self, chunks: list[KnowledgeChunk]) -> int:
+        """Replace the complete collection after validating embedding dimensions.
+
+        Args:
+            chunks: Integrity-checked knowledge chunks to index.
+
+        Returns:
+            Number of points written.
+
+        Raises:
+            RuntimeError: If embeddings are empty, missing, or dimensionally inconsistent.
+        """
         vectors = self._embeddings.embed([f"{chunk.title}\n\n{chunk.content}" for chunk in chunks])
         if len(vectors) != len(chunks) or not vectors:
             raise RuntimeError("Embedding provider returned an invalid vector count")
@@ -77,8 +90,8 @@ class QdrantVectorStore:
         self._client.upsert(collection_name=self._collection, points=points, wait=True)
         return len(points)
 
-    # Implementing a simple search; no filtering or scoring beyond the top-k results.
     def search(self, query: str, top_k: int) -> list[RetrievedChunk]:
+        """Return bounded similarity results with normalized scores."""
         vector = self._embeddings.embed([query])[0]
         response = self._client.query_points(
             collection_name=self._collection,
