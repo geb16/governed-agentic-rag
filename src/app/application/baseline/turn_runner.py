@@ -1,3 +1,5 @@
+"""Bounded baseline model loop and controlled-tool dispatch."""
+
 from __future__ import annotations
 
 import logging
@@ -46,6 +48,16 @@ class BaselineTurnRunner:
         trace_id: str,
         state: InvocationState,
     ) -> BaselineResponse:
+        """Run model turns until a validated terminal response is available.
+
+        Args:
+            request: Normalized task and trusted case identifiers.
+            trace_id: Per-invocation operational trace identifier.
+            state: Request-local conversation and evidence state.
+
+        Returns:
+            A completed response, a safety refusal, or a bounded failure response.
+        """
         for turn_index in range(1, self._policy.max_agent_turns + 1):
             turn = self._model.complete(
                 input_items=state.input_items,
@@ -146,6 +158,7 @@ class BaselineTurnRunner:
         state: InvocationState,
         category: str,
     ) -> BaselineResponse:
+        """Create and log a safety refusal for an invalid model output."""
         self._log(
             ExecutionEvent.OUTPUT_BLOCKED,
             request,
@@ -168,6 +181,7 @@ class BaselineTurnRunner:
         trace_id: str,
         state: InvocationState,
     ) -> BaselineResponse:
+        """Create a stable failure response without claiming task completion."""
         return self._responses.create(
             request=request,
             trace_id=trace_id,
