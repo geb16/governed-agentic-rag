@@ -1,3 +1,5 @@
+"""SQLite adapter for case-partitioned synthetic support-domain state."""
+
 from __future__ import annotations
 
 import sqlite3
@@ -117,6 +119,12 @@ class SqliteSyntheticRepository:
             connection.close()
 
     def initialize(self) -> None:
+        """Create the schema and reject incompatible schema versions.
+
+        Raises:
+            RuntimeError: If the database records a different schema version.
+            sqlite3.Error: If schema initialization fails.
+        """
         self._database_path.parent.mkdir(parents=True, exist_ok=True)
         with self._connect() as connection:
             connection.execute("PRAGMA journal_mode = WAL")
@@ -138,6 +146,12 @@ class SqliteSyntheticRepository:
             )
 
     def create_case(self, fixture: SyntheticCaseFixture, *, replace: bool = False) -> None:
+        """Insert an isolated case fixture in one transaction.
+
+        Args:
+            fixture: Validated tickets, accounts, and fault plans for the case.
+            replace: Whether to delete an existing case partition before insertion.
+        """
         with self._connect() as connection:
             if replace:
                 connection.execute(
@@ -183,6 +197,7 @@ class SqliteSyntheticRepository:
                 self._set_fault_plan(connection, fixture.case_id, plan)
 
     def case_exists(self, case_id: str) -> bool:
+        """Return whether the named case partition exists."""
         with self._connect() as connection:
             row = connection.execute(
                 "SELECT 1 FROM synthetic_cases WHERE case_id = ?", (case_id,)
@@ -190,6 +205,7 @@ class SqliteSyntheticRepository:
         return row is not None
 
     def get_ticket(self, case_id: str, ticket_id: str) -> TicketRecord | None:
+        """Read one ticket from the specified case partition."""
         with self._connect() as connection:
             row = connection.execute(
                 """
@@ -203,6 +219,7 @@ class SqliteSyntheticRepository:
     def update_ticket_status(
         self, case_id: str, ticket_id: str, new_status: str
     ) -> tuple[TicketRecord | None, bool]:
+        """Update a ticket and increment its version only when status changes."""
         with self._connect() as connection:
             connection.execute("BEGIN IMMEDIATE")
             row = connection.execute(
@@ -230,6 +247,7 @@ class SqliteSyntheticRepository:
         return self._ticket_from_row(updated), changed
 
     def get_access_account(self, case_id: str, subject_id: str) -> AccessAccountRecord | None:
+        """Read one synthetic access account from a case partition."""
         with self._connect() as connection:
             row = connection.execute(
                 """
@@ -243,6 +261,7 @@ class SqliteSyntheticRepository:
     def change_access_role(
         self, case_id: str, subject_id: str, new_role: str
     ) -> tuple[AccessAccountRecord | None, bool]:
+        """Change a synthetic role and increment its version when required."""
         with self._connect() as connection:
             connection.execute("BEGIN IMMEDIATE")
             row = connection.execute(
@@ -277,6 +296,7 @@ class SqliteSyntheticRepository:
         currency: str,
         idempotency_key: str,
     ) -> tuple[RefundRecord | None, bool]:
+        """Create an idempotent synthetic refund for an existing case ticket."""
         with self._connect() as connection:
             connection.execute("BEGIN IMMEDIATE")
             existing = connection.execute(
@@ -329,6 +349,7 @@ class SqliteSyntheticRepository:
         requested_role: str,
         idempotency_key: str,
     ) -> tuple[EscalationRecord | None, bool]:
+        """Create an idempotent pending review for an existing case ticket."""
         with self._connect() as connection:
             connection.execute("BEGIN IMMEDIATE")
             existing = connection.execute(
@@ -374,6 +395,7 @@ class SqliteSyntheticRepository:
         return self._escalation_from_row(row), True
 
     def set_fault_plan(self, case_id: str, plan: FaultPlan) -> None:
+        """Replace one case-scoped deterministic tool-failure plan."""
         with self._connect() as connection:
             if (
                 connection.execute(
@@ -401,6 +423,7 @@ class SqliteSyntheticRepository:
         )
 
     def consume_fault(self, case_id: str, tool_name: str) -> ConsumedFault | None:
+        """Atomically consume and number the next planned failure attempt."""
         with self._connect() as connection:
             connection.execute("BEGIN IMMEDIATE")
             row = connection.execute(
