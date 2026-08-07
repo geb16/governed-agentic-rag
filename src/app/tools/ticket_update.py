@@ -1,3 +1,5 @@
+"""Controlled status changes for case-partitioned synthetic tickets."""
+
 from __future__ import annotations
 
 from typing import Literal
@@ -16,17 +18,23 @@ from app.tools.evidence import evidence_reference
 
 
 class TicketUpdateArguments(StrictModel):
+    """Validated ticket identifier and finite target status."""
+
     ticket_id: str = Field(pattern=r"^TKT-[0-9]{4}$")
     new_status: Literal["open", "in_progress", "resolved", "closed"]
 
 
 class TicketUpdateResult(ControlledToolResult):
+    """Resulting ticket status and optional updated version."""
+
     ticket_id: str
     status: str
     version: int | None = None
 
 
 class TicketUpdateTool:
+    """Change only synthetic ticket state inside the trusted case partition."""
+
     name = "update_ticket_status"
     description = (
         "Change the status of a ticket inside the isolated synthetic case. "
@@ -42,6 +50,7 @@ class TicketUpdateTool:
         arguments: TicketUpdateArguments,
         context: ToolExecutionContext,
     ) -> TicketUpdateResult:
+        """Apply a status change and return integrity-addressed ticket evidence."""
         record, changed = self._repository.update_ticket_status(
             context.case_id,
             arguments.ticket_id,
