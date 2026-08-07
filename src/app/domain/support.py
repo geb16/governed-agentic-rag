@@ -1,3 +1,5 @@
+"""Support-domain entities for isolated synthetic evaluation state."""
+
 from __future__ import annotations
 
 from enum import StrEnum
@@ -8,18 +10,24 @@ from app.domain.schemas import StrictModel
 
 
 class FailureMode(StrEnum):
+    """Deterministic failure categories available to evaluation fixtures."""
+
     TRANSIENT_ERROR = "transient_error"
     TIMEOUT = "timeout"
     PERMANENT_ERROR = "permanent_error"
 
 
 class AccessAccountRecord(StrictModel):
+    """Versioned synthetic IAM account state."""
+
     subject_id: str = Field(pattern=r"^USR-[0-9]{4}$")
     role: str
     version: int = Field(ge=1)
 
 
 class RefundRecord(StrictModel):
+    """Idempotent entry in the synthetic refund ledger."""
+
     refund_id: str
     ticket_id: str
     amount_minor: int = Field(gt=0)
@@ -29,6 +37,8 @@ class RefundRecord(StrictModel):
 
 
 class EscalationRecord(StrictModel):
+    """Pending synthetic human-review request."""
+
     escalation_id: str
     ticket_id: str
     reason: str
@@ -38,6 +48,8 @@ class EscalationRecord(StrictModel):
 
 
 class FaultPlan(StrictModel):
+    """Case-scoped deterministic failure plan for one tool."""
+
     tool_name: str = Field(min_length=1, max_length=100)
     mode: FailureMode
     failures: int = Field(ge=1, le=20)
@@ -45,6 +57,8 @@ class FaultPlan(StrictModel):
 
 
 class TicketRecord(StrictModel):
+    """Versioned synthetic support ticket state."""
+
     ticket_id: str = Field(pattern=r"^TKT-[0-9]{4}$")
     status: str
     category: str
@@ -53,16 +67,21 @@ class TicketRecord(StrictModel):
 
 
 class ConsumedFault(StrictModel):
+    """One consumed attempt from a deterministic fault plan."""
+
     mode: FailureMode
     error_code: str
     attempt_number: int = Field(ge=1)
 
     @property
     def retryable(self) -> bool:
+        """Return whether the simulated failure permits a model retry."""
         return self.mode in {FailureMode.TRANSIENT_ERROR, FailureMode.TIMEOUT}
 
 
 class SyntheticCaseFixture(StrictModel):
+    """Complete seed data for one isolated evaluation case."""
+
     case_id: str = Field(pattern=r"^case_[a-zA-Z0-9_-]+$")
     tickets: list[TicketRecord] = Field(default_factory=list)
     access_accounts: list[AccessAccountRecord] = Field(default_factory=list)
