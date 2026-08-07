@@ -1,3 +1,5 @@
+"""Request-local conversation, evidence, tool, and usage state."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -33,6 +35,15 @@ class InvocationState:
         user_prompt: str,
         chunks: list[RetrievedChunk],
     ) -> InvocationState:
+        """Create invocation state from the initial prompt and retrieved chunks.
+
+        Args:
+            user_prompt: Serialized untrusted request and retrieval context.
+            chunks: Initial approved retrieval results.
+
+        Returns:
+            New state whose evidence allowlist contains the supplied chunks.
+        """
         return cls(
             input_items=[{"role": "user", "content": user_prompt}],
             available_chunks={chunk.chunk_id: chunk for chunk in chunks},
@@ -51,13 +62,16 @@ class InvocationState:
 
     @property
     def usage(self) -> Usage:
+        """Return accumulated model token usage."""
         return Usage(input_tokens=self.input_tokens, output_tokens=self.output_tokens)
 
     def record_model_turn(self, turn: ModelTurn) -> None:
+        """Accumulate provider-reported token usage for one model turn."""
         self.input_tokens += turn.input_tokens
         self.output_tokens += turn.output_tokens
 
     def record_tool_execution(self, turn: ModelTurn, execution: ToolExecution) -> None:
+        """Append a controlled tool result and its newly available evidence."""
         self.tool_calls.append(execution.record)
         self.available_chunks.update(
             (chunk.chunk_id, chunk) for chunk in execution.retrieved_chunks
@@ -75,6 +89,7 @@ class InvocationState:
         )
 
     def citations_for(self, chunk_ids: list[str]) -> list[Citation]:
+        """Build public citations for previously validated chunk identifiers."""
         return [
             Citation(
                 chunk_id=chunk_id,
@@ -86,6 +101,7 @@ class InvocationState:
         ]
 
     def evidence_for(self, chunk_ids: list[str]) -> list[EvidenceReference]:
+        """Return cited knowledge plus unique evidence produced by tools."""
         evidence = [self.available_evidence[chunk_id] for chunk_id in chunk_ids]
         seen_ids = {item.evidence_id for item in evidence}
         for record in self.tool_calls:
