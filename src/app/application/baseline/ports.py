@@ -1,3 +1,5 @@
+"""Inbound and outbound ports used by the baseline application layer."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -33,19 +35,33 @@ class ToolExecution:
 
 
 class CaseReader(Protocol):
-    def case_exists(self, case_id: str) -> bool: ...
+    """Read-only boundary for validating isolated evaluation cases."""
+
+    def case_exists(self, case_id: str) -> bool:
+        """Return whether a synthetic case exists."""
+        ...
 
 
 class RetrievalGateway(Protocol):
-    @property
-    def backend_name(self) -> str: ...
+    """Boundary for retrieving approved knowledge chunks."""
 
-    def retrieve(self, query: str, top_k: int | None = None) -> list[RetrievedChunk]: ...
+    @property
+    def backend_name(self) -> str:
+        """Return the stable retrieval-backend identifier."""
+        ...
+
+    def retrieve(self, query: str, top_k: int | None = None) -> list[RetrievedChunk]:
+        """Return ranked chunks for a normalized query."""
+        ...
 
 
 class ModelGateway(Protocol):
+    """Provider-neutral boundary for one structured model turn."""
+
     @property
-    def model_name(self) -> str: ...
+    def model_name(self) -> str:
+        """Return the configured model identifier."""
+        ...
 
     def complete(
         self,
@@ -54,12 +70,18 @@ class ModelGateway(Protocol):
         instructions: str,
         tools: list[dict[str, Any]],
         safety_identifier: str,
-    ) -> ModelTurn: ...
+    ) -> ModelTurn:
+        """Generate one bounded turn from provider conversation items."""
+        ...
 
 
 class ToolGateway(Protocol):
+    """Boundary for allowlisted tool schemas and controlled execution."""
+
     @property
-    def specs(self) -> list[dict[str, Any]]: ...
+    def specs(self) -> list[dict[str, Any]]:
+        """Return strict function definitions exposed to the model."""
+        ...
 
     def execute(
         self,
@@ -68,23 +90,35 @@ class ToolGateway(Protocol):
         name: str,
         arguments_json: str,
         context: ToolExecutionContext,
-    ) -> ToolExecution: ...
+    ) -> ToolExecution:
+        """Validate and execute one model-proposed tool call."""
+        ...
 
 
 class InputSafetyPolicy(Protocol):
-    def inspect(self, text: str, *, max_chars: int) -> SafetyDecision: ...
+    """Boundary for deterministic input normalization and screening."""
+
+    def inspect(self, text: str, *, max_chars: int) -> SafetyDecision:
+        """Inspect user text against bounded input rules."""
+        ...
 
 
 class OutputSafetyPolicy(Protocol):
+    """Boundary for deterministic final-output validation."""
+
     def inspect(
         self,
         draft: AgentDraft,
         *,
         allowed_chunk_ids: set[str],
-    ) -> SafetyDecision: ...
+    ) -> SafetyDecision:
+        """Inspect a structured draft against evidence and content rules."""
+        ...
 
 
 class BaselineUseCase(Protocol):
     """Stable API-facing boundary for the baseline invocation use case."""
 
-    def invoke(self, request: BaselineRequest) -> BaselineResponse: ...
+    def invoke(self, request: BaselineRequest) -> BaselineResponse:
+        """Execute one isolated baseline task and return its public outcome."""
+        ...
