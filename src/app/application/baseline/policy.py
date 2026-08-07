@@ -1,3 +1,5 @@
+"""Provider-neutral runtime limits for the baseline application service."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
