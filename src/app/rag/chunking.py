@@ -1,3 +1,5 @@
+"""Integrity-checked loading and deterministic chunking of approved knowledge."""
+
 from __future__ import annotations
 
 import hashlib
@@ -6,11 +8,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-MAX_DOCUMENT_BYTES = 512_000  # Set 512 KB to avoid excessive memory usage
+MAX_DOCUMENT_BYTES = 512_000
 
 
 @dataclass(frozen=True, slots=True)
 class KnowledgeChunk:
+    """Immutable chunk produced from an allowlisted knowledge document."""
+
     chunk_id: str
     document_id: str
     title: str
@@ -39,7 +43,6 @@ def _windows(text: str, size: int, overlap: int) -> list[str]:
     return chunks
 
 
-# validating the knowledge base files and loading them into chunks
 def _safe_markdown_files(base_dir: Path) -> list[Path]:
 
     resolved_base = base_dir.resolve(strict=True)
@@ -79,6 +82,20 @@ def load_knowledge_chunks(
     chunk_size: int,
     chunk_overlap: int,
 ) -> list[KnowledgeChunk]:
+    """Validate the knowledge manifest and load deterministic text chunks.
+
+    Args:
+        base_dir: Directory containing ``manifest.json`` and Markdown documents.
+        chunk_size: Maximum target characters per chunk.
+        chunk_overlap: Characters retained between adjacent chunks.
+
+    Returns:
+        Ordered, content-addressed knowledge chunks.
+
+    Raises:
+        ValueError: If the manifest, document set, hashes, paths, sizes, or content fail
+            validation, or if no chunks are produced.
+    """
     chunks: list[KnowledgeChunk] = []
     for path in _safe_markdown_files(base_dir):
         raw = path.read_text(encoding="utf-8")
