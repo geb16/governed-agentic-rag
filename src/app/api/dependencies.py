@@ -1,3 +1,5 @@
+"""FastAPI dependency resolvers for application-layer ports."""
+
 from __future__ import annotations
 
 from fastapi import HTTPException, Request, status
@@ -5,8 +7,18 @@ from fastapi import HTTPException, Request, status
 from app.application.baseline.ports import BaselineUseCase
 
 
-# function to retrieve the baseline use case from the FastAPI request context
 def get_agent(request: Request) -> BaselineUseCase:
+    """Resolve the configured baseline use case for an HTTP request.
+
+    Args:
+        request: Active FastAPI request containing application lifespan state.
+
+    Returns:
+        The application-facing baseline invocation port.
+
+    Raises:
+        HTTPException: If no model-backed baseline use case is configured.
+    """
     agent: BaselineUseCase | None = request.app.state.agent
     if agent is None:
         raise HTTPException(
