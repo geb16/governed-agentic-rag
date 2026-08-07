@@ -1,3 +1,5 @@
+"""Read-only capability for querying the approved knowledge corpus."""
+
 from __future__ import annotations
 
 from pydantic import Field
@@ -14,15 +16,21 @@ from app.rag.retriever import Retriever
 
 
 class PolicyLookupArguments(StrictModel):
+    """Validated policy query and bounded result count."""
+
     query: str = Field(min_length=3, max_length=500)
     max_results: int = Field(ge=1, le=5)
 
 
 class PolicyLookupResult(ControlledToolResult):
+    """Approved ranked chunks and their evidence references."""
+
     matches: list[RetrievedChunk]
 
 
 class PolicyLookupTool:
+    """Expose narrower retrieval as a read-only model capability."""
+
     name = "policy_lookup"
     description = (
         "Search the approved synthetic enterprise knowledge base. Read-only; "
@@ -38,6 +46,7 @@ class PolicyLookupTool:
         arguments: PolicyLookupArguments,
         context: ToolExecutionContext,
     ) -> PolicyLookupResult:
+        """Retrieve approved chunks; trusted case context is intentionally unused."""
         del context
         matches = self._retriever.retrieve(arguments.query, arguments.max_results)
         return PolicyLookupResult(
