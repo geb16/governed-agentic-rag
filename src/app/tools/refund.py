@@ -1,3 +1,5 @@
+"""Controlled synthetic refund-ledger capability."""
+
 from __future__ import annotations
 
 from typing import Literal
@@ -16,6 +18,8 @@ from app.tools.evidence import evidence_reference
 
 
 class IssueRefundArguments(StrictModel):
+    """Validated synthetic refund amount, currency, ticket, and idempotency key."""
+
     ticket_id: str = Field(pattern=r"^TKT-[0-9]{4}$")
     amount_minor: int = Field(
         gt=0,
@@ -27,6 +31,8 @@ class IssueRefundArguments(StrictModel):
 
 
 class IssueRefundResult(ControlledToolResult):
+    """Synthetic refund identity and ledger status."""
+
     refund_id: str | None = None
     ticket_id: str
     amount_minor: int
@@ -35,6 +41,8 @@ class IssueRefundResult(ControlledToolResult):
 
 
 class IssueRefundTool:
+    """Write only to the isolated synthetic ledger; never a payment provider."""
+
     name = "issue_refund"
     description = (
         "Issue a refund only in the isolated synthetic ledger. This tool does not enforce "
@@ -51,6 +59,7 @@ class IssueRefundTool:
         arguments: IssueRefundArguments,
         context: ToolExecutionContext,
     ) -> IssueRefundResult:
+        """Create or return an idempotent refund in the trusted case context."""
         record, changed = self._repository.issue_refund(
             context.case_id,
             arguments.ticket_id,
