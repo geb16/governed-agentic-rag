@@ -19,26 +19,7 @@ dependencies = [
 ]
 
 [project.scripts]
-dev-task = "dev_tools.dev_tasks:main"
-app = "dev_tools.dev_tasks:main"
-serve = "dev_tools.dev_tasks:serve_cli"
-lint = "dev_tools.dev_tasks:lint_cli"
-lint-fix = "dev_tools.dev_tasks:lint_fix_cli"
-format = "dev_tools.dev_tasks:format_cli"
-format-check = "dev_tools.dev_tasks:format_check_cli"
-format-write = "dev_tools.dev_tasks:format_write_cli"
-test = "dev_tools.dev_tasks:test_cli"
-test-smoke = "dev_tools.dev_tasks:test_smoke_cli"
-coverage = "dev_tools.dev_tasks:coverage_cli"
-typecheck = "dev_tools.dev_tasks:typecheck_cli"
-fix = "dev_tools.dev_tasks:fix_cli"
-check = "dev_tools.dev_tasks:check_cli"
-ci = "dev_tools.dev_tasks:ci_cli"
-doctor = "dev_tools.dev_tasks:doctor_cli"
-clean = "dev_tools.dev_tasks:clean_cli"
-precommit-lint = "dev_tools.dev_tasks:precommit_lint_cli"
-precommit-format = "dev_tools.dev_tasks:precommit_format_cli"
-precommit-check = "dev_tools.dev_tasks:precommit_check_cli"
+
 
 
 [dependency-groups]
