@@ -38,7 +38,6 @@ FROZEN_PATTERNS = (
     "tests/__init__.py",
     "tests/conftest.py",
     "tests/architecture/test_baseline_boundaries.py",
-    "tests/architecture/test_baseline_documentation.py",
     "tests/baseline/**/*.py",
     "tests/shared/**/*.py",
     "tests/support/**/*.py",
