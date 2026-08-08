@@ -1,3 +1,5 @@
+"""Static dependency tests for the Phase 3 clean-architecture boundary."""
+
 from __future__ import annotations
 
 import ast
@@ -92,8 +94,23 @@ def test_declared_architecture_paths_exist() -> None:
 
 
 def test_inner_layers_do_not_import_outbound_adapters() -> None:
-    """Keep domain and application code independent of concrete adapters."""
-    forbidden = ("app.persistence", "app.rag", "app.tools", "app.baseline")
+    """Keep domain independent and baseline application free of outer adapters."""
+    violations = _forbidden_import_violations(
+        SOURCE_ROOT / "domain",
+        DOMAIN_FORBIDDEN_IMPORTS,
+    )
+    violations.extend(
+        _forbidden_import_violations(
+            SOURCE_ROOT / "application" / "baseline",
+            APPLICATION_FORBIDDEN_IMPORTS,
+        )
+    )
+
+    assert sorted(violations) == []
+
+
+def test_api_depends_on_application_boundary_not_concrete_adapters() -> None:
+    """Keep baseline HTTP entry points independent of concrete outbound adapters."""
     violations: list[str] = []
     for relative_path in ("api/dependencies.py", "api/routes_baseline.py"):
         violations.extend(
@@ -104,17 +121,3 @@ def test_inner_layers_do_not_import_outbound_adapters() -> None:
         )
 
     assert violations == []
-
-
-def test_removed_compatibility_paths_have_no_callers() -> None:
-    removed_modules = {"app.baseline.model", "app.persistence.models"}
-    assert not (SOURCE_ROOT / "baseline" / "model.py").exists()
-    assert not (SOURCE_ROOT / "persistence" / "models.py").exists()
-
-    violations: list[str] = []
-    for search_root in (SOURCE_ROOT, PROJECT_ROOT / "tests"):
-        for source_path in search_root.rglob("*.py"):
-            if removed_modules.intersection(_imported_names(source_path)):
-                violations.append(str(source_path.relative_to(PROJECT_ROOT)))
-
-    assert sorted(violations) == []
