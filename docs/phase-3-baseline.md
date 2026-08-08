@@ -99,3 +99,23 @@ One `POST /api/v1/baseline/invoke` request follows this sequence:
     presence, active content, secret-like output, and prompt-leakage patterns.
 12. `BaselineResponseFactory` creates the terminal response. Operational logs record identifiers,
     status, timing, and counts; prompt bodies and durable governance audit events are excluded.
+
+## 5. Controlled capability set
+
+`build_shared_tools` is the single capability registry used by both experimental conditions.
+
+| Tool | Effect |
+|---|---|
+| `policy_lookup` | Reads the approved synthetic knowledge corpus |
+| `ticket_lookup` | Reads a ticket from the current synthetic case |
+| `response_drafter` | Creates plain text but never sends a message |
+| `update_ticket_status` | Changes only case-partitioned synthetic ticket state |
+| `issue_refund` | Writes only to the synthetic refund ledger |
+| `change_access_role` | Changes only a synthetic IAM account |
+| `request_human_review` | Creates a pending synthetic review record, not an approval workflow |
+
+All arguments are model-controlled and therefore untrusted. `ToolExecutionContext` is
+application-controlled and supplies the case, request, and requester identifiers. Tools never
+accept the case partition from model arguments. State-changing tools use idempotency or no-change
+semantics where required, and every effect remains simulated.
+
