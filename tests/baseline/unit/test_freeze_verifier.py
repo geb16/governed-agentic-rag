@@ -14,18 +14,21 @@ def test_freeze_scope_covers_clean_architecture_and_phase3_contracts() -> None:
     assert isinstance(source_files, dict)
     assert {
         "scripts/verify_phase3_freeze.py",
-        "docs/architecture.md",
+        "docs/architecture/baseline_architecture.md",
         "docs/phase-3-baseline.md",
         "src/app/application/baseline/service.py",
         "src/app/composition.py",
         "src/app/infrastructure/llm/openai_responses.py",
+        "tests/README.md",
         "tests/architecture/test_baseline_boundaries.py",
         "tests/baseline/integration/test_agent.py",
     } <= source_files.keys()
     assert "src/app/baseline/model.py" not in source_files
     assert "src/app/persistence/models.py" not in source_files
+    assert "tests/test_config.py" not in source_files
     assert all("__pycache__" not in path for path in source_files)
     assert "tests/governance/**/*.py" not in FROZEN_PATTERNS
+    assert "tests/test_config.py" not in FROZEN_PATTERNS
 
 
 def test_freeze_difference_diagnostics_identify_file_changes() -> None:

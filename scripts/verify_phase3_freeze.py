@@ -20,7 +20,7 @@ FROZEN_PATTERNS = (
     "pyproject.toml",
     "uv.lock",
     "data/knowledge_base/*",
-    "docs/architecture.md",
+    "docs/architecture/baseline_architecture.md",
     "docs/phase-3-baseline.md",
     "scripts/verify_phase3_freeze.py",
     "src/app/__init__.py",
@@ -36,12 +36,12 @@ FROZEN_PATTERNS = (
     "src/app/rag/*.py",
     "src/app/tools/*.py",
     "tests/__init__.py",
+    "tests/README.md",
     "tests/conftest.py",
     "tests/architecture/test_baseline_boundaries.py",
     "tests/baseline/**/*.py",
     "tests/shared/**/*.py",
     "tests/support/**/*.py",
-    "tests/test_config.py",
 )
 
 COMPARABLE_KEYS = (
