@@ -1,7 +1,68 @@
+[build-system]
+requires = ["setuptools>=80,<82"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "governed-agentic-rag"
 version = "0.1.0"
-description = "Add your description here"
+description = "design and evaluating a governed enterprise stle RAG workflow."
 readme = "README.md"
-requires-python = ">=3.11"
-dependencies = []
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "fastapi>=0.136,<1",
+  "openai>=2.36,<3",
+  "pydantic>=2.13,<3",
+  "pydantic-settings>=2.12,<3",
+  "python-dotenv>=1.2.2",
+  "qdrant-client>=1.17,<2",
+  "uvicorn[standard]>=0.41,<1",
+]
+
+[project.scripts]
+
+
+
+[dependency-groups]
+dev = [
+  "httpx2>=2,<3",
+  "mypy>=1.19,<2",
+  "pre-commit>=4.4,<5",
+  "pyright>=1.1.411",
+  "pytest>=9.0,<10",
+  "pytest-cov>=7,<8",
+  "ruff>=0.15,<1",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q --strict-config --strict-markers"
+markers = [
+  "smoke: fast tests covering critical application startup and behavior",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "RUF", "I001"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+mypy_path = ["src"]
+files = ["src"]
+explicit_package_bases = true
+plugins = ["pydantic.mypy"]
+
+[tool.pyright]
+include = ["src", "tests"]
+extraPaths = ["src"]
+pythonVersion = "3.11"
+typeCheckingMode = "basic"
+reportMissingImports = "error"
+reportMissingModuleSource = "error"
