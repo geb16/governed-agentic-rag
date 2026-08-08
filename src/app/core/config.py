@@ -1,3 +1,5 @@
+"""Validated environment configuration and production security invariants."""
+
 from __future__ import annotations
 
 import json
@@ -12,7 +14,7 @@ from app.core.version import APP_VERSION
 
 
 class Settings(BaseSettings):
-    """Environment-backed configuration"""
+    """Load typed runtime settings from ``RAG_``-prefixed environment values."""
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -67,6 +69,17 @@ class Settings(BaseSettings):
     @field_validator("allowed_hosts", mode="before")
     @classmethod
     def parse_allowed_hosts(cls, value: object) -> object:
+        """Parse allowed hosts from a JSON array or comma-separated string.
+
+        Args:
+            value: Raw settings value supplied by Pydantic Settings.
+
+        Returns:
+            A host list for string input, otherwise the original value.
+
+        Raises:
+            ValueError: If a JSON value is valid JSON but is not an array.
+        """
         if isinstance(value, str):
             stripped = value.strip()
             if stripped.startswith("["):
@@ -79,6 +92,14 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_security_configuration(self) -> Settings:
+        """Enforce cross-field retrieval, experiment, and production constraints.
+
+        Returns:
+            The validated settings instance.
+
+        Raises:
+            ValueError: If settings would create an invalid or unsafe runtime profile.
+        """
         if self.chunk_overlap_chars >= self.chunk_size_chars:
             raise ValueError("chunk_overlap_chars must be smaller than chunk_size_chars")
         if self.environment == "production":
@@ -107,4 +128,5 @@ class Settings(BaseSettings):
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
+    """Return the process-cached environment configuration."""
     return Settings()

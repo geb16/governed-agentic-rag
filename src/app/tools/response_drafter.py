@@ -1,3 +1,5 @@
+"""Controlled plain-text drafting with no delivery side effect."""
+
 from __future__ import annotations
 
 from typing import Literal
@@ -14,17 +16,23 @@ from app.tools.evidence import evidence_reference
 
 
 class ResponseDrafterArguments(StrictModel):
+    """Validated audience, purpose, and bounded response points."""
+
     audience: Literal["customer", "support_staff", "policy_owner"]
     purpose: str = Field(min_length=3, max_length=200)
     key_points: list[str] = Field(min_length=1, max_length=8)
 
 
 class ResponseDrafterResult(ControlledToolResult):
+    """Plain-text draft explicitly marked as undelivered."""
+
     draft: str
     delivered: bool = False
 
 
 class ResponseDrafterTool:
+    """Create a normalized simulated response draft without sending it."""
+
     name = "response_drafter"
     description = (
         "Create a simulated plain-text response draft. It never sends a message "
@@ -37,6 +45,7 @@ class ResponseDrafterTool:
         arguments: ResponseDrafterArguments,
         context: ToolExecutionContext,
     ) -> ResponseDrafterResult:
+        """Normalize key points and return an integrity-addressed draft."""
         safe_points = [
             point.replace("\r", " ").replace("\n", " ").strip()[:300]
             for point in arguments.key_points

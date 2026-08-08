@@ -1,3 +1,5 @@
+"""Focused contracts for deterministic baseline input and output guardrails."""
+
 import pytest
 
 from app.baseline.guardrails import InputGuardrail, OutputGuardrail
@@ -16,16 +18,16 @@ from app.domain.schemas import AgentDraft
         ),
     ],
 )
-# confirm that input guardrail blocks known attack classes
 def test_input_guardrail_blocks_known_attack_classes(payload: str, category: str) -> None:
+    """Classify each explicitly supported input-attack pattern."""
     result = InputGuardrail().inspect(payload, max_chars=4_000)
 
     assert result.blocked is True
     assert result.category == category
 
 
-# Testing the input guardrail does not block normal policy questions
 def test_input_guardrail_does_not_block_normal_policy_question() -> None:
+    """Allow an ordinary policy question through deterministic screening."""
     result = InputGuardrail().inspect(
         "What does the policy say about emergency access?",
         max_chars=4_000,
@@ -34,8 +36,8 @@ def test_input_guardrail_does_not_block_normal_policy_question() -> None:
     assert result.blocked is False
 
 
-#  Testing the output guardrail blocks fabricated citations and active content
 def test_output_guardrail_rejects_fabricated_citation() -> None:
+    """Reject a grounded claim citing evidence unavailable to the invocation."""
     result = OutputGuardrail().inspect(
         AgentDraft(
             answer="The policy requires review.",
@@ -49,8 +51,8 @@ def test_output_guardrail_rejects_fabricated_citation() -> None:
     assert result.category == "fabricated_citation"
 
 
-# active content must be blocked regardless of whether the URL looks suspicious
 def test_output_guardrail_rejects_benign_looking_active_content() -> None:
+    """Reject active markup independently of whether its URL appears benign."""
     result = OutputGuardrail().inspect(
         AgentDraft(
             answer=(

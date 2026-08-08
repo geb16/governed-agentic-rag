@@ -1,3 +1,5 @@
+"""HTTP authentication, response hardening, and pseudonymous model identifiers."""
+
 import hashlib
 import hmac
 import secrets
@@ -9,15 +11,25 @@ from starlette.responses import Response
 
 from app.core.config import Settings
 
-# API key header for authentication
 api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
 
-# Function to require an API key for access to certain endpoints
 def require_api_key(
     request: Request,
     supplied_key: str | None = Depends(api_key_header),
 ) -> None:
+    """Enforce constant-time API-key authentication when configured.
+
+    Development and test profiles may operate without a key. Production fails closed
+    when configuration is missing and rejects absent or incorrect credentials.
+
+    Args:
+        request: Active request containing validated settings.
+        supplied_key: Optional credential extracted from ``X-API-Key``.
+
+    Raises:
+        HTTPException: If production lacks a key or the supplied key is invalid.
+    """
     settings: Settings = request.app.state.settings
     configured = settings.api_key
     if configured is None or not configured.get_secret_value():
@@ -48,6 +60,19 @@ async def security_middleware(
     request: Request,
     call_next: Callable[[Request], Awaitable[Response]],
 ) -> Response:
+    """Apply declared-size checks and defensive response headers.
+
+    Args:
+        request: Incoming HTTP request.
+        call_next: Downstream ASGI request handler.
+
+    Returns:
+        A 400/413 rejection or the downstream response with security headers.
+
+    Note:
+        ``Content-Length`` is an early rejection control, not a streaming-body limit.
+        The deployment proxy must independently enforce maximum body size.
+    """
     settings: Settings = request.app.state.settings
     content_length = request.headers.get("content-length")
     if content_length:

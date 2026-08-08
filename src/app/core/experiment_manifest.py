@@ -1,3 +1,5 @@
+"""Reproducibility manifest for controlled Phase 3 experiment runs."""
+
 from __future__ import annotations
 
 import hashlib
@@ -36,6 +38,8 @@ def _canonical_sha256(value: Any) -> str:
 
 
 class ExperimentRunManifest(StrictModel):
+    """Immutable experiment identity derived from code-adjacent configuration."""
+
     manifest_schema_version: int = 1
     freeze_id: str
     run_id: str
@@ -62,6 +66,19 @@ def build_experiment_manifest(
     settings: Settings,
     tool_router: ToolRouter,
 ) -> ExperimentRunManifest:
+    """Build a reproducibility manifest for an experiment-profile runtime.
+
+    Args:
+        settings: Validated experiment configuration.
+        tool_router: Configured router whose strict schemas form part of the identity.
+
+    Returns:
+        A manifest covering models, retrieval, prompts, tools, and package versions.
+
+    Raises:
+        ValueError: If the runtime is not a named experiment profile.
+        OSError: If the knowledge manifest cannot be read.
+    """
     if settings.execution_profile != "experiment" or settings.experiment_run_id is None:
         raise ValueError("An experiment manifest can only be built for the experiment profile")
     knowledge_manifest = settings.knowledge_base_dir / "manifest.json"
@@ -95,15 +112,29 @@ def build_experiment_manifest(
     )
 
 
-# Record the experiment manifest to a file
 def record_experiment_manifest(
     settings: Settings,
     tool_router: ToolRouter,
 ) -> tuple[ExperimentRunManifest, Path]:
+    """Create a run manifest once, preserving run-identifier immutability.
+
+    Args:
+        settings: Validated experiment configuration and artifact location.
+        tool_router: Configured strict tool registry.
+
+    Returns:
+        The stored manifest and its filesystem path. An identical existing manifest
+        is returned without rewriting it.
+
+    Raises:
+        RuntimeError: If the run identifier already names different configuration.
+        OSError: If the manifest cannot be read or created.
+    """
     manifest = build_experiment_manifest(settings, tool_router)
     path = settings.experiment_manifest_dir / manifest.run_id / "manifest.json"
 
     def validate_existing() -> tuple[ExperimentRunManifest, Path]:
+        """Return an existing manifest only when its configuration identity matches."""
         existing = ExperimentRunManifest.model_validate_json(path.read_text(encoding="utf-8"))
         if existing.configuration_sha256 != manifest.configuration_sha256:
             raise RuntimeError(

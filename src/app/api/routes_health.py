@@ -1,3 +1,5 @@
+"""Liveness and dependency-readiness endpoints."""
+
 from __future__ import annotations
 
 from datetime import UTC, datetime
@@ -9,9 +11,16 @@ from app.domain.schemas import HealthResponse
 router = APIRouter(prefix="/health", tags=["health"])
 
 
-# check if the service is live and responding
 @router.get("/live", response_model=HealthResponse)
 def live(request: Request) -> HealthResponse:
+    """Report process liveness without asserting dependency readiness.
+
+    Args:
+        request: Active request used to read service metadata.
+
+    Returns:
+        An ``ok`` health response when the process can serve HTTP traffic.
+    """
     settings = request.app.state.settings
     return HealthResponse(
         service=settings.app_name,
@@ -21,9 +30,17 @@ def live(request: Request) -> HealthResponse:
     )
 
 
-#  ready endpoint checks if the service is ready to handle requests
 @router.get("/ready", response_model=HealthResponse)
 def ready(request: Request, response: Response) -> HealthResponse:
+    """Report whether retrieval and model-backed invocation are configured.
+
+    Args:
+        request: Active request used to inspect application state.
+        response: Mutable response whose status becomes 503 when dependencies are absent.
+
+    Returns:
+        A structured ``ready`` or ``not_ready`` health response.
+    """
     settings = request.app.state.settings
     is_ready = request.app.state.agent is not None and request.app.state.retriever is not None
     if not is_ready:

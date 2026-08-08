@@ -1,3 +1,5 @@
+"""Unit contracts for pseudonymization, log redaction, and secure configuration."""
+
 import json
 import logging
 
@@ -10,6 +12,7 @@ from app.core.security import stable_safety_identifier
 
 
 def test_safety_identifier_is_keyed_and_does_not_expose_identity() -> None:
+    """Produce a secret-dependent digest that omits the raw requester identity."""
     first = stable_safety_identifier("employee@example.test", "secret-a")
     second = stable_safety_identifier("employee@example.test", "secret-b")
 
@@ -19,6 +22,7 @@ def test_safety_identifier_is_keyed_and_does_not_expose_identity() -> None:
 
 
 def test_json_logging_redacts_secrets_and_log_injection() -> None:
+    """Redact keyed and inline secrets while neutralizing forged log lines."""
     formatter = JsonFormatter()
     record = logging.LogRecord(
         name="test",
@@ -40,6 +44,7 @@ def test_json_logging_redacts_secrets_and_log_injection() -> None:
 
 
 def test_production_rejects_plaintext_qdrant(project_root) -> None:
+    """Reject production Qdrant credentials sent over a non-TLS URL."""
     with pytest.raises(ValidationError, match="must use HTTPS"):
         Settings(
             environment="production",

@@ -1,3 +1,5 @@
+"""Trusted-corpus retrieval port with lexical and Qdrant implementations."""
+
 from __future__ import annotations
 
 import math
@@ -15,10 +17,16 @@ TOKEN_PATTERN = re.compile(r"[a-zA-Z0-9]+")
 
 
 class Retriever(Protocol):
-    @property
-    def backend_name(self) -> str: ...
+    """Boundary shared by knowledge consumers and the policy lookup tool."""
 
-    def retrieve(self, query: str, top_k: int | None = None) -> list[RetrievedChunk]: ...
+    @property
+    def backend_name(self) -> str:
+        """Return the active backend identifier."""
+        ...
+
+    def retrieve(self, query: str, top_k: int | None = None) -> list[RetrievedChunk]:
+        """Return ranked approved chunks for a query."""
+        ...
 
 
 def _tokens(text: str) -> list[str]:
@@ -47,6 +55,7 @@ class KnowledgeRetriever:
 
     @property
     def backend_name(self) -> str:
+        """Return ``qdrant`` or ``lexical`` for reproducibility metadata."""
         return "qdrant" if self._vector_store is not None else "lexical"
 
     @staticmethod
@@ -92,6 +101,7 @@ class KnowledgeRetriever:
         ]
 
     def retrieve(self, query: str, top_k: int | None = None) -> list[RetrievedChunk]:
+        """Retrieve up to ten chunks above the configured minimum score."""
         limit = min(top_k or self.settings.retrieval_top_k, 10)
         if self._vector_store is not None:
             return [
@@ -101,7 +111,7 @@ class KnowledgeRetriever:
             ]
         return self._lexical_search(query, limit)
 
-    # Chunk count property  to provide the number of chunks in the kb
     @property
     def chunk_count(self) -> int:
+        """Return the number of integrity-validated local chunks."""
         return len(self._chunks)

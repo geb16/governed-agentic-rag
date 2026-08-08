@@ -1,3 +1,5 @@
+"""Structural contract implemented by every allowlisted controlled tool."""
+
 from __future__ import annotations
 
 from typing import Protocol, TypeVar
@@ -10,6 +12,8 @@ ArgumentsT = TypeVar("ArgumentsT", bound=BaseModel)
 
 
 class ControlledTool(Protocol[ArgumentsT]):
+    """Expose strict arguments and governance-neutral execution results."""
+
     name: str
     description: str
     input_model: type[ArgumentsT]
@@ -18,4 +22,6 @@ class ControlledTool(Protocol[ArgumentsT]):
         self,
         arguments: ArgumentsT,
         context: ToolExecutionContext,
-    ) -> ControlledToolResult: ...
+    ) -> ControlledToolResult:
+        """Execute validated arguments within application-injected trusted context."""
+        ...

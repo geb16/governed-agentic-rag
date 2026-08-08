@@ -1,3 +1,5 @@
+"""Controlled synthetic IAM role-change capability."""
+
 from __future__ import annotations
 
 from typing import Literal
@@ -16,17 +18,23 @@ from app.tools.evidence import evidence_reference
 
 
 class ChangeAccessRoleArguments(StrictModel):
+    """Validated identifiers and target role for a synthetic IAM change."""
+
     subject_id: str = Field(pattern=r"^USR-[0-9]{4}$")
     new_role: Literal["viewer", "support_agent", "billing_agent", "administrator"]
 
 
 class ChangeAccessRoleResult(ControlledToolResult):
+    """Resulting synthetic account state and version."""
+
     subject_id: str
     role: str
     version: int | None = None
 
 
 class ChangeAccessRoleTool:
+    """Change an isolated synthetic role without external IAM side effects."""
+
     name = "change_access_role"
     description = (
         "Change a user's role only in the isolated synthetic IAM table. This tool does not "
@@ -43,6 +51,7 @@ class ChangeAccessRoleTool:
         arguments: ChangeAccessRoleArguments,
         context: ToolExecutionContext,
     ) -> ChangeAccessRoleResult:
+        """Apply an idempotent role change within the trusted case context."""
         record, changed = self._repository.change_access_role(
             context.case_id,
             arguments.subject_id,

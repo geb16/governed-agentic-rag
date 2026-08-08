@@ -1,3 +1,5 @@
+"""Compatibility façade that wires legacy constructor inputs to the use case."""
+
 from __future__ import annotations
 
 from app.application.baseline.policy import AgentRuntimePolicy

@@ -1,3 +1,5 @@
+"""Baseline instructions and serialization of untrusted request context."""
+
 from __future__ import annotations
 
 import json
@@ -49,6 +51,15 @@ Security and behaviour:
 
 
 def build_user_prompt(request: BaselineRequest, chunks: list[RetrievedChunk]) -> str:
+    """Serialize task and retrieval context as explicitly untrusted JSON data.
+
+    Args:
+        request: Validated task request.
+        chunks: Approved knowledge chunks retrieved for the request.
+
+    Returns:
+        A deterministic user message separating data from system instructions.
+    """
     payload = {
         "USER_REQUEST": {
             "request_id": request.request_id,

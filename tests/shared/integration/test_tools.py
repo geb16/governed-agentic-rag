@@ -1,3 +1,5 @@
+"""Strict schemas, validation, simulation, and shared tool-registry contracts."""
+
 from app.baseline.tool_router import ToolRouter
 from app.domain.schemas import ToolExecutionContext, ToolStatus
 from app.persistence.repository import SqliteSyntheticRepository
@@ -16,6 +18,7 @@ CONTEXT = ToolExecutionContext(
 def test_tool_specs_are_strict_and_forbid_extra_properties(
     repository: SqliteSyntheticRepository,
 ) -> None:
+    """Expose strict schemas that reject undeclared model arguments."""
     specs = ToolRouter([TicketLookupTool(repository), ResponseDrafterTool()]).specs
 
     assert all(spec["strict"] is True for spec in specs)
@@ -25,6 +28,7 @@ def test_tool_specs_are_strict_and_forbid_extra_properties(
 def test_tool_arguments_are_validated_before_execution(
     repository: SqliteSyntheticRepository,
 ) -> None:
+    """Deny malformed and extra tool arguments before controlled execution."""
     router = ToolRouter([TicketLookupTool(repository)])
 
     result = router.execute(
@@ -39,6 +43,7 @@ def test_tool_arguments_are_validated_before_execution(
 
 
 def test_response_drafter_is_simulated_and_never_delivers() -> None:
+    """Keep response drafting explicitly simulated and undelivered."""
     router = ToolRouter([ResponseDrafterTool()])
 
     result = router.execute(
@@ -60,6 +65,7 @@ def test_shared_tool_registry_is_the_frozen_capability_set(
     retriever: KnowledgeRetriever,
     repository: SqliteSyntheticRepository,
 ) -> None:
+    """Keep the ordered capability set identical across experimental conditions."""
     names = [tool.name for tool in build_shared_tools(retriever, repository)]
 
     assert names == [

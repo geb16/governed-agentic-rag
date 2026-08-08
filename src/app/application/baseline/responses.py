@@ -1,3 +1,5 @@
+"""Construction of consistent public responses across baseline exit paths."""
+
 from __future__ import annotations
 
 from datetime import UTC, datetime
@@ -35,6 +37,23 @@ class BaselineResponseFactory:
         usage: Usage | None = None,
         error_code: str | None = None,
     ) -> BaselineResponse:
+        """Create a timestamped response with stable adapter metadata.
+
+        Args:
+            request: Original task identity and case context.
+            trace_id: Per-invocation operational trace identifier.
+            status: Terminal application status.
+            answer: Caller-facing result text.
+            safety: Deterministic safety decision attached to the result.
+            citations: Validated knowledge citations, if any.
+            evidence: Knowledge and tool evidence, if any.
+            tool_calls: Controlled tool execution records, if any.
+            usage: Aggregate model token usage.
+            error_code: Stable machine-readable failure code, if applicable.
+
+        Returns:
+            A fully populated baseline response contract.
+        """
         return BaselineResponse(
             request_id=request.request_id,
             case_id=request.case_id,

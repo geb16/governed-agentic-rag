@@ -1,3 +1,5 @@
+"""Single allowlisted capability registry shared by experimental conditions."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -18,10 +20,15 @@ def build_shared_tools(
     retriever: Retriever,
     repository: SyntheticRepository,
 ) -> list[ControlledTool[Any]]:
+    """Build the exact dependency-injected tool set shared by both conditions.
+
+    Args:
+        retriever: Approved-knowledge retrieval boundary.
+        repository: Isolated synthetic support-state boundary.
+
+    Returns:
+        Ordered controlled tools whose names form the model allowlist.
     """
-    Build the exact capability set shared by both experimental systems.
-    """
-    #  return a list of tool instances, each initialized with the appropriate dependencies
     return [
         PolicyLookupTool(retriever),
         TicketLookupTool(repository),

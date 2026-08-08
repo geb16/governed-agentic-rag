@@ -1,3 +1,5 @@
+"""Governance-neutral outcome contracts shared by simulated capabilities."""
+
 import json
 
 from app.baseline.tool_router import ToolRouter
@@ -8,11 +10,10 @@ from app.tools.refund import IssueRefundTool
 from tests.support.baseline import tool_context
 
 
-# Testing the simulated action and the human escalation share a neutral outcome contract,
-# - so that the baseline LLM can treat them interchangeably.
 def test_simulated_action_and_escalation_share_neutral_outcome_contract(
     repository: SqliteSyntheticRepository,
 ) -> None:
+    """Represent actions and escalation uniformly while preserving idempotency."""
     router = ToolRouter([IssueRefundTool(repository), HumanReviewTool(repository)])
 
     refund = router.execute(

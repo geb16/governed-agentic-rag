@@ -1,3 +1,5 @@
+"""OpenAI Responses API adapter for the provider-neutral model gateway."""
+
 from __future__ import annotations
 
 from typing import Any, cast
@@ -10,7 +12,14 @@ from app.domain.schemas import AgentDraft, ModelToolCall, ModelTurn
 
 
 def serialize_continuation_item(item: Any) -> dict[str, Any]:
-    """Convert an SDK output item into provider-valid continuation input."""
+    """Convert an SDK output item into provider-valid continuation input.
+
+    Args:
+        item: OpenAI SDK response item supporting ``model_dump``.
+
+    Returns:
+        JSON-compatible continuation data without SDK-only convenience fields.
+    """
 
     serialized: dict[str, Any] = item.model_dump(mode="json", exclude_none=True)
     # ``responses.parse`` adds this local convenience field. It is not accepted
@@ -34,6 +43,7 @@ class OpenAIResponsesModel:
 
     @property
     def model_name(self) -> str:
+        """Return the configured OpenAI model identifier."""
         return self._settings.openai_model
 
     def complete(
@@ -44,6 +54,17 @@ class OpenAIResponsesModel:
         tools: list[dict[str, Any]],
         safety_identifier: str,
     ) -> ModelTurn:
+        """Request one non-persistent, structured Responses API turn.
+
+        Args:
+            input_items: Provider conversation items assembled for this invocation.
+            instructions: Trusted baseline system instructions.
+            tools: Strict allowlisted function definitions.
+            safety_identifier: Keyed pseudonymous requester identifier.
+
+        Returns:
+            A provider-neutral turn containing at most one tool proposal or a final draft.
+        """
         response = self._client.responses.parse(
             model=self._settings.openai_model,
             instructions=instructions,

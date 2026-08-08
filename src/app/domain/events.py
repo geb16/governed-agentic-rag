@@ -1,3 +1,5 @@
+"""Governance-neutral names for ephemeral operational execution logs."""
+
 from enum import StrEnum
 
 

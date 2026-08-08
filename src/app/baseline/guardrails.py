@@ -1,3 +1,5 @@
+"""Deterministic input and output safety checks for the baseline agent."""
+
 from __future__ import annotations
 
 import re
@@ -58,6 +60,15 @@ class InputGuardrail:
     """Deterministic first-line screening; prompt instructions remain a second layer."""
 
     def inspect(self, text: str, *, max_chars: int) -> GuardrailDecision:
+        """Normalize input and reject bounded, high-confidence unsafe patterns.
+
+        Args:
+            text: Untrusted caller text.
+            max_chars: Maximum normalized character count.
+
+        Returns:
+            A blocked decision with a stable category, or normalized safe text.
+        """
         normalized = unicodedata.normalize("NFKC", text).strip()
         if len(normalized) > max_chars:
             return GuardrailDecision(True, "input_too_large")
@@ -70,12 +81,23 @@ class InputGuardrail:
 
 
 class OutputGuardrail:
+    """Validate citations and reject active, secret-like, or leaked content."""
+
     def inspect(
         self,
         draft: AgentDraft,
         *,
         allowed_chunk_ids: set[str],
     ) -> GuardrailDecision:
+        """Check a model draft against evidence membership and output rules.
+
+        Args:
+            draft: Strict structured draft returned by the model adapter.
+            allowed_chunk_ids: Evidence identifiers available to this invocation.
+
+        Returns:
+            A deterministic safety decision for the public response path.
+        """
         if len(set(draft.cited_chunk_ids)) != len(draft.cited_chunk_ids):
             return GuardrailDecision(True, "duplicate_citation")
         if not set(draft.cited_chunk_ids).issubset(allowed_chunk_ids):

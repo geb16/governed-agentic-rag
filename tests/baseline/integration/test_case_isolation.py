@@ -1,3 +1,5 @@
+"""Persistence and tool-dispatch isolation across synthetic evaluation cases."""
+
 from app.baseline.tool_router import ToolRouter
 from app.domain.schemas import ActionResultStatus, ToolStatus
 from app.domain.support import AccessAccountRecord, SyntheticCaseFixture, TicketRecord
@@ -6,8 +8,8 @@ from app.tools.ticket_update import TicketUpdateTool
 from tests.support.baseline import tool_context
 
 
-# Test that the state of a case is isolated by its case_id.
 def test_case_state_is_isolated_by_case_id(repository: SqliteSyntheticRepository) -> None:
+    """Confine a synthetic write to the trusted case identifier in its context."""
     repository.create_case(
         SyntheticCaseFixture(
             case_id="case_isolated",
@@ -24,7 +26,6 @@ def test_case_state_is_isolated_by_case_id(repository: SqliteSyntheticRepository
         )
     )
     router = ToolRouter([TicketUpdateTool(repository)])
-    # Execute the tool to update the ticket status in the isolated case
     result = router.execute(
         call_id="call_update",
         name="update_ticket_status",

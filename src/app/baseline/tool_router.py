@@ -1,3 +1,5 @@
+"""Allowlisted validation and dispatch of model-proposed tool calls."""
+
 from __future__ import annotations
 
 import json
@@ -21,10 +23,7 @@ from app.tools.faults import FaultInjector
 
 
 class ToolRouter:
-    """
-    Allowlist dispatcher. The model proposes calls;
-    And deterministic code authorizes them.
-    """
+    """Authorize model proposals through an explicit deterministic allowlist."""
 
     def __init__(
         self,
@@ -61,6 +60,19 @@ class ToolRouter:
         arguments_json: str,
         context: ToolExecutionContext,
     ) -> ToolExecution:
+        """Validate, optionally fault, and execute one proposed tool call.
+
+        Args:
+            call_id: Provider-assigned call identifier.
+            name: Proposed tool name.
+            arguments_json: Untrusted JSON arguments emitted by the model.
+            context: Trusted case and requester context injected by the application.
+
+        Returns:
+            A serializable output and governance-neutral execution record. Invalid,
+            unknown, faulted, and exceptional calls are represented as outcomes rather
+            than escaping across the application boundary.
+        """
         started = perf_counter()
         tool = self._tools.get(name)
         if tool is None:

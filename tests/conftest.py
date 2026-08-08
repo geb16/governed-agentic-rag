@@ -1,3 +1,5 @@
+"""Shared isolated settings, retrieval, and persistence fixtures."""
+
 from __future__ import annotations
 
 from pathlib import Path

@@ -1,7 +1,9 @@
+"""FastAPI application factory and process-level application instance."""
+
 from __future__ import annotations
 
 import logging
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -17,13 +19,25 @@ from app.core.security import security_middleware
 logger = logging.getLogger(__name__)
 
 
-# create_app function initializes the FastAPI application
 def create_app(settings: Settings | None = None) -> FastAPI:
+    """Create the Phase 3 HTTP application without global runtime adapters.
+
+    Concrete adapters are created during the FastAPI lifespan so each application
+    instance owns its resources and tests can provide isolated settings.
+
+    Args:
+        settings: Optional validated settings override. Environment settings are used
+            when omitted.
+
+    Returns:
+        A configured FastAPI application with health and baseline routers.
+    """
     resolved_settings = settings or get_settings()
     configure_logging(resolved_settings)
 
     @asynccontextmanager
-    async def lifespan(application: FastAPI) -> AsyncIterator[None]:
+    async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
+        """Attach one composed runtime for the duration of the application lifespan."""
         runtime = build_runtime(resolved_settings)
         application.state.retriever = runtime.retriever
         application.state.repository = runtime.repository
