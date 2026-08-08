@@ -1,3 +1,5 @@
+"""Reusable deterministic doubles and composition helpers for baseline tests."""
+
 from __future__ import annotations
 
 from collections.abc import Iterator
@@ -24,6 +26,7 @@ class ScriptedModel(ModelGateway):
 
     @property
     def model_name(self) -> str:
+        """Return stable provider metadata for response assertions."""
         return "scripted-test-model"
 
     def complete(
@@ -34,6 +37,7 @@ class ScriptedModel(ModelGateway):
         tools: list[dict[str, Any]],
         safety_identifier: str,
     ) -> ModelTurn:
+        """Record gateway inputs and return the next scripted model turn."""
         self.calls.append(
             {
                 "input_items": input_items.copy(),

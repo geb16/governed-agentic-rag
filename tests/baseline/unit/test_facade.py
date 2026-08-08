@@ -1,3 +1,5 @@
+"""Unit contracts for the constructor-compatible baseline façade."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -17,24 +19,32 @@ from app.tools.response_drafter import ResponseDrafterTool
 
 
 class FakeRepository:
+    """Minimal case-reader double with configurable existence behavior."""
+
     def __init__(self, *, case_exists: bool = True) -> None:
         self._case_exists = case_exists
 
     def case_exists(self, case_id: str) -> bool:
+        """Return the configured case-existence result."""
         return self._case_exists
 
 
 class FakeRetriever:
+    """Retrieval double returning a fixed ordered chunk list."""
+
     backend_name = "fake"
 
     def __init__(self, chunks: list[RetrievedChunk]) -> None:
         self._chunks = chunks
 
     def retrieve(self, query: str, top_k: int | None = None) -> list[RetrievedChunk]:
+        """Return the configured chunks without ranking or truncation."""
         return self._chunks
 
 
 class FakeModel:
+    """Model-gateway double returning scripted turns in order."""
+
     model_name = "fake-model"
 
     def __init__(self, turns: list[ModelTurn]) -> None:
@@ -49,7 +59,8 @@ class FakeModel:
         tools: list[dict[str, Any]],
         safety_identifier: str,
     ) -> ModelTurn:
-        del input_items, instructions, tools, safety_identifier  # inused parameters
+        """Return the next scripted turn and count the invocation."""
+        del input_items, instructions, tools, safety_identifier
         self.calls += 1
         return self._turns.pop(0)
 
@@ -90,6 +101,7 @@ def _agent(
 
 
 def test_compatibility_facade_completes_grounded_response() -> None:
+    """Preserve response metadata, usage, and citations through the façade."""
     model = FakeModel(
         [
             ModelTurn(
@@ -114,6 +126,7 @@ def test_compatibility_facade_completes_grounded_response() -> None:
 
 
 def test_missing_case_short_circuits_before_model_call() -> None:
+    """Reject an unknown synthetic case before spending a model call."""
     model = FakeModel([])
 
     response = _agent(
@@ -127,6 +140,7 @@ def test_missing_case_short_circuits_before_model_call() -> None:
 
 
 def test_tool_turn_continues_to_a_final_response() -> None:
+    """Carry controlled tool output and usage into a subsequent final turn."""
     model = FakeModel(
         [
             ModelTurn(
@@ -168,6 +182,7 @@ def test_tool_turn_continues_to_a_final_response() -> None:
 
 
 def test_tool_router_exposes_strict_provider_specs() -> None:
+    """Expose only strict schemas for tools registered with the router."""
     router = ToolRouter([ResponseDrafterTool()])
 
     assert router.specs == [

@@ -1,3 +1,5 @@
+"""Behavioral boundaries distinguishing the baseline from Phase 4 governance."""
+
 from app.core.config import Settings
 from app.domain.schemas import (
     AgentDraft,
@@ -16,6 +18,7 @@ def test_baseline_llm_can_choose_human_escalation_without_formal_router(
     settings: Settings,
     retriever: KnowledgeRetriever,
 ) -> None:
+    """Allow the baseline model to request review without a formal risk router."""
     model = ScriptedModel(
         [
             ModelTurn(
@@ -71,6 +74,7 @@ def test_unknown_case_fails_before_model_or_tool_execution(
     settings: Settings,
     retriever: KnowledgeRetriever,
 ) -> None:
+    """Reject an unknown case before model reasoning or tool execution."""
     model = ScriptedModel([])
     agent = build_agent(settings, retriever, model)
 

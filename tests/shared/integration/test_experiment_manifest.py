@@ -1,3 +1,5 @@
+"""Experiment-profile validation and immutable run-manifest contracts."""
+
 from __future__ import annotations
 
 import json
@@ -13,8 +15,8 @@ from app.core.version import BASELINE_FREEZE_ID
 from app.tools.response_drafter import ResponseDrafterTool
 
 
-# Check that the experiment profile requires the retrieval backend to be qdrant.
 def test_experiment_profile_requires_qdrant(project_root: Path, tmp_path: Path) -> None:
+    """Reject an experiment profile that does not use the frozen Qdrant path."""
     with pytest.raises(ValidationError, match="requires RAG_RETRIEVAL_BACKEND=qdrant"):
         Settings(
             execution_profile="experiment",
@@ -26,11 +28,11 @@ def test_experiment_profile_requires_qdrant(project_root: Path, tmp_path: Path) 
         )
 
 
-# Testing that the experiment profile correctly records and reuses a frozen run manifest
 def test_experiment_profile_records_and_reuses_frozen_run_manifest(
     project_root: Path,
     tmp_path: Path,
 ) -> None:
+    """Reuse an identical named-run manifest without changing its identity."""
     settings = Settings(
         execution_profile="experiment",
         retrieval_backend="qdrant",

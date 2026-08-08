@@ -1,3 +1,5 @@
+"""Deterministic fault-injection and bounded retry behavior."""
+
 from app.baseline.tool_router import ToolRouter
 from app.core.config import Settings
 from app.domain.schemas import (
@@ -19,6 +21,7 @@ from tests.support.baseline import ScriptedModel, build_agent, tool_context
 def test_fault_plan_fails_exact_number_of_attempts_then_allows_execution(
     repository: SqliteSyntheticRepository,
 ) -> None:
+    """Consume exactly the planned failures before permitting execution."""
     repository.set_fault_plan(
         "case_default",
         FaultPlan(
@@ -61,6 +64,7 @@ def test_baseline_can_observe_retryable_failure_and_choose_one_retry(
     retriever: KnowledgeRetriever,
     repository: SqliteSyntheticRepository,
 ) -> None:
+    """Expose a retryable failure so the baseline can choose one bounded retry."""
     repository.set_fault_plan(
         "case_default",
         FaultPlan(

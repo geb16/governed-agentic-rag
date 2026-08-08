@@ -1,3 +1,5 @@
+"""Determinism, relevance, and corpus-integrity retrieval contracts."""
+
 import shutil
 
 import pytest
@@ -7,6 +9,7 @@ from app.rag.retriever import KnowledgeRetriever
 
 
 def test_retrieval_returns_relevant_policy(retriever: KnowledgeRetriever) -> None:
+    """Rank the relevant refund-policy chunk with its integrity digest."""
     results = retriever.retrieve("refund 750 finance manager approval")
 
     assert results
@@ -16,6 +19,7 @@ def test_retrieval_returns_relevant_policy(retriever: KnowledgeRetriever) -> Non
 
 
 def test_retrieval_is_deterministic(retriever: KnowledgeRetriever) -> None:
+    """Return the same ordered chunk identities for repeated identical queries."""
     first = retriever.retrieve("privileged role IAM review")
     second = retriever.retrieve("privileged role IAM review")
 
@@ -24,6 +28,7 @@ def test_retrieval_is_deterministic(retriever: KnowledgeRetriever) -> None:
 
 
 def test_empty_match_does_not_invent_context(retriever: KnowledgeRetriever) -> None:
+    """Return no chunks when the approved corpus contains no lexical match."""
     assert retriever.retrieve("zqxwv nonexistent terminology") == []
 
 
@@ -31,6 +36,7 @@ def test_corpus_integrity_manifest_rejects_modified_document(
     project_root,
     tmp_path,
 ) -> None:
+    """Reject an allowlisted document whose content no longer matches its digest."""
     copied_kb = tmp_path / "knowledge_base"
     shutil.copytree(project_root / "data" / "knowledge_base", copied_kb)
     refund_policy = copied_kb / "refund_policy.md"
