@@ -162,3 +162,39 @@ not proof of approval and does not authorize another action.
 These exclusions define the experimental boundary. They must not be quietly added to the baseline
 after freeze; they belong in the governed Phase 4 condition.
 
+## 8. Reproducibility and freeze procedure
+
+The experiment profile requires Qdrant, an OpenAI credential, and a named run identifier.
+`ExperimentRunManifest` records the freeze ID, models, knowledge digest, prompt digest, strict tool
+schema digest, retrieval parameters, contract versions, selected package versions, and a canonical
+configuration digest. A run identifier cannot be reused for different configuration.
+
+Before writing the freeze manifest:
+
+1. review the source, docstrings, tests, knowledge manifest, dependency lock, and this baseline
+   contract;
+2. run Ruff formatting and linting, MyPy, Pyright, and the complete Pytest suite;
+3. confirm the Git worktree contains only reviewed Phase 3 changes;
+4. write `docs/phase-3-freeze-manifest.json` once with
+   `uv run python scripts/verify_phase3_freeze.py --write`;
+5. immediately verify it with `uv run python scripts/verify_phase3_freeze.py`;
+6. review the generated file list and aggregate SHA-256 before committing and tagging.
+
+The verifier freezes Phase-3 runtime code, normative architecture and baseline documents,
+knowledge, dependencies, boundary tests, baseline tests, shared tests, and support fixtures.
+`tests/governance` content is deliberately outside this identity. Any subsequent added,
+removed, or modified frozen file must fail verification.
+
+## 9. Verification evidence
+
+The pre-freeze gate consists of:
+
+- Ruff format check and lint over `src`, `tests`, and `scripts`;
+- strict MyPy over `src`;
+- Pyright over `src` and `tests`;
+- the complete Pytest suite with cache generation disabled during final verification;
+- `git diff --check`;
+- freeze-scope tests confirming clean-architecture and Phase 3 contract coverage.
+
+Passing these checks establishes that the reviewed implementation matches its executable contracts.
+It does not establish Phase-4 governance effectiveness.
