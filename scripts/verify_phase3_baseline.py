@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
@@ -81,3 +82,13 @@ def build_freeze_payload() -> dict[str, Any]:
         "source_files": hashes,
         "aggregate_sha256": aggregate,
     }
+
+
+def _write_manifest(payload: Mapping[str, Any]) -> None:
+    MANIFEST_PATH.parent.mkdir(parents=True, exist_ok=True)
+    temporary_path = MANIFEST_PATH.with_suffix(f"{MANIFEST_PATH.suffix}.tmp")
+    temporary_path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    temporary_path.replace(MANIFEST_PATH)
