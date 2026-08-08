@@ -52,6 +52,7 @@ COMPARABLE_KEYS = (
     "aggregate_sha256",
 )
 
+
 class FreezeScopeError(RuntimeError):
     """Raised when the declared freeze scope cannot be resolved safely."""
 
@@ -91,8 +92,10 @@ def build_freeze_payload() -> dict[str, Any]:
         "aggregate_sha256": aggregate,
     }
 
+
 def _comparable_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
     return {key: payload.get(key) for key in COMPARABLE_KEYS}
+
 
 def _write_manifest(payload: Mapping[str, Any]) -> None:
     MANIFEST_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -133,7 +136,6 @@ def describe_freeze_differences(
     if not differences and expected.get("aggregate_sha256") != current.get("aggregate_sha256"):
         differences.append("aggregate_sha256 does not match the frozen source hashes")
     return differences
-
 
 
 def main() -> int:
