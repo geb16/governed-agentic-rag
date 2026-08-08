@@ -198,3 +198,39 @@ The pre-freeze gate consists of:
 
 Passing these checks establishes that the reviewed implementation matches its executable contracts.
 It does not establish Phase-4 governance effectiveness.
+
+## References
+
+[1] Google, “Google Python Style Guide,” sec. 3.8, *Google Open Source Style Guides*.
+[Online]. Available: https://google.github.io/styleguide/pyguide.html. [Accessed: Jul. 27, 2026].
+
+[2] *Software, Systems and Enterprise—Architecture Description*, ISO/IEC/IEEE Standard
+42010:2022, Nov. 2022. [Online]. Available: https://www.iso.org/standard/74393.html.
+[Accessed: Jul. 13, 2026].
+
+[3] M. Souppaya, K. Scarfone, and D. Dodson, *Secure Software Development Framework (SSDF)
+Version 1.1: Recommendations for Mitigating the Risk of Software Vulnerabilities*, NIST Special
+Publication 800-218, Feb. 2022, doi: 10.6028/NIST.SP.800-218.
+
+[4] OWASP Foundation, “AI Agent Security Cheat Sheet,” *OWASP Cheat Sheet Series*. [Online].
+Available: https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html.
+[Accessed: Jun. 08, 2026].
+
+[5] OpenAI, “Function calling,” *OpenAI API Documentation*. [Online]. Available:
+https://developers.openai.com/api/docs/guides/function-calling. [Accessed: Jun. 21, 2026].
+
+[6] S. Ramírez, “Lifespan Events,” *FastAPI Documentation*. [Online]. Available:
+https://fastapi.tiangolo.com/advanced/events/. [Accessed: Jul. 13, 2026].
+
+[7] Pydantic Services Inc., “Configuration,” *Pydantic Documentation*. [Online]. Available:
+https://docs.pydantic.dev/latest/api/config/. [Accessed: Jul. 09, 2026].
+
+[8] Qdrant Solutions GmbH, “Qdrant Python Client Documentation.” [Online]. Available:
+https://python-client.qdrant.tech/. [Accessed: Jul. 02, 2026].
+
+[9] Python Software Foundation, “`sqlite3`—DB-API 2.0 interface for SQLite databases,”
+*Python Documentation*. [Online]. Available: https://docs.python.org/3/library/sqlite3.html.
+[Accessed: Jul. 17, 2026].
+
+[10] OpenAI, “Vector embeddings,” *OpenAI API Documentation*. [Online]. Available:
+https://developers.openai.com/api/docs/guides/embeddings. [Accessed: Jun. 21, 2026].
