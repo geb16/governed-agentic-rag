@@ -206,7 +206,6 @@ they threaten experimental validity, security, or maintainability.
   persistence, RAG, tool, composition, or process-entry modules;
 - the baseline API entry points import concrete baseline, governance, or outbound adapters instead
   of the application boundary;
-- removed compatibility paths are recreated or imported.
 
 These static checks protect dependency direction. They do not replace code review, runtime tests,
 threat modeling, or the cryptographic freeze procedure described in
