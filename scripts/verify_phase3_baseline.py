@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 from collections.abc import Mapping
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -43,6 +45,13 @@ FROZEN_PATTERNS = (
     "tests/test_config.py",
 )
 
+COMPARABLE_KEYS = (
+    "manifest_schema_version",
+    "freeze_id",
+    "app_version",
+    "source_files",
+    "aggregate_sha256",
+)
 
 class FreezeScopeError(RuntimeError):
     """Raised when the declared freeze scope cannot be resolved safely."""
@@ -83,6 +92,8 @@ def build_freeze_payload() -> dict[str, Any]:
         "aggregate_sha256": aggregate,
     }
 
+def _comparable_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
+    return {key: payload.get(key) for key in COMPARABLE_KEYS}
 
 def _write_manifest(payload: Mapping[str, Any]) -> None:
     MANIFEST_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -92,3 +103,56 @@ def _write_manifest(payload: Mapping[str, Any]) -> None:
         encoding="utf-8",
     )
     temporary_path.replace(MANIFEST_PATH)
+
+
+
+def main() -> int:
+    """Run manifest write or verification mode from command-line arguments."""
+    parser = argparse.ArgumentParser(
+        description="Write or verify the cryptographic Phase 3 control freeze manifest."
+    )
+    parser.add_argument(
+        "--write",
+        action="store_true",
+        help="Write the named freeze manifest after deliberate Phase 3 changes.",
+    )
+    arguments = parser.parse_args()
+    try:
+        current = build_freeze_payload()
+    except FreezeScopeError as error:
+        print(f"Phase 3 freeze scope is invalid: {error}")
+        return 1
+
+    if arguments.write:
+        payload = {
+            **current,
+            "frozen_at": datetime.now(UTC).isoformat(),
+        }
+        _write_manifest(payload)
+        print(f"Wrote {BASELINE_FREEZE_ID}: {current['aggregate_sha256']}")
+        return 0
+
+    if not MANIFEST_PATH.exists():
+        print(f"Freeze manifest is missing: {MANIFEST_PATH}")
+        return 1
+    try:
+        expected = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        print(f"Freeze manifest cannot be read: {error}")
+        return 1
+    if not isinstance(expected, dict):
+        print("Freeze manifest is invalid: the root value must be an object.")
+        return 1
+
+    comparable_expected = _comparable_payload(expected)
+    if current != comparable_expected:
+        print("Phase 3 freeze verification failed: frozen control files changed.")
+        for difference in describe_freeze_differences(comparable_expected, current):
+            print(f"- {difference}")
+        return 1
+    print(f"Verified {BASELINE_FREEZE_ID}: {current['aggregate_sha256']}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
