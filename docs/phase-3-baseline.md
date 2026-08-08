@@ -64,3 +64,38 @@ library:
 SQLAlchemy and LangChain are deliberately not referenced: neither is declared as a dependency nor
 imported by Phase 3. Persistence uses Python `sqlite3` directly, and agent orchestration is the
 project's bounded application service rather than a framework-owned chain or graph.
+
+## 4. Invocation sequence
+
+One `POST /api/v1/baseline/invoke` request follows this sequence:
+
+1. `create_app` loads validated settings, configures JSON logging, installs trusted-host and
+   security middleware, and registers HTTP routers.
+2. The application lifespan calls `build_runtime`, initializes the SQLite schema and default
+   synthetic case, loads the approved knowledge corpus, and conditionally creates the model-backed
+   agent.
+3. HTTP middleware performs an early declared-size check and adds defensive response headers.
+   The authenticated route compares configured API keys in constant time.
+4. Pydantic rejects undeclared fields and invalid request identifiers before the use case runs.
+   `BaselineAgentService` then confirms the trusted `case_id` and applies deterministic input
+   normalization and screening.
+5. `KnowledgeRetriever` returns ranked chunks. Local Markdown must be named in `manifest.json`,
+   remain inside the configured directory, satisfy the file-size bound, and match its SHA-256
+   digest before chunking.
+6. `build_user_prompt` serializes the request and retrieved knowledge as JSON explicitly labelled
+   as untrusted data. System instructions remain a separate trusted model parameter.
+7. `OpenAIResponsesModel` makes a non-persistent Responses API request with a keyed pseudonymous
+   safety identifier, strict structured final output, strict tool schemas, one-call turns,
+   provider timeout, retry, and output-token bounds. Strict schemas and disabling parallel calls
+   follow the function-calling controls described in [5].
+8. `BaselineTurnRunner` rejects mixed final/tool turns, multiple tool calls in one turn, excess
+   tool calls, excess turns, and missing terminal output.
+9. `ToolRouter` treats the model call as a proposal. It enforces the name allowlist, parses JSON,
+   validates the selected Pydantic argument model, injects trusted case context, and returns a
+   structured success, denial, or failure record.
+10. `InvocationState` accumulates provider usage, controlled tool records, and only the evidence
+    made available during that invocation. State is never shared between requests.
+11. `OutputGuardrail` validates citation uniqueness and membership, grounded-answer citation
+    presence, active content, secret-like output, and prompt-leakage patterns.
+12. `BaselineResponseFactory` creates the terminal response. Operational logs record identifiers,
+    status, timing, and counts; prompt bodies and durable governance audit events are excluded.
