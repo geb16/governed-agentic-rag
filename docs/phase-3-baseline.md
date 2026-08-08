@@ -152,3 +152,13 @@ bounds, schemas, allowlisting, case selection, execution, and final-output valid
 - SQLite and the supplied tools model synthetic evaluation state, not production availability,
   authorization, payments, IAM, or customer-data requirements.
 
+## 7. Deliberate Phase 3 exclusions
+
+Phase 3 contains no governance graph, formal risk classifier, policy decision engine, durable
+approval, approval-bound action token, checkpoint/resume mechanism, compensating transaction,
+or persistent audit-event pipeline. The model may choose `request_human_review`, but that record is
+not proof of approval and does not authorize another action.
+
+These exclusions define the experimental boundary. They must not be quietly added to the baseline
+after freeze; they belong in the governed Phase 4 condition.
+
