@@ -1,3 +1,5 @@
+"""HTTP boundary contracts for authenticated baseline invocation."""
+
 from fastapi.testclient import TestClient
 from pydantic import SecretStr
 
@@ -10,6 +12,7 @@ from tests.support.baseline import ScriptedModel, build_agent
 
 
 def test_invoke_endpoint_enforces_api_key(settings: Settings) -> None:
+    """Reject a missing API key while accepting the configured credential."""
     protected_settings = settings.model_copy(update={"api_key": SecretStr("test-inbound-key")})
     retriever = KnowledgeRetriever(protected_settings)
     model = ScriptedModel(
@@ -50,6 +53,7 @@ def test_invoke_endpoint_enforces_api_key(settings: Settings) -> None:
 
 
 def test_request_schema_rejects_extra_fields(settings: Settings) -> None:
+    """Reject undeclared request fields before invoking the application service."""
     app = create_app(settings)
     app.dependency_overrides[get_agent] = lambda: object()
 

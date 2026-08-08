@@ -1,3 +1,5 @@
+"""End-to-end baseline orchestration contracts with real local adapters."""
+
 from app.domain.schemas import (
     AgentDraft,
     AgentStatus,
@@ -14,6 +16,7 @@ def test_agent_invocation_returns_valid_grounded_output(
     settings,
     retriever: KnowledgeRetriever,
 ) -> None:
+    """Return a grounded response using only an available retrieved chunk."""
     chunk = retriever.retrieve("refund 750 finance manager approval")[0]
     model = ScriptedModel(
         [
@@ -48,6 +51,7 @@ def test_agent_executes_simulated_tool_and_returns_record(
     settings,
     retriever: KnowledgeRetriever,
 ) -> None:
+    """Execute an allowlisted simulated tool and continue with its output."""
     model = ScriptedModel(
         [
             ModelTurn(
@@ -97,6 +101,7 @@ def test_agent_denies_unknown_tool(
     settings,
     retriever: KnowledgeRetriever,
 ) -> None:
+    """Record and deny a model proposal for a tool outside the allowlist."""
     model = ScriptedModel(
         [
             ModelTurn(
@@ -135,6 +140,7 @@ def test_guardrail_blocks_before_model_invocation(
     settings,
     retriever: KnowledgeRetriever,
 ) -> None:
+    """Block a recognized prompt attack before any model invocation."""
     model = ScriptedModel([])
     agent = build_agent(settings, retriever, model)
 
@@ -154,6 +160,7 @@ def test_fabricated_model_citation_fails_closed(
     settings,
     retriever: KnowledgeRetriever,
 ) -> None:
+    """Fail closed when a model cites a chunk unavailable to the invocation."""
     model = ScriptedModel(
         [
             ModelTurn(

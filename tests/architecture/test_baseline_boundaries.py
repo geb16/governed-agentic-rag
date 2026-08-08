@@ -1,3 +1,5 @@
+"""Static dependency tests for the Phase 3 clean-architecture boundary."""
+
 from __future__ import annotations
 
 import ast
@@ -8,6 +10,7 @@ PROJECT_ROOT = SOURCE_ROOT.parents[1]
 
 
 def test_inner_layers_do_not_import_outbound_adapters() -> None:
+    """Keep domain and application code independent of concrete adapters."""
     forbidden = ("app.persistence", "app.rag", "app.tools", "app.baseline")
     violations: list[str] = []
 
@@ -30,6 +33,7 @@ def test_inner_layers_do_not_import_outbound_adapters() -> None:
 
 
 def test_removed_compatibility_paths_have_no_callers() -> None:
+    """Prevent deleted model compatibility modules from re-entering the import graph."""
     removed_modules = {"app.baseline.model", "app.persistence.models"}
     assert not (SOURCE_ROOT / "baseline" / "model.py").exists()
     assert not (SOURCE_ROOT / "persistence" / "models.py").exists()
