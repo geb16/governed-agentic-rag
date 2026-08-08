@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import hashlib
-
+import json
 from pathlib import Path
+from typing import Any
 
+from app.core.version import APP_VERSION, BASELINE_FREEZE_ID
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-3-freeze-manifest.json"
@@ -64,3 +66,18 @@ def _frozen_files() -> list[Path]:
         files.update(matches)
     return sorted(files, key=lambda path: path.as_posix())
 
+
+def build_freeze_payload() -> dict[str, Any]:
+    """Hash every declared Phase 3 file and derive a canonical aggregate digest."""
+    hashes = {
+        path.relative_to(PROJECT_ROOT).as_posix(): _sha256(path.read_bytes())
+        for path in _frozen_files()
+    }
+    aggregate = _sha256(json.dumps(hashes, separators=(",", ":"), sort_keys=True).encode("utf-8"))
+    return {
+        "manifest_schema_version": 1,
+        "freeze_id": BASELINE_FREEZE_ID,
+        "app_version": APP_VERSION,
+        "source_files": hashes,
+        "aggregate_sha256": aggregate,
+    }
