@@ -1,0 +1,36 @@
+"""Authenticated HTTP endpoint for baseline agent invocations."""
+
+from __future__ import annotations
+
+from typing import Annotated
+
+from fastapi import APIRouter, Depends
+from starlette.concurrency import run_in_threadpool
+
+from app.api.dependencies import get_agent
+from app.application.baseline.ports import BaselineUseCase
+from app.core.security import require_api_key
+from app.domain.schemas import BaselineRequest, BaselineResponse
+
+router = APIRouter(
+    prefix="/baseline",
+    tags=["baseline"],
+    dependencies=[Depends(require_api_key)],
+)
+
+
+@router.post("/invoke", response_model=BaselineResponse)
+async def invoke_baseline(
+    request: BaselineRequest,
+    agent: Annotated[BaselineUseCase, Depends(get_agent)],
+) -> BaselineResponse:
+    """Run one validated baseline request outside the asynchronous event loop.
+
+    Args:
+        request: Strict task request parsed from the HTTP body.
+        agent: Baseline use case resolved from application state.
+
+    Returns:
+        The structured baseline outcome, including safety and evidence metadata.
+    """
+    return await run_in_threadpool(agent.invoke, request)

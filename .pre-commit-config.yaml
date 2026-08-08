@@ -1,0 +1,65 @@
+# This file is managed by the pre-commit framework. Do not edit it manually.
+
+minimum_pre_commit_version: "4.4.0"
+default_stages: [manual]
+default_install_hook_types: [pre-commit, pre-push, commit-msg]
+default_language_version:
+  python: python3.11
+fail_fast: false
+
+repos:
+  - repo: meta
+    hooks:
+      - id: check-hooks-apply
+      - id: check-useless-excludes
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+      - id: check-ast
+      - id: check-builtin-literals
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-executables-have-shebangs
+      - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: check-toml
+      - id: check-yaml
+      - id: debug-statements
+      - id: detect-aws-credentials
+        args: [--allow-missing-credentials]
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=no]
+      - id: trailing-whitespace
+
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.3.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [manual]
+
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff lint
+        entry: uv run --frozen precommit-lint
+        language: system
+        types: [python]
+        require_serial: true
+      - id: ruff-format
+        name: ruff format
+        entry: uv run --frozen precommit-format
+        language: system
+        types: [python]
+        require_serial: true
+      - id: repository-quality-gate
+        name: repository quality gate
+        entry: uv run --frozen precommit-check
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [manual]
