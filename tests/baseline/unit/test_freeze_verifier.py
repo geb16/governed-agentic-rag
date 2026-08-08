@@ -20,7 +20,6 @@ def test_freeze_scope_covers_clean_architecture_and_phase3_contracts() -> None:
         "src/app/composition.py",
         "src/app/infrastructure/llm/openai_responses.py",
         "tests/architecture/test_baseline_boundaries.py",
-        "tests/architecture/test_baseline_documentation.py",
         "tests/baseline/integration/test_agent.py",
     } <= source_files.keys()
     assert "src/app/baseline/model.py" not in source_files
