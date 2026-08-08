@@ -105,6 +105,37 @@ def _write_manifest(payload: Mapping[str, Any]) -> None:
     temporary_path.replace(MANIFEST_PATH)
 
 
+def describe_freeze_differences(
+    expected: Mapping[str, Any], current: Mapping[str, Any]
+) -> list[str]:
+    """Return stable, reviewable diagnostics for a manifest mismatch."""
+    differences: list[str] = []
+    for key in ("manifest_schema_version", "freeze_id", "app_version"):
+        if expected.get(key) != current.get(key):
+            differences.append(f"{key} changed: {expected.get(key)!r} -> {current.get(key)!r}")
+
+    expected_files = expected.get("source_files")
+    current_files = current.get("source_files")
+    if not isinstance(expected_files, dict):
+        differences.append("stored source_files is missing or invalid")
+    elif not isinstance(current_files, dict):
+        differences.append("current source_files is missing or invalid")
+    else:
+        expected_paths = set(expected_files)
+        current_paths = set(current_files)
+        differences.extend(f"added: {path}" for path in sorted(current_paths - expected_paths))
+        differences.extend(f"removed: {path}" for path in sorted(expected_paths - current_paths))
+        differences.extend(
+            f"modified: {path}"
+            for path in sorted(expected_paths & current_paths)
+            if expected_files[path] != current_files[path]
+        )
+
+    if not differences and expected.get("aggregate_sha256") != current.get("aggregate_sha256"):
+        differences.append("aggregate_sha256 does not match the frozen source hashes")
+    return differences
+
+
 
 def main() -> int:
     """Run manifest write or verification mode from command-line arguments."""
