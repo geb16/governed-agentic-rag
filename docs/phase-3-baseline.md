@@ -119,3 +119,36 @@ application-controlled and supplies the case, request, and requester identifiers
 accept the case partition from model arguments. State-changing tools use idempotency or no-change
 semantics where required, and every effect remains simulated.
 
+## 6. Security model
+
+The secure-development posture is informed by the NIST SSDF [3] and the OWASP AI Agent Security
+Cheat Sheet [4]. These are engineering references, not certification claims.
+
+| Threat or failure | Enforced control |
+|---|---|
+| Unauthorized HTTP access | Configured API key, constant-time comparison, production fail-closed validation |
+| Host-header abuse | Explicit trusted-host middleware |
+| Oversized requests | Configured `Content-Length` rejection plus required deployment-proxy body limit |
+| Direct or indirect prompt injection | Untrusted-data labelling, bounded deterministic input rules, strict tool boundary |
+| Tool abuse or privilege escalation | Fixed allowlist, strict schemas, one call per turn, trusted case context |
+| Cross-case state leakage | Every synthetic business row and operation is partitioned by `case_id` |
+| Fabricated evidence | Per-invocation evidence allowlist and deterministic citation membership checks |
+| Secret or active-content disclosure | Output patterns, secret-redacting logs, response hardening headers |
+| Runaway execution or cost | Turn, tool-call, output-token, timeout, retry, retrieval, and document-size bounds |
+| Irreversible external action | No external business-system writes; all action tools are simulated |
+
+Prompt instructions are behavioral guidance, not authorization. Deterministic code owns identity,
+bounds, schemas, allowlisting, case selection, execution, and final-output validation.
+
+### 6.1 Residual risks and deployment obligations
+
+- Prompt-injection detection is a defense-in-depth heuristic and cannot prove that text is safe.
+- `Content-Length` is only an early application check. A reverse proxy or gateway must enforce the
+  actual streamed-body limit, including omitted-length and chunked requests.
+- The development-only safety-identifier fallback must not be treated as a deployment secret.
+  Production configuration requires a non-empty API key, which supplies keyed pseudonymization.
+- Retrieved documents and tool output remain untrusted even after integrity validation; a valid
+  digest establishes identity, not truth or safety.
+- SQLite and the supplied tools model synthetic evaluation state, not production availability,
+  authorization, payments, IAM, or customer-data requirements.
+
