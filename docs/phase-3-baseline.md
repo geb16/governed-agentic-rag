@@ -3,7 +3,7 @@
 ## 1. Purpose and status
 
 Phase 3 is the conventional agentic retrieval-augmented generation (RAG) control condition for
-the later governed-agent comparison. Its freeze identifier is `phase3-baseline-v1`. The code uses
+the later governed-agent comparison. Its freeze identifier is `phase3-baseline-v2`. The code uses
 clean architecture (ports and adapters) with domain-owned contracts; it does not claim to be a
 complete domain-driven design or a production governance platform.
 

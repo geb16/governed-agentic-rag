@@ -3,7 +3,7 @@
 ## Purpose and declared scope
 
 This document describes the software architecture of the conventional Phase 3 agentic RAG
-baseline identified as `phase3-baseline-v1`. It records the dependency direction, component
+baseline identified as `phase3-baseline-v2`. It records the dependency direction, component
 ownership, runtime flow, trust boundaries, extension seams, and known compromises that must be
 reviewed before the baseline is frozen.
 
