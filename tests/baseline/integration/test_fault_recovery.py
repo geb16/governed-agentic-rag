@@ -1,21 +1,15 @@
 """Deterministic fault-injection and bounded retry behavior."""
 
+from app.baseline.application.contracts import AgentStatus, BaselineRequest, ToolStatus
 from app.baseline.tool_router import ToolRouter
 from app.core.config import Settings
-from app.domain.schemas import (
-    AgentDraft,
-    AgentStatus,
-    BaselineRequest,
-    ModelToolCall,
-    ModelTurn,
-    ToolStatus,
-)
+from app.domain.model import AgentDraft, ModelToolCall, ModelTurn
 from app.domain.support import FailureMode, FaultPlan
-from app.persistence.repository import SqliteSyntheticRepository
+from app.infrastructure.persistence.sqlite import SqliteSyntheticRepository
 from app.rag.retriever import KnowledgeRetriever
 from app.tools.faults import RepositoryFaultInjector
 from app.tools.response_drafter import ResponseDrafterTool
-from tests.support.baseline import ScriptedModel, build_agent, tool_context
+from tests.baseline.support import ScriptedModel, build_agent, tool_context
 
 
 def test_fault_plan_fails_exact_number_of_attempts_then_allows_execution(

@@ -8,7 +8,7 @@ import pytest
 
 from app.core.config import Settings
 from app.domain.support import DEFAULT_CASE_FIXTURE
-from app.persistence.repository import SqliteSyntheticRepository
+from app.infrastructure.persistence.sqlite import SqliteSyntheticRepository
 from app.rag.retriever import KnowledgeRetriever
 
 

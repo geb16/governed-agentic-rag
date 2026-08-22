@@ -8,16 +8,11 @@ from typing import Any
 
 from pydantic import ValidationError
 
-from app.application.baseline.ports import ToolExecution
-from app.domain.schemas import (
-    ActionOutcome,
-    ActionProposal,
-    ActionResultStatus,
-    RetrievedChunk,
-    ToolCallRecord,
-    ToolExecutionContext,
-    ToolStatus,
-)
+from app.baseline.application.contracts import ToolCallRecord, ToolStatus
+from app.baseline.application.ports import ToolExecution
+from app.domain.actions import ActionOutcome, ActionProposal, ActionResultStatus
+from app.domain.evidence import RetrievedChunk
+from app.domain.tasks import ToolExecutionContext
 from app.tools.base import ControlledTool
 from app.tools.faults import FaultInjector
 

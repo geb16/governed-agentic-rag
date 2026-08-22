@@ -1,8 +1,9 @@
 """Strict schemas, validation, simulation, and shared tool-registry contracts."""
 
+from app.baseline.application.contracts import ToolStatus
 from app.baseline.tool_router import ToolRouter
-from app.domain.schemas import ToolExecutionContext, ToolStatus
-from app.persistence.repository import SqliteSyntheticRepository
+from app.domain.tasks import ToolExecutionContext
+from app.infrastructure.persistence.sqlite import SqliteSyntheticRepository
 from app.rag.retriever import KnowledgeRetriever
 from app.tools.registry import build_shared_tools
 from app.tools.response_drafter import ResponseDrafterTool

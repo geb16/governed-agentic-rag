@@ -4,14 +4,10 @@ from __future__ import annotations
 
 from pydantic import Field
 
-from app.domain.schemas import (
-    ControlledToolResult,
-    EvidenceReference,
-    EvidenceType,
-    RetrievedChunk,
-    StrictModel,
-    ToolExecutionContext,
-)
+from app.domain.actions import ControlledToolResult
+from app.domain.contracts import StrictModel
+from app.domain.evidence import EvidenceReference, EvidenceType, RetrievedChunk
+from app.domain.tasks import ToolExecutionContext
 from app.rag.retriever import Retriever
 
 

@@ -6,7 +6,7 @@ import hashlib
 import json
 from typing import Any
 
-from app.domain.schemas import EvidenceReference, EvidenceType
+from app.domain.evidence import EvidenceReference, EvidenceType
 
 
 def evidence_reference(

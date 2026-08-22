@@ -17,31 +17,29 @@ MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-3-freeze-manifest.json"
 
 # Phase 4 governance tests must not alter the Phase 3 identity.
 FROZEN_PATTERNS = (
+    "docker-compose.yml",
     "pyproject.toml",
     "uv.lock",
     "data/knowledge_base/*",
     "docs/architecture/baseline_architecture.md",
     "docs/phase-3-baseline.md",
+    "scripts/ingest_kb.py",
+    "scripts/run_smoke_tests.py",
     "scripts/verify_phase3_freeze.py",
     "src/app/__init__.py",
-    "src/app/api/*.py",
-    "src/app/application/**/*.py",
     "src/app/baseline/*.py",
-    "src/app/composition.py",
+    "src/app/baseline/**/*.py",
+    "src/app/baseline_main.py",
     "src/app/core/*.py",
     "src/app/domain/*.py",
     "src/app/infrastructure/**/*.py",
-    "src/app/main.py",
-    "src/app/persistence/*.py",
     "src/app/rag/*.py",
     "src/app/tools/*.py",
     "tests/__init__.py",
     "tests/README.md",
     "tests/conftest.py",
-    "tests/architecture/test_baseline_boundaries.py",
     "tests/baseline/**/*.py",
     "tests/shared/**/*.py",
-    "tests/support/**/*.py",
 )
 
 COMPARABLE_KEYS = (

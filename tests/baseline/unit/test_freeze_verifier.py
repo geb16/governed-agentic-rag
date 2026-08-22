@@ -13,16 +13,24 @@ def test_freeze_scope_covers_clean_architecture_and_phase3_contracts() -> None:
 
     assert isinstance(source_files, dict)
     assert {
+        "docker-compose.yml",
+        "scripts/ingest_kb.py",
+        "scripts/run_smoke_tests.py",
         "scripts/verify_phase3_freeze.py",
         "docs/architecture/baseline_architecture.md",
         "docs/phase-3-baseline.md",
-        "src/app/application/baseline/service.py",
-        "src/app/composition.py",
+        "src/app/baseline/experiments/manifest.py",
+        "src/app/baseline/application/service.py",
+        "src/app/baseline/composition.py",
         "src/app/infrastructure/llm/openai_responses.py",
+        "src/app/infrastructure/persistence/sqlite/repository.py",
         "tests/README.md",
-        "tests/architecture/test_baseline_boundaries.py",
+        "tests/baseline/architecture/test_baseline_boundaries.py",
         "tests/baseline/integration/test_agent.py",
+        "tests/baseline/integration/test_experiment_manifest.py",
     } <= source_files.keys()
+    assert "src/app/core/experiment_manifest.py" not in source_files
+    assert "tests/shared/integration/test_experiment_manifest.py" not in source_files
     assert "src/app/baseline/model.py" not in source_files
     assert "src/app/persistence/models.py" not in source_files
     assert "tests/test_config.py" not in source_files

@@ -8,7 +8,7 @@ from collections import Counter
 from typing import Protocol
 
 from app.core.config import Settings
-from app.domain.schemas import RetrievedChunk
+from app.domain.evidence import RetrievedChunk
 from app.rag.chunking import KnowledgeChunk, load_knowledge_chunks
 from app.rag.embeddings import OpenAIEmbeddingProvider
 from app.rag.vector_store import QdrantVectorStore

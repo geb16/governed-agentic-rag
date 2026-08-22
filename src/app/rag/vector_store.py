@@ -7,7 +7,7 @@ from uuid import NAMESPACE_URL, uuid5
 from qdrant_client import QdrantClient, models
 
 from app.core.config import Settings
-from app.domain.schemas import RetrievedChunk
+from app.domain.evidence import RetrievedChunk
 from app.rag.chunking import KnowledgeChunk
 from app.rag.embeddings import EmbeddingProvider
 

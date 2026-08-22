@@ -2,8 +2,8 @@
 
 import pytest
 
-from app.baseline.guardrails import InputGuardrail, OutputGuardrail
-from app.domain.schemas import AgentDraft
+from app.baseline.application.guardrails import InputGuardrail, OutputGuardrail
+from app.domain.model import AgentDraft
 
 
 @pytest.mark.parametrize(

@@ -35,18 +35,20 @@ a design basis, not a formal claim of ISO/IEC/IEEE 42010 conformance.
 
 | Layer | Responsibility | May depend on |
 |---|---|---|
-| `app.domain` | Strict task, evidence, action, and synthetic support contracts | Python and Pydantic |
-| `app.application.baseline` | Baseline use case, ports, invocation state, turn policy, and responses | Domain contracts |
-| `app.baseline` | Compatibility façade, deterministic guardrails, and allowlisted dispatch | Application and domain contracts |
-| `app.infrastructure` | Provider adapters, currently OpenAI Responses | Application ports and domain contracts |
-| `app.persistence`, `app.rag`, `app.tools` | SQLite, retrieval, Qdrant, and controlled capability adapters | Domain ports and contracts |
-| `app.api` | HTTP parsing, authentication dependency, and response transport | Application use-case port |
-| `app.composition`, `app.main` | Concrete wiring and process lifecycle | All outward adapters |
+| `app.domain` | Strict task, evidence, action, model-turn, and synthetic support contracts | Python and Pydantic |
+| `app.baseline.application` | Baseline contracts, use case, ports, invocation state, turn policy, and responses | Domain contracts |
+| `app.baseline.api` | HTTP parsing, authentication dependency, health transport contract, and response transport | Baseline application boundary |
+| `app.baseline.agent`, `app.baseline.tool_router` | Compatibility façade and allowlisted dispatch | Baseline application and domain contracts |
+| `app.baseline.experiments` | Phase 3 run identity and immutable manifest recording | Baseline prompt, tool, configuration, and version contracts |
+| `app.infrastructure` | OpenAI and SQLite adapters | Application ports and domain contracts |
+| `app.rag`, `app.tools` | Retrieval, Qdrant, and controlled capability adapters | Domain ports and contracts |
+| `app.baseline.composition`, `app.baseline_main` | Concrete Phase 3 wiring and process lifecycle | All outward adapters |
 
-The dependency rule is enforced by `tests/architecture/test_baseline_boundaries.py`: the domain and
-application layers cannot import outbound adapter packages. `app.composition.build_runtime` is the
-composition root. `app.baseline.agent.BaselineAgent` remains a thin constructor-compatible façade;
-orchestration belongs to `BaselineAgentService` and `BaselineTurnRunner`.
+The dependency rule is enforced by `tests/baseline/architecture/test_baseline_boundaries.py`: the domain and
+application layers cannot import outbound adapter packages. `app.baseline.composition.build_runtime`
+is the Phase 3 composition root. `app.baseline.agent.BaselineAgent` remains a thin
+constructor-compatible façade; orchestration belongs to `BaselineAgentService` and
+`BaselineTurnRunner`.
 
 ### 3.1 Technology traceability
 
@@ -73,7 +75,8 @@ One `POST /api/v1/baseline/invoke` request follows this sequence:
    security middleware, and registers HTTP routers.
 2. The application lifespan calls `build_runtime`, initializes the SQLite schema and default
    synthetic case, loads the approved knowledge corpus, and conditionally creates the model-backed
-   agent.
+   agent. Experiment-profile composition also records and exposes the immutable run manifest before
+   startup succeeds.
 3. HTTP middleware performs an early declared-size check and adds defensive response headers.
    The authenticated route compares configured API keys in constant time.
 4. Pydantic rejects undeclared fields and invalid request identifiers before the use case runs.
@@ -127,7 +130,9 @@ Cheat Sheet [4]. These are engineering references, not certification claims.
 | Threat or failure | Enforced control |
 |---|---|
 | Unauthorized HTTP access | Configured API key, constant-time comparison, production fail-closed validation |
+| Identity disclosure to the model provider | Dedicated keyed pseudonymous safety identifier; raw requester identity is never sent |
 | Host-header abuse | Explicit trusted-host middleware |
+| Production API metadata exposure | OpenAPI schema and interactive documentation disabled in production |
 | Oversized requests | Configured `Content-Length` rejection plus required deployment-proxy body limit |
 | Direct or indirect prompt injection | Untrusted-data labelling, bounded deterministic input rules, strict tool boundary |
 | Tool abuse or privilege escalation | Fixed allowlist, strict schemas, one call per turn, trusted case context |
@@ -145,8 +150,9 @@ bounds, schemas, allowlisting, case selection, execution, and final-output valid
 - Prompt-injection detection is a defense-in-depth heuristic and cannot prove that text is safe.
 - `Content-Length` is only an early application check. A reverse proxy or gateway must enforce the
   actual streamed-body limit, including omitted-length and chunked requests.
-- The development-only safety-identifier fallback must not be treated as a deployment secret.
-  Production configuration requires a non-empty API key, which supplies keyed pseudonymization.
+- Development and test may use the documented local safety-identifier fallback. Experiment and
+  production profiles require an independent `RAG_SAFETY_IDENTIFIER_SECRET`; the inbound API key
+  is never reused for provider pseudonymization.
 - Retrieved documents and tool output remain untrusted even after integrity validation; a valid
   digest establishes identity, not truth or safety.
 - SQLite and the supplied tools model synthetic evaluation state, not production availability,
@@ -164,10 +170,13 @@ after freeze; they belong in the governed Phase 4 condition.
 
 ## 8. Reproducibility and freeze procedure
 
-The experiment profile requires Qdrant, an OpenAI credential, and a named run identifier.
-`ExperimentRunManifest` records the freeze ID, models, knowledge digest, prompt digest, strict tool
-schema digest, retrieval parameters, contract versions, selected package versions, and a canonical
-configuration digest. A run identifier cannot be reused for different configuration.
+The experiment profile requires Qdrant, an OpenAI credential, a dedicated safety-identifier
+secret, and a named run identifier.
+`app.baseline.experiments.ExperimentRunManifest` records the freeze ID, models, knowledge digest,
+prompt digest, strict tool schema digest, retrieval parameters, contract versions, selected package
+versions, and a canonical configuration digest. Composition records this manifest automatically
+before the experiment application becomes ready. A run identifier cannot be reused for different
+configuration.
 
 Before writing the freeze manifest:
 
@@ -181,7 +190,8 @@ Before writing the freeze manifest:
 6. review the generated file list and aggregate SHA-256 before committing and tagging.
 
 The verifier freezes Phase-3 runtime code, normative architecture and baseline documents,
-knowledge, dependencies, boundary tests, baseline tests, shared tests, and support fixtures.
+knowledge, dependencies, pinned Qdrant Compose configuration, ingestion and smoke scripts,
+boundary tests, baseline tests, shared tests, and support fixtures.
 `tests/governance` content is deliberately outside this identity. Any subsequent added,
 removed, or modified frozen file must fail verification.
 

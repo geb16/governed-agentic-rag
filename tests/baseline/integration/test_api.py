@@ -3,12 +3,12 @@
 from fastapi.testclient import TestClient
 from pydantic import SecretStr
 
-from app.api.dependencies import get_agent
+from app.baseline.api.dependencies import get_agent
+from app.baseline_main import create_app
 from app.core.config import Settings
-from app.domain.schemas import AgentDraft, ModelTurn
-from app.main import create_app
+from app.domain.model import AgentDraft, ModelTurn
 from app.rag.retriever import KnowledgeRetriever
-from tests.support.baseline import ScriptedModel, build_agent
+from tests.baseline.support import ScriptedModel, build_agent
 
 
 def test_invoke_endpoint_enforces_api_key(settings: Settings) -> None:
