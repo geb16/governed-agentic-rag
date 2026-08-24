@@ -207,3 +207,6 @@ https://developers.openai.com/api/docs/guides/function-calling. [Accessed: Aug. 
 
 [5] S. Ramírez, “Lifespan Events,” *FastAPI Documentation*. [Online]. Available:
 https://fastapi.tiangolo.com/advanced/events/. [Accessed: Aug. 06, 2026].
+
+[6] OpenAI, “Codex,” *OpenAI*. [Online]. Available: https://openai.com/codex/.
+[Accessed: Aug. 24, 2026]. AI assistance was limited only to converting the text-based architecture diagram into SVG.
