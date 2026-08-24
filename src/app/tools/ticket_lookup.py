@@ -4,14 +4,11 @@ from __future__ import annotations
 
 from pydantic import Field
 
+from app.domain.actions import ActionResultStatus, ControlledToolResult
+from app.domain.contracts import StrictModel
+from app.domain.evidence import EvidenceType
 from app.domain.repositories import SyntheticRepository
-from app.domain.schemas import (
-    ActionResultStatus,
-    ControlledToolResult,
-    EvidenceType,
-    StrictModel,
-    ToolExecutionContext,
-)
+from app.domain.tasks import ToolExecutionContext
 from app.tools.evidence import evidence_reference
 
 

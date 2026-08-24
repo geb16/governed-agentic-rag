@@ -32,33 +32,45 @@ repos:
         args: [--allow-missing-credentials]
       - id: detect-private-key
       - id: end-of-file-fixer
-      - id: mixed-line-ending
-        args: [--fix=no]
       - id: trailing-whitespace
 
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.3.0
     hooks:
       - id: conventional-pre-commit
-        stages: [manual]
+        stages: [commit-msg]
 
   - repo: local
     hooks:
       - id: ruff-check
         name: ruff lint
-        entry: uv run --frozen precommit-lint
+        entry: uv run --frozen ruff check
         language: system
         types: [python]
         require_serial: true
       - id: ruff-format
-        name: ruff format
-        entry: uv run --frozen precommit-format
+        name: ruff format check
+        entry: uv run --frozen ruff format --check
         language: system
         types: [python]
         require_serial: true
-      - id: repository-quality-gate
-        name: repository quality gate
-        entry: uv run --frozen precommit-check
+      - id: mypy
+        name: mypy
+        entry: uv run --frozen mypy
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [manual]
+      - id: pyright
+        name: pyright
+        entry: uv run --frozen pyright
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [manual]
+      - id: pytest
+        name: pytest
+        entry: uv run --frozen pytest -p no:cacheprovider
         language: system
         pass_filenames: false
         always_run: true

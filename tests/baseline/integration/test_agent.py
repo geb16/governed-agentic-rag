@@ -1,15 +1,9 @@
 """End-to-end baseline orchestration contracts with real local adapters."""
 
-from app.domain.schemas import (
-    AgentDraft,
-    AgentStatus,
-    BaselineRequest,
-    ModelToolCall,
-    ModelTurn,
-    ToolStatus,
-)
+from app.baseline.application.contracts import AgentStatus, BaselineRequest, ToolStatus
+from app.domain.model import AgentDraft, ModelToolCall, ModelTurn
 from app.rag.retriever import KnowledgeRetriever
-from tests.support.baseline import ScriptedModel, build_agent
+from tests.baseline.support import ScriptedModel, build_agent
 
 
 def test_agent_invocation_returns_valid_grounded_output(

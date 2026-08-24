@@ -50,6 +50,7 @@ def test_production_rejects_plaintext_qdrant(project_root) -> None:
             environment="production",
             api_key=SecretStr("inbound"),
             openai_api_key=SecretStr("openai"),
+            safety_identifier_secret=SecretStr("safety-identifier-key"),
             retrieval_backend="qdrant",
             qdrant_url="http://qdrant.internal:6333",
             qdrant_read_api_key=SecretStr("read-only"),

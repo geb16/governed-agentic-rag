@@ -1,11 +1,12 @@
 """Persistence and tool-dispatch isolation across synthetic evaluation cases."""
 
+from app.baseline.application.contracts import ToolStatus
 from app.baseline.tool_router import ToolRouter
-from app.domain.schemas import ActionResultStatus, ToolStatus
+from app.domain.actions import ActionResultStatus
 from app.domain.support import AccessAccountRecord, SyntheticCaseFixture, TicketRecord
-from app.persistence.repository import SqliteSyntheticRepository
+from app.infrastructure.persistence.sqlite import SqliteSyntheticRepository
 from app.tools.ticket_update import TicketUpdateTool
-from tests.support.baseline import tool_context
+from tests.baseline.support import tool_context
 
 
 def test_case_state_is_isolated_by_case_id(repository: SqliteSyntheticRepository) -> None:

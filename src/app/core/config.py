@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
 
     api_key: SecretStr | None = None
+    safety_identifier_secret: SecretStr | None = None
     allowed_hosts: Annotated[list[str], NoDecode] = Field(
         default_factory=lambda: ["localhost", "127.0.0.1", "testserver"]
     )
@@ -107,6 +108,11 @@ class Settings(BaseSettings):
                 raise ValueError("RAG_API_KEY is required in production")
             if self.openai_api_key is None or not self.openai_api_key.get_secret_value():
                 raise ValueError("RAG_OPENAI_API_KEY is required in production")
+            if (
+                self.safety_identifier_secret is None
+                or not self.safety_identifier_secret.get_secret_value()
+            ):
+                raise ValueError("RAG_SAFETY_IDENTIFIER_SECRET is required in production")
             if "*" in self.allowed_hosts:
                 raise ValueError("Wildcard hosts are not allowed in production")
             if self.retrieval_backend == "qdrant":
@@ -123,6 +129,11 @@ class Settings(BaseSettings):
                 raise ValueError("The experiment profile requires RAG_OPENAI_API_KEY")
             if self.experiment_run_id is None:
                 raise ValueError("The experiment profile requires RAG_EXPERIMENT_RUN_ID")
+            if (
+                self.safety_identifier_secret is None
+                or not self.safety_identifier_secret.get_secret_value()
+            ):
+                raise ValueError("The experiment profile requires RAG_SAFETY_IDENTIFIER_SECRET")
         return self
 
 

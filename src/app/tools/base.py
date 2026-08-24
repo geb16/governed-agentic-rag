@@ -6,7 +6,8 @@ from typing import Protocol, TypeVar
 
 from pydantic import BaseModel
 
-from app.domain.schemas import ControlledToolResult, ToolExecutionContext
+from app.domain.actions import ControlledToolResult
+from app.domain.tasks import ToolExecutionContext
 
 ArgumentsT = TypeVar("ArgumentsT", bound=BaseModel)
 

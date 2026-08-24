@@ -3,7 +3,7 @@
 ## Purpose and declared scope
 
 This document describes the software architecture of the conventional Phase 3 agentic RAG
-baseline identified as `phase3-baseline-v1`. It records the dependency direction, component
+baseline identified as `phase3-baseline-v2`. It records the dependency direction, component
 ownership, runtime flow, trust boundaries, extension seams, and known compromises that must be
 reviewed before the baseline is frozen.
 
@@ -20,7 +20,8 @@ In scope:
 - strict, allowlisted, simulated tools;
 - case-partitioned synthetic SQLite state;
 - deterministic input, tool, citation, and output controls;
-- governance-neutral outcomes, evidence, operational logging, and an experiment-manifest utility.
+- governance-neutral outcomes, evidence, operational logging, and a baseline-owned
+  experiment-manifest utility.
 
 Out of scope:
 
@@ -37,21 +38,21 @@ The detailed behavioral, security, reproducibility, and reference contract is ma
 Arrows below represent source-code dependency direction, not runtime control flow.
 
 ```text
-                         main.py + composition.py
+                 baseline_main.py + baseline/composition.py
                         /          |             \
                        v           v              v
                  API transport  baseline       concrete adapters
-                    app.api      façade       infrastructure / RAG
-                       |        + guardrails    persistence / tools
+                 baseline/api    façade       infrastructure / RAG
+                       |        + tool router        tools
                        |           |              |
                        +-----------+--------------+
                                    v
-                         app.application.baseline
+                         baseline/application
                       use case / ports / state / policy
                                    |
                                    v
                               app.domain
-                    task / evidence / action / support
+              task / evidence / action / model / support
 
         app.core: cross-cutting configuration, logging, and HTTP security
 ```
@@ -59,17 +60,20 @@ Arrows below represent source-code dependency direction, not runtime control flo
 The domain layer is the innermost boundary and imports no outer application package. The
 application layer depends on domain contracts and selected cross-cutting `app.core` functions, not
 on concrete model, retrieval, persistence, tool, or HTTP adapters. FastAPI routes depend on
-`BaselineUseCase`, not `BaselineAgent` or concrete outbound adapters. `app.composition` is the only
-composition root.
+`BaselineUseCase`, not `BaselineAgent` or concrete outbound adapters. `app.baseline.composition` is
+the Phase 3 composition root.
 
-`app.baseline` is not an inner domain layer. It is a Phase 3 compatibility and policy-mechanism
-package containing the constructor-compatible façade, deterministic guardrails, and tool router.
+`app.baseline` is a feature package, not a single clean-architecture layer. It owns the Phase 3
+transport, application services, constructor-compatible façade, deterministic guardrails, tool
+router, experiment identity, and composition root. Boundary tests enforce dependency direction
+among those internal packages.
 
 ## Component ownership
 
 | Component | Owns | Does not own |
 |---|---|---|
-| `app.api` | HTTP routes, dependency resolution, transport status | Agent orchestration or adapter construction |
+| `app.baseline.api` | HTTP routes, dependency resolution, transport status | Agent orchestration or adapter construction |
+| `app.baseline.experiments` | Phase 3 run identity and immutable manifest recording | Governance-run identity or runtime composition |
 | `BaselineUseCase` | Stable inbound invocation contract | FastAPI or provider details |
 | `BaselineAgentService` | Case/input validation, retrieval coordination, terminal response selection | OpenAI SDK calls or tool implementation |
 | `BaselineTurnRunner` | Turn/tool limits, model-turn validation, tool continuation, output decision | HTTP and persistent state construction |
@@ -80,7 +84,13 @@ package containing the constructor-compatible façade, deterministic guardrails,
 | `SyntheticRepository` / `SqliteSyntheticRepository` | Domain persistence contract / case-partitioned synthetic state | Production business-system state |
 | `build_shared_tools` | Frozen intended capability set for experimental conditions | Risk classification or workflow routing |
 | `build_runtime` | Concrete adapter construction and default synthetic-case initialization | Request-specific orchestration |
-| `app.domain` | Strict task, evidence, action, result, and support-state language | Transport and provider representations |
+| `app.domain.actions` | Governance-neutral action proposals, outcomes, and controlled-tool results | Baseline dispatch status or transport responses |
+| `app.domain.evidence` | Evidence identity, citations, and retrieved knowledge chunks | Retrieval implementation or baseline response assembly |
+| `app.domain.model` | Provider-neutral model drafts, tool proposals, and bounded turns | OpenAI SDK types or baseline orchestration |
+| `app.domain.tasks` | Shared task requests and trusted execution context | Baseline or governance workflow state |
+| `app.domain.support` | Synthetic support-state language | SQLite implementation or production business state |
+| `app.baseline.application.contracts` | Phase 3 requests, responses, statuses, usage, and tool-call records | Shared governance-domain language |
+| `app.baseline.api.contracts` | Baseline health transport response | Application orchestration or shared domain behavior |
 
 ## Startup sequence
 
@@ -94,7 +104,11 @@ package containing the constructor-compatible façade, deterministic guardrails,
 5. When an OpenAI credential is configured, the composition root creates the model adapter,
    shared tool registry, fault injector, router, and `BaselineAgent` façade. Otherwise, invocation
    remains unavailable while liveness can still succeed.
-6. The lifespan publishes the assembled adapters through application state.
+6. For an experiment profile, composition records the immutable run manifest from the configured
+   model, retrieval, prompt, tool, knowledge, package, and contract identity. A conflicting run
+   identifier or manifest write failure aborts startup.
+7. The lifespan publishes the assembled adapters and optional experiment manifest through
+   application state.
 
 Startup fails rather than serving a partially initialized runtime when knowledge integrity,
 database schema, or configured Qdrant readiness validation fails.
@@ -147,13 +161,13 @@ database schema, or configured Qdrant readiness validation fails.
 | `ToolExecutionContext` | Trusted application data | Constructed from validated request context, never accepted from model arguments |
 | Tool output | Content-untrusted | Structured result contracts, evidence capture, output guardrail |
 | SQLite state | Trusted synthetic state | Foreign keys, transactions, idempotency, and `case_id` partitioning |
-| API/OpenAI/Qdrant credentials | Secret configuration | `SecretStr`, HTTPS requirements, redacting logs, no response exposure |
+| API/OpenAI/Qdrant credentials and safety-identifier key | Secret configuration | Independent `SecretStr` values, HTTPS requirements, redacting logs, no response exposure |
 | Operational logs | Internal diagnostics | Structured context, secret redaction, no prompt bodies; not a durable audit trail |
 
 Model requests use `store=False`. Request conversation and evidence state live only for one
 `invoke` call. Synthetic support state is intentionally durable on local storage. Experiment
-manifests are durable when the recording utility is invoked; governance workflow state does not
-exist in Phase 3.
+manifests are recorded durably and exposed through application state during experiment startup;
+governance workflow state does not exist in Phase 3.
 
 The application-level `Content-Length` check is an early rejection only. The deployment gateway must
 enforce the actual streamed-body limit, including omitted-length and chunked requests.
@@ -179,17 +193,14 @@ checkpoints, and structured audit events. Those concerns must compose outside th
 2. The application layer imports `app.core.logging` and `app.core.security` directly. These are
    stable cross-cutting functions, but dedicated logging and pseudonymization ports would create a
    stricter dependency inversion boundary.
-3. `app.baseline` combines compatibility, deterministic safety, and tool dispatch. It is bounded by
-   purpose but is not a pure clean-architecture layer.
-4. `persistence/repository.py` and `baseline/tool_router.py` retain multiple related responsibilities
-   and should be split only when change frequency or additional implementations justify it.
+3. `app.baseline` is a vertical feature package spanning transport, application, and composition
+   concerns. Its internal dependency rules, rather than the package itself, form the clean boundary.
+4. `baseline/tool_router.py` retains several closely related validation and dispatch
+   responsibilities and should be split only when change frequency justifies another abstraction.
 5. SQLite, lexical retrieval, and simulated tools are appropriate for the controlled pilot, not a
    claim of production throughput, distributed consistency, or external authorization.
 6. Prompt-injection patterns and output rules are defense in depth, not proofs of semantic safety.
-7. `ExperimentRunManifest` can create an immutable named-run artifact, but `build_runtime` and the
-   FastAPI lifespan do not currently invoke it; `application.state.experiment_manifest` remains
-   `None`. Automatic experiment recording must not be claimed until composition wires this utility.
-8. `BaselineAgentService` converts exceptions raised by the model/tool turn runner into a stable
+7. `BaselineAgentService` converts exceptions raised by the model/tool turn runner into a stable
    failed response, while case validation, input inspection, and initial retrieval occur outside
    that exception boundary and can propagate as transport-level failures.
 
@@ -198,12 +209,12 @@ they threaten experimental validity, security, or maintainability.
 
 ## Architecture verification expectations
 
-`tests/architecture/test_baseline_boundaries.py` must fail when:
+`tests/baseline/architecture/test_baseline_boundaries.py` must fail when:
 
 - a declared Phase 3 layer is missing;
 - `app.domain` imports an outer application package;
-- `app.application.baseline` imports API, compatibility, Phase 4 governance, infrastructure,
-  persistence, RAG, tool, composition, or process-entry modules;
+- `app.baseline.application` imports baseline API, façade, experiment recorder, tool router,
+  Phase 4 governance, infrastructure, RAG, tools, composition, or process-entry modules;
 - the baseline API entry points import concrete baseline, governance, or outbound adapters instead
   of the application boundary;
 

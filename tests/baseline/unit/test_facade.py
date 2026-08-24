@@ -4,17 +4,15 @@ from __future__ import annotations
 
 from typing import Any
 
+from pydantic import SecretStr
+
 from app.baseline.agent import BaselineAgent
+from app.baseline.application.contracts import AgentStatus, BaselineRequest
 from app.baseline.tool_router import ToolRouter
 from app.core.config import Settings
-from app.domain.schemas import (
-    AgentDraft,
-    AgentStatus,
-    BaselineRequest,
-    ModelToolCall,
-    ModelTurn,
-    RetrievedChunk,
-)
+from app.core.security import stable_safety_identifier
+from app.domain.evidence import RetrievedChunk
+from app.domain.model import AgentDraft, ModelToolCall, ModelTurn
 from app.tools.response_drafter import ResponseDrafterTool
 
 
@@ -50,6 +48,7 @@ class FakeModel:
     def __init__(self, turns: list[ModelTurn]) -> None:
         self._turns = turns
         self.calls = 0
+        self.safety_identifiers: list[str] = []
 
     def complete(
         self,
@@ -60,8 +59,9 @@ class FakeModel:
         safety_identifier: str,
     ) -> ModelTurn:
         """Return the next scripted turn and count the invocation."""
-        del input_items, instructions, tools, safety_identifier
+        del input_items, instructions, tools
         self.calls += 1
+        self.safety_identifiers.append(safety_identifier)
         return self._turns.pop(0)
 
 
@@ -89,10 +89,11 @@ def _agent(
     *,
     model: FakeModel,
     repository: FakeRepository | None = None,
+    settings: Settings | None = None,
     tool_router: ToolRouter | None = None,
 ) -> BaselineAgent:
     return BaselineAgent(
-        settings=Settings(),
+        settings=settings or Settings(),
         retriever=FakeRetriever([_chunk()]),
         model=model,
         tool_router=tool_router or ToolRouter([]),
@@ -123,6 +124,33 @@ def test_compatibility_facade_completes_grounded_response() -> None:
     assert response.model == "fake-model"
     assert response.usage.input_tokens == 12
     assert [citation.chunk_id for citation in response.citations] == ["chunk-refund"]
+
+
+def test_facade_never_reuses_inbound_api_key_for_provider_identity() -> None:
+    """Derive provider pseudonymization only from the dedicated safety secret."""
+    settings = Settings(
+        api_key=SecretStr("inbound-authentication-key"),
+        safety_identifier_secret=SecretStr("dedicated-safety-key"),
+    )
+    model = FakeModel(
+        [
+            ModelTurn(
+                final=AgentDraft(
+                    answer="The request is not grounded in retrieved policy.",
+                    grounded=False,
+                )
+            )
+        ]
+    )
+
+    _agent(model=model, settings=settings).invoke(_request())
+
+    assert model.safety_identifiers == [
+        stable_safety_identifier("requester-1", "dedicated-safety-key")
+    ]
+    assert model.safety_identifiers != [
+        stable_safety_identifier("requester-1", "inbound-authentication-key")
+    ]
 
 
 def test_missing_case_short_circuits_before_model_call() -> None:

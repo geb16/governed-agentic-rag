@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "governed-agentic-rag"
-version = "0.1.0"
+version = "0.2.0"
 description = "design and evaluating a governed enterprise stle RAG workflow."
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
@@ -17,10 +17,6 @@ dependencies = [
   "qdrant-client>=1.17,<2",
   "uvicorn[standard]>=0.41,<1",
 ]
-
-[project.scripts]
-
-
 
 [dependency-groups]
 dev = [

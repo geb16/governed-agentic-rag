@@ -1,0 +1,210 @@
+<!--
+Diagram purpose: Show the Phase 4 dependency and composition model, including
+process-level adapter registration, feature composition, the seven-stage governed
+workflow, and reused Phase 3 contracts and capabilities.
+Source: docs/architecture/phase4_governance_architecture.md
+AI-assistance disclosure: OpenAI Codex assisted in converting the text-based
+architecture diagram into SVG. The resulting content was reviewed and approved by the author. 
+For more information; see reference [6] in the source document.
+-->
+<svg width="1200" height="1100" viewBox="0 0 1200 1100" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="diagram-title diagram-description">
+  <title id="diagram-title">Phase 4 dependency and composition model</title>
+  <desc id="diagram-description">The governed FastAPI entry point registers HTTP and concrete adapters, delegates feature wiring to governance composition, and exposes a seven-stage workflow built on governance contracts and frozen Phase 3 contracts and capabilities.</desc>
+  <defs>
+    <linearGradient id="gradIndigo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#4C1D95"/>
+    </linearGradient>
+    <linearGradient id="gradBlue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="gradAmber" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#B45309"/>
+    </linearGradient>
+    <linearGradient id="gradGreen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="gradGreenDark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#065F46"/>
+    </linearGradient>
+    <linearGradient id="gradViolet" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#6D28D9"/>
+    </linearGradient>
+    <linearGradient id="gradViolet2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#C084FC"/>
+      <stop offset="100%" stop-color="#7E22CE"/>
+    </linearGradient>
+    <linearGradient id="gradPink" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#9D174D"/>
+    </linearGradient>
+    <linearGradient id="gradGray" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#64748B"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.28"/>
+    </filter>
+
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#B91C1C"/>
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563EB"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="1100" fill="#F8FAFC"/>
+  <rect x="0" y="0" width="1200" height="1100" fill="none" stroke="#E2E8F0" stroke-width="2"/>
+
+  <!-- Title -->
+  <text x="600" y="30" text-anchor="middle" font-size="23" font-weight="700" fill="#1E293B">Phase 4 &#8212; Dependency and Composition Model</text>
+  <text x="600" y="50" text-anchor="middle" font-size="13" fill="#64748B">process composition root, feature wiring, runtime invocation, and stable package boundaries</text>
+
+  <!-- ============ Connectors (drawn first, under boxes) ============ -->
+  <g stroke="#334155" stroke-width="2" fill="none">
+    <!-- root -> level2 branch -->
+    <polyline points="600,160 600,175 200,175 200,190" marker-end="url(#arrow)"/>
+    <polyline points="600,175 600,190" marker-end="url(#arrow)"/>
+    <polyline points="600,175 1000,175 1000,190" marker-end="url(#arrow)"/>
+
+    <!-- concrete and shared adapters -> feature composition -->
+    <line x1="600" y1="290" x2="600" y2="370" marker-end="url(#arrow)"/>
+    <polyline points="1000,290 1000,410 770,410" marker-end="url(#arrow)"/>
+
+    <!-- feature composition -> orchestration -->
+    <line x1="600" y1="445" x2="600" y2="475" marker-end="url(#arrow)"/>
+
+  </g>
+
+  <!-- Orchestration invokes bounded stages at runtime. -->
+  <line x1="600" y1="550" x2="600" y2="580" fill="none" stroke="#2563EB" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#arrowBlue)"/>
+
+  <!-- Stages use the stable governance contracts. -->
+  <line x1="600" y1="655" x2="600" y2="685" fill="none" stroke="#B91C1C" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#arrowRed)"/>
+
+  <!-- Governance contracts reuse frozen shared domain and baseline contracts. -->
+  <g stroke="#B91C1C" stroke-width="2" stroke-dasharray="7,5" fill="none">
+    <polyline points="600,760 600,795 350,795"/>
+    <polyline points="600,795 850,795"/>
+    <polyline points="350,795 350,830" marker-end="url(#arrowRed)"/>
+    <polyline points="850,795 850,830" marker-end="url(#arrowRed)"/>
+  </g>
+
+  <!-- HTTP adapter invokes the composed use case through FastAPI application state. -->
+  <polyline points="200,290 200,512 430,512" fill="none" stroke="#2563EB" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#arrowBlue)"/>
+  <rect x="220" y="472" width="176" height="27" rx="6" fill="#EFF6FF" stroke="#93C5FD"/>
+  <text x="308" y="490" text-anchor="middle" font-size="10.5" fill="#1D4ED8">invokes via app.state</text>
+
+  <!-- audit -> app.domain dashed dependency -->
+  <path d="M 430,255 C 80,330 20,720 245,832" fill="none" stroke="#B91C1C" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#arrowRed)"/>
+  <rect x="18" y="606" width="230" height="44" rx="6" fill="#FEF2F2" stroke="#B91C1C" stroke-width="1"/>
+  <text x="133" y="623" text-anchor="middle" font-size="10.5" fill="#991B1B" font-style="italic">audit's only cross-package import</text>
+  <text x="133" y="638" text-anchor="middle" font-size="10.5" fill="#991B1B" font-style="italic">app.domain.StrictModel</text>
+
+  <!-- ============ Box 1: governed_main.py ============ -->
+  <g filter="url(#shadow)">
+    <rect x="410" y="70" width="380" height="90" rx="14" fill="url(#gradIndigo)"/>
+  </g>
+  <text x="600" y="102" text-anchor="middle" font-size="17" font-weight="700" fill="#FFFFFF">governed_main.py</text>
+  <text x="600" y="122" text-anchor="middle" font-size="12" fill="#E9D5FF">process composition root</text>
+  <text x="600" y="142" text-anchor="middle" font-size="10.5" fill="#EDE9FE" font-style="italic">startup validation &#183; concrete wiring &#183; router registration</text>
+
+  <!-- ============ Level 2: three branches ============ -->
+  <g filter="url(#shadow)">
+    <rect x="30" y="190" width="340" height="100" rx="14" fill="url(#gradBlue)"/>
+  </g>
+  <text x="200" y="222" text-anchor="middle" font-size="16" font-weight="700" fill="#FFFFFF">HTTP Transport</text>
+  <text x="200" y="242" text-anchor="middle" font-size="12" fill="#DBEAFE">governance/transport/http</text>
+  <text x="200" y="262" text-anchor="middle" font-size="10.5" fill="#EFF6FF" font-style="italic">request validation &#183; principal</text>
+  <text x="200" y="276" text-anchor="middle" font-size="10.5" fill="#EFF6FF" font-style="italic">resolution &#183; HTTP status mapping</text>
+
+  <g filter="url(#shadow)">
+    <rect x="430" y="190" width="340" height="100" rx="14" fill="url(#gradAmber)"/>
+  </g>
+  <text x="600" y="222" text-anchor="middle" font-size="16" font-weight="700" fill="#FFFFFF">Concrete Phase 4 Adapters</text>
+  <text x="600" y="242" text-anchor="middle" font-size="10.8" fill="#FFF7ED">governance/llm &#183; governance/persistence</text>
+  <text x="600" y="257" text-anchor="middle" font-size="10.8" fill="#FFF7ED">audit/sqlite</text>
+  <text x="600" y="276" text-anchor="middle" font-size="10.5" fill="#FFFBEB" font-style="italic">model adapter &#183; workflow state &#183; audit chain</text>
+
+  <g filter="url(#shadow)">
+    <rect x="830" y="190" width="340" height="100" rx="14" fill="url(#gradGreen)"/>
+  </g>
+  <text x="1000" y="222" text-anchor="middle" font-size="16" font-weight="700" fill="#FFFFFF">Shared Frozen Adapters</text>
+  <text x="1000" y="242" text-anchor="middle" font-size="11.5" fill="#D1FAE5">app.rag &#183; app.tools &#183; infrastructure SQLite</text>
+  <text x="1000" y="262" text-anchor="middle" font-size="10.5" fill="#ECFDF5" font-style="italic">frozen Phase 3 v2 identity</text>
+  <text x="1000" y="276" text-anchor="middle" font-size="10.5" fill="#ECFDF5" font-style="italic">(model-independent)</text>
+
+  <!-- ============ governance feature composition ============ -->
+  <g filter="url(#shadow)">
+    <rect x="430" y="370" width="340" height="75" rx="14" fill="url(#gradViolet)"/>
+  </g>
+  <text x="600" y="399" text-anchor="middle" font-size="16" font-weight="700" fill="#FFFFFF">governance/composition.py</text>
+  <text x="600" y="418" text-anchor="middle" font-size="12" fill="#EDE9FE">feature composer</text>
+  <text x="600" y="434" text-anchor="middle" font-size="10.5" fill="#F5F3FF" font-style="italic">binds ports &#183; stages &#183; shared capabilities</text>
+
+  <!-- ============ governance/orchestration ============ -->
+  <g filter="url(#shadow)">
+    <rect x="430" y="475" width="340" height="75" rx="14" fill="url(#gradViolet2)"/>
+  </g>
+  <text x="600" y="505" text-anchor="middle" font-size="16" font-weight="700" fill="#FFFFFF">governance/orchestration</text>
+  <text x="600" y="524" text-anchor="middle" font-size="12" fill="#F5F3FF">seven-stage use case</text>
+  <text x="600" y="540" text-anchor="middle" font-size="10.5" fill="#FAF5FF" font-style="italic">sequence &#183; transitions &#183; approval pause/resume</text>
+
+  <!-- ============ governance/stages + application ports ============ -->
+  <g filter="url(#shadow)">
+    <rect x="430" y="580" width="340" height="75" rx="14" fill="url(#gradViolet2)"/>
+  </g>
+  <text x="600" y="609" text-anchor="middle" font-size="16" font-weight="700" fill="#FFFFFF">Stages + application ports</text>
+  <text x="600" y="629" text-anchor="middle" font-size="10.5" fill="#FAF5FF" font-style="italic">classification &#183; retrieval &#183; risk &#183; approval</text>
+  <text x="600" y="644" text-anchor="middle" font-size="10.5" fill="#FAF5FF" font-style="italic">recovery &#183; final policy &#183; injected interfaces</text>
+
+  <!-- ============ governance/contracts ============ -->
+  <g filter="url(#shadow)">
+    <rect x="430" y="685" width="340" height="75" rx="14" fill="url(#gradPink)"/>
+  </g>
+  <text x="600" y="714" text-anchor="middle" font-size="16" font-weight="700" fill="#FFFFFF">governance/contracts</text>
+  <text x="600" y="735" text-anchor="middle" font-size="10.5" fill="#FCE7F3" font-style="italic">workflow state &#183; decisions &#183; results</text>
+  <text x="600" y="750" text-anchor="middle" font-size="10.5" fill="#FCE7F3" font-style="italic">stable errors</text>
+
+  <!-- ============ Split: app.domain / frozen baseline ============ -->
+  <g filter="url(#shadow)">
+    <rect x="200" y="830" width="300" height="90" rx="14" fill="url(#gradGreen)"/>
+  </g>
+  <text x="350" y="862" text-anchor="middle" font-size="16" font-weight="700" fill="#FFFFFF">app.domain</text>
+  <text x="350" y="884" text-anchor="middle" font-size="10.5" fill="#ECFDF5" font-style="italic">frozen shared tasks, evidence,</text>
+  <text x="350" y="898" text-anchor="middle" font-size="10.5" fill="#ECFDF5" font-style="italic">retrieval contracts</text>
+
+  <g filter="url(#shadow)">
+    <rect x="680" y="830" width="340" height="90" rx="14" fill="url(#gradGreenDark)"/>
+  </g>
+  <text x="850" y="858" text-anchor="middle" font-size="15.5" font-weight="700" fill="#FFFFFF">Frozen Baseline Execution</text>
+  <text x="850" y="877" text-anchor="middle" font-size="12" fill="#D1FAE5">records &amp; safety behavior</text>
+  <text x="850" y="895" text-anchor="middle" font-size="10.5" fill="#ECFDF5" font-style="italic">ToolCallRecord &#183; Usage &#183; guardrails (reused)</text>
+
+  <!-- ============ app.core cross-cutting foundation ============ -->
+  <g filter="url(#shadow)">
+    <rect x="60" y="960" width="1080" height="65" rx="14" fill="url(#gradGray)" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="6,4"/>
+  </g>
+  <text x="600" y="986" text-anchor="middle" font-size="15" font-weight="700" fill="#FFFFFF">app.core &#8212; cross-cutting foundation</text>
+  <text x="600" y="1005" text-anchor="middle" font-size="11" fill="#E2E8F0" font-style="italic">shared configuration &#183; logging &#183; HTTP security &#183; pseudonymization &#8212; imported only where required</text>
+
+  <!-- ============ Connector legend ============ -->
+  <g font-size="10.5" fill="#475569">
+    <line x1="282" y1="1060" x2="332" y2="1060" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="345" y="1064">composition / wiring</text>
+    <line x1="500" y1="1060" x2="550" y2="1060" stroke="#2563EB" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#arrowBlue)"/>
+    <text x="563" y="1064">runtime invocation</text>
+    <line x1="735" y1="1060" x2="785" y2="1060" stroke="#B91C1C" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#arrowRed)"/>
+    <text x="798" y="1064">compile-time dependency</text>
+  </g>
+</svg>

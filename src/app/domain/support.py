@@ -6,7 +6,7 @@ from enum import StrEnum
 
 from pydantic import Field
 
-from app.domain.schemas import StrictModel
+from app.domain.contracts import StrictModel
 
 
 class FailureMode(StrEnum):

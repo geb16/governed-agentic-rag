@@ -8,7 +8,7 @@ from openai import OpenAI
 from openai.types.responses import ResponseInputParam, ToolParam
 
 from app.core.config import Settings
-from app.domain.schemas import AgentDraft, ModelToolCall, ModelTurn
+from app.domain.model import AgentDraft, ModelToolCall, ModelTurn
 
 
 def serialize_continuation_item(item: Any) -> dict[str, Any]:

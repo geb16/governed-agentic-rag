@@ -3,11 +3,12 @@
 import json
 
 from app.baseline.tool_router import ToolRouter
-from app.domain.schemas import ActionResultStatus, EvidenceType
-from app.persistence.repository import SqliteSyntheticRepository
+from app.domain.actions import ActionResultStatus
+from app.domain.evidence import EvidenceType
+from app.infrastructure.persistence.sqlite import SqliteSyntheticRepository
 from app.tools.human_review import HumanReviewTool
 from app.tools.refund import IssueRefundTool
-from tests.support.baseline import tool_context
+from tests.baseline.support import tool_context
 
 
 def test_simulated_action_and_escalation_share_neutral_outcome_contract(

@@ -1,16 +1,11 @@
 """Behavioral boundaries distinguishing the baseline from Phase 4 governance."""
 
+from app.baseline.application.contracts import AgentStatus, BaselineRequest
 from app.core.config import Settings
-from app.domain.schemas import (
-    AgentDraft,
-    AgentStatus,
-    BaselineRequest,
-    EvidenceType,
-    ModelToolCall,
-    ModelTurn,
-)
+from app.domain.evidence import EvidenceType
+from app.domain.model import AgentDraft, ModelToolCall, ModelTurn
 from app.rag.retriever import KnowledgeRetriever
-from tests.support.baseline import ScriptedModel, build_agent
+from tests.baseline.support import ScriptedModel, build_agent
 
 
 # Test that the baseline LLM can choose to escalate a ticket to a human reviewer
