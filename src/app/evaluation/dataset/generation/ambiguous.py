@@ -39,5 +39,20 @@ def cases() -> list[EvaluationCase]:
             tags=["pronoun"],
             **common,
         ),
-        
+        make_case(
+            19,
+            c,
+            "Refund without currency",
+            "Refund 500 on TKT-1001 for the outage.",
+            intent="refund",
+            task_type=TaskType.STATE_CHANGING,
+            sensitivity=Sensitivity.HIGH,
+            clarification_fields=["currency", "arrival_date", "reason_code"],
+            documents=["refund_policy"],
+            ticket_status="open",
+            ticket_category="refund",
+            pair="pair_refund_500_currency",
+            **common,
+        ),
+
     ]
