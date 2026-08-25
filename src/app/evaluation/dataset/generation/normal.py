@@ -259,5 +259,18 @@ def cases() -> list[EvaluationCase]:
             documents=["refund_policy"],
             tags=["audit", "narrow_retrieval"],
         ),
+        make_case(
+            16,
+            c,
+            "Emergency access duration",
+            "What is the maximum documented duration for emergency access?",
+            route=Route.ANSWER,
+            intent="information",
+            task_type=TaskType.READ_ONLY,
+            sensitivity=Sensitivity.MODERATE,
+            risk=Risk.LOW,
+            documents=["iam_change_policy"],
+            tags=["iam", "emergency_access"],
+        ),
         
     ]
