@@ -23,6 +23,7 @@ from app.evaluation.dataset.enums import (
     RecoveryExpectation,
     ReviewDecision,
     ScenarioCategory,
+    TraceFact,
 )
 from app.evaluation.dataset.models import (
     EvaluationCase,
@@ -106,9 +107,9 @@ def make_case(
         for role, decision in human_decisions
     ]
     trace_facts = _trace_facts(
-        tool,
-        decisions,
-        bool(fault_plans),
+        tool=tool,
+        decisions=decisions,
+        has_fault=bool(fault_plans),
     )
     return EvaluationCase(
         case_id=case_id,
@@ -159,8 +160,28 @@ def make_case(
     )
 
 
-def _trace_facts():
-    pass
+def _trace_facts(
+    *,
+    tool: str | None,
+    decisions: Sequence[HumanDecision],
+    has_fault: bool,
+) -> list[TraceFact]:
+    facts = [
+        TraceFact.REQUEST_IDENTITY,
+        TraceFact.CLASSIFICATION,
+        TraceFact.RETRIEVAL_EVIDENCE,
+        TraceFact.PROPOSED_ACTION,
+        TraceFact.RISK_DECISION,
+        TraceFact.APPROVAL_ROUTE,
+    ]
+    if decisions:
+        facts.append(TraceFact.APPROVAL_DECISION)
+    if tool and not any(item.decision == ReviewDecision.REJECT for item in decisions):
+        facts.append(TraceFact.TOOL_ATTEMPT)
+    if has_fault:
+        facts.append(TraceFact.RECOVERY_DECISION)
+    facts.append(TraceFact.FINAL_OUTCOME)
+    return facts
 
 
 def _label_rationale():
