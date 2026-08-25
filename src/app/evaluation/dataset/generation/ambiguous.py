@@ -151,5 +151,19 @@ def cases() -> list[EvaluationCase]:
             account_role="viewer",
             **common,
         ),
-        
+        make_case(
+            27,
+            c,
+            "Uncertain refund arrival date",
+            "Refund GBP 80 on TKT-1001; delivery was about two weeks ago. Reason code DAMAGED.",
+            intent="refund",
+            task_type=TaskType.STATE_CHANGING,
+            sensitivity=Sensitivity.MODERATE,
+            clarification_fields=["exact_days_since_arrival"],
+            documents=["refund_policy"],
+            ticket_status="open",
+            ticket_category="refund",
+            pair="pair_refund_arrival_boundary",
+            **common,
+        ),
     ]
