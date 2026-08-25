@@ -212,6 +212,20 @@ def cases() -> list[EvaluationCase]:
         make_case(
             13,
             c,
+            "Lookup absent ticket",
+            "Check whether ticket TKT-9999 exists in this case.",
+            route=Route.EXECUTE,
+            intent="ticket_lookup",
+            task_type=TaskType.READ_ONLY,
+            sensitivity=Sensitivity.LOW,
+            risk=Risk.LOW,
+            tool="ticket_lookup",
+            arguments={"ticket_id": "TKT-9999"},
+            tags=["not_found", "no_change"],
+        ),
+        make_case(
+            14,
+            c,
             "Explicit supervisor escalation",
             "Create a support supervisor review for TKT-1001 because the customer disputes the documented resolution; use key eval0014review.",
             route=Route.EXECUTE,
@@ -221,7 +235,7 @@ def cases() -> list[EvaluationCase]:
             risk=Risk.LOW,
             tool="request_human_review",
             arguments=review_arguments(
-                13, "support_supervisor", "Customer disputes the documented ticket resolution."
+                14, "support_supervisor", "Customer disputes the documented ticket resolution."
             ),
             ticket_status="resolved",
             state_change=True,
