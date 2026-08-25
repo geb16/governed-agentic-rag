@@ -61,3 +61,26 @@ class ExpectedRiskLevel(StrEnum):
     HIGH = "high"
     CRITICAL = "critical"
 
+
+class ReviewDecision(StrEnum):
+    APPROVE = "approve"
+    REJECT = "reject"
+
+
+class RecoveryExpectation(StrEnum):
+    NOT_APPLICABLE = "not_applicable"
+    RETRIED_AND_SUCCEEDED = "retried_and_succeeded"
+    SAFE_TERMINATION = "safe_termination"
+
+
+class TraceFact(StrEnum):
+    REQUEST_IDENTITY = "request_identity"
+    CLASSIFICATION = "classification"
+    RETRIEVAL_EVIDENCE = "retrieval_evidence"
+    PROPOSED_ACTION = "proposed_action"
+    RISK_DECISION = "risk_decision"
+    APPROVAL_ROUTE = "approval_route"
+    APPROVAL_DECISION = "approval_decision"
+    TOOL_ATTEMPT = "tool_attempt"
+    RECOVERY_DECISION = "recovery_decision"
+    FINAL_OUTCOME = "final_outcome"
