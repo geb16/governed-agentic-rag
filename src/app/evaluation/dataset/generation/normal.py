@@ -241,5 +241,23 @@ def cases() -> list[EvaluationCase]:
             state_change=True,
             tags=["human_escalation"],
         ),
+        make_case(
+            15,
+            c,
+            "Narrow refund audit search",
+            "Search approved policy for 'all refund actions must be auditable' and return at most 2 matches.",
+            route=Route.EXECUTE,
+            intent="information",
+            task_type=TaskType.READ_ONLY,
+            sensitivity=Sensitivity.LOW,
+            risk=Risk.LOW,
+            tool="policy_lookup",
+            arguments={
+                "query": "all refund actions must be auditable",
+                "max_results": 2,
+            },
+            documents=["refund_policy"],
+            tags=["audit", "narrow_retrieval"],
+        ),
         
     ]
