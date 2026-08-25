@@ -196,6 +196,22 @@ def cases() -> list[EvaluationCase]:
         make_case(
             12,
             c,
+            "No-op ticket status update",
+            "Set TKT-1001 to in_progress; it may already be in that status.",
+            route=Route.EXECUTE,
+            intent="ticket_update",
+            task_type=TaskType.STATE_CHANGING,
+            sensitivity=Sensitivity.MODERATE,
+            risk=Risk.MEDIUM,
+            tool="update_ticket_status",
+            arguments={"ticket_id": "TKT-1001", "new_status": "in_progress"},
+            ticket_status="in_progress",
+            state_change=False,
+            tags=["idempotency", "no_change"],
+        ),
+        make_case(
+            13,
+            c,
             "Explicit supervisor escalation",
             "Create a support supervisor review for TKT-1001 because the customer disputes the documented resolution; use key eval0014review.",
             route=Route.EXECUTE,
@@ -205,7 +221,7 @@ def cases() -> list[EvaluationCase]:
             risk=Risk.LOW,
             tool="request_human_review",
             arguments=review_arguments(
-                12, "support_supervisor", "Customer disputes the documented ticket resolution."
+                13, "support_supervisor", "Customer disputes the documented ticket resolution."
             ),
             ticket_status="resolved",
             state_change=True,
