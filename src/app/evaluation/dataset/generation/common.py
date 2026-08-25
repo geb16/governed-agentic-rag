@@ -184,8 +184,28 @@ def _trace_facts(
     return facts
 
 
-def _label_rationale():
-    pass
+def _label_rationale(
+    *,
+    route: ExpectedRoute,
+    tool: str | None,
+    roles: Sequence[str],
+    fields: Sequence[str],
+    denial_code: str | None,
+    recovery: RecoveryExpectation,
+) -> str:
+    """Render a concise reviewer-facing explanation of the gold route."""
+    if route == ExpectedRoute.ANSWER:
+        return "The request is read-only and can be answered from the frozen approved knowledge."
+    if route == ExpectedRoute.EXECUTE:
+        return f"The request supplies the material inputs for the allowed {tool} capability."
+    if route == ExpectedRoute.HUMAN_REVIEW:
+        return "Policy requires accountable review before action by: " + ", ".join(roles)
+    if route == ExpectedRoute.CLARIFY:
+        return "Safe execution requires the missing or authoritative fields: " + ", ".join(fields)
+    if route == ExpectedRoute.DENY:
+        return f"The request is prohibited or unsupported under the {denial_code} rule."
+    return f"The injected failure must end as {recovery.value} without changing business state."
+
 
 def refund_arguments(number: int, amount_minor: int, currency: str = "GBP") -> dict[str, Any]:
     """Create exact valid arguments with a stable idempotency key."""
