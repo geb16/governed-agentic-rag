@@ -2,11 +2,18 @@
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from app.domain.support import SyntheticCaseFixture
+from app.domain.tasks import TaskRequest
 from app.evaluation.dataset.enums import (
+    DatasetSplit,
+    InteractionChannel,
     RecoveryExpectation,
     ReviewDecision,
+    ScenarioCategory,
 )
 
 
@@ -41,5 +48,37 @@ class ExpectedRecovery(EvaluationModel):
                 raise ValueError("successful recovery requires retries and no terminal error")
         elif self.expected_attempts < 1 or not self.expected_error_code:
             raise ValueError("safe termination requires attempts and an error code")
+        return self
+
+
+class ExpectedBehavior(EvaluationModel):
+    # Common observable oracle, independent of either system architecture.
+    ...
+class EvaluationCase(EvaluationModel):
+    """One isolated synthetic request, environment, and pre-adjudicated oracle."""
+
+    schema_version: Literal[1] = 1
+    dataset_version: Literal["1.0.0"] = "1.0.0"
+    case_id: str = Field(pattern=r"^case_eval_[0-9]{4}$")
+    split: DatasetSplit
+    category: ScenarioCategory
+    channel: InteractionChannel
+    title: str = Field(min_length=5, max_length=160)
+    request: TaskRequest
+    fixture: SyntheticCaseFixture
+    expected: ExpectedBehavior
+    label_rationale: str = Field(min_length=20, max_length=500)
+    tags: list[str] = Field(min_length=1, max_length=16)
+    minimal_pair_id: str | None = Field(default=None, pattern=r"^pair_[a-z0-9_]+$")
+    design_source_ids: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def validate_identity_and_faults(self) -> EvaluationCase:
+        """Bind input and fixture identity and isolate fault cases."""
+        if self.request.case_id != self.case_id or self.fixture.case_id != self.case_id:
+            raise ValueError("request, fixture, and case identifiers must match")
+        has_fault = bool(self.fixture.fault_plans)
+        if has_fault != (self.category == ScenarioCategory.TOOL_FAILURE):
+            raise ValueError("fault plans are allowed only and required for tool_failure cases")
         return self
 
