@@ -272,5 +272,24 @@ def cases() -> list[EvaluationCase]:
             documents=["iam_change_policy"],
             tags=["iam", "emergency_access"],
         ),
+        make_case(
+            17,
+            c,
+            "Draft unsent policy response",
+            "Create an unsent customer draft with purpose 'Explain low-risk support handling' and key point 'Low-risk information requests may be resolved autonomously'.",
+            route=Route.EXECUTE,
+            intent="information",
+            task_type=TaskType.READ_ONLY,
+            sensitivity=Sensitivity.LOW,
+            risk=Risk.LOW,
+            tool="response_drafter",
+            arguments={
+                "audience": "customer",
+                "purpose": "Explain low-risk support handling",
+                "key_points": ["Low-risk information requests may be resolved autonomously"],
+            },
+            documents=["support_sop"],
+            tags=["autonomy", "draft_not_delivered"],
+        ),
         
     ]
