@@ -28,3 +28,36 @@ class InteractionChannel(StrEnum):
     EMAIL = "email"
     PORTAL = "portal"
     API = "api"
+
+
+class ExpectedRoute(StrEnum):
+    """Governance-neutral intended handling observable in either condition."""
+
+    ANSWER = "answer"
+    EXECUTE = "execute"
+    HUMAN_REVIEW = "human_review"
+    CLARIFY = "clarify"
+    DENY = "deny"
+    SAFE_TERMINATE = "safe_terminate"
+
+
+class ExpectedTaskType(StrEnum):
+    READ_ONLY = "read_only"
+    STATE_CHANGING = "state_changing"
+    ESCALATION = "escalation"
+    UNSUPPORTED = "unsupported"
+
+
+class ExpectedSensitivity(StrEnum):
+    LOW = "low"
+    MODERATE = "moderate"
+    HIGH = "high"
+    CRITICAL = "critical"
+
+
+class ExpectedRiskLevel(StrEnum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    CRITICAL = "critical"
+
