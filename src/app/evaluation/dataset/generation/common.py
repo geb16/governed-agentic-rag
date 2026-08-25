@@ -6,20 +6,29 @@ from collections.abc import Sequence
 from typing import Any
 
 from app.domain.support import (
+    AccessAccountRecord,
     FailureMode,
     FaultPlan,
+    SyntheticCaseFixture,
+    TicketRecord,
 )
+from app.domain.tasks import TaskRequest
 from app.evaluation.dataset.enums import (
+    DatasetSplit,
     ExpectedRiskLevel,
     ExpectedRoute,
     ExpectedSensitivity,
     ExpectedTaskType,
     InteractionChannel,
     RecoveryExpectation,
+    ReviewDecision,
     ScenarioCategory,
 )
 from app.evaluation.dataset.models import (
     EvaluationCase,
+    ExpectedBehavior,
+    ExpectedRecovery,
+    HumanDecision,
 )
 
 _VALIDATION_NUMBERS = {1, 2, 3, 4, 18, 19, 20, 34, 35, 36, 51, 52, 53, 68, 69, 70, 85, 86, 87, 88}
@@ -68,7 +77,94 @@ def make_case(
     state_change: bool = False,
     sources: Sequence[str] = ("nist-ai-rmf", "openai-contextual-evals"),
 ) -> EvaluationCase:
-    pass 
+    # Build one fully isolated and pre-adjudicated evaluation case.
+    case_id = f"case_eval_{number:04d}"
+    fixture = SyntheticCaseFixture(
+        case_id=case_id,
+        tickets=(
+            [
+                TicketRecord(
+                    ticket_id="TKT-1001",
+                    status=ticket_status,
+                    category=ticket_category,
+                    summary=ticket_summary,
+                    version=1,
+                )
+            ]
+            if ticket_status
+            else []
+        ),
+        access_accounts=(
+            [AccessAccountRecord(subject_id="USR-1001", role=account_role, version=1)]
+            if account_role
+            else []
+        ),
+        fault_plans=list(fault_plans),
+    )
+    decisions = [
+        HumanDecision(role=role, decision=ReviewDecision(decision))
+        for role, decision in human_decisions
+    ]
+    trace_facts = _trace_facts(
+        tool,
+        decisions,
+        bool(fault_plans),
+    )
+    return EvaluationCase(
+        case_id=case_id,
+        split=(DatasetSplit.VALIDATION if number in _VALIDATION_NUMBERS else DatasetSplit.TEST),
+        category=category,
+        channel=_CHANNELS[(number - 1) % len(_CHANNELS)],
+        title=title,
+        request=TaskRequest(
+            request_id=f"req_eval_{number:04d}",
+            case_id=case_id,
+            requester_id=f"synthetic_requester_{((number - 1) % 12) + 1:02d}",
+            query=query,
+        ),
+        fixture=fixture,
+        expected=ExpectedBehavior(
+            route=route,
+            intent=intent,
+            task_type=task_type,
+            sensitivity=sensitivity,
+            risk_level=risk,
+            expected_tool=tool,
+            tool_arguments=arguments or {},
+            state_change_expected=state_change,
+            approval_roles=list(approval_roles),
+            human_decisions=decisions,
+            clarification_fields=list(clarification_fields),
+            denial_reason_code=denial_code,
+            retrieval_documents=list(documents),
+            risk_flags=list(risk_flags),
+            recovery=ExpectedRecovery(
+                expectation=recovery,
+                expected_attempts=attempts,
+                expected_error_code=error_code,
+            ),
+            required_trace_facts=trace_facts,
+        ),
+        label_rationale=_label_rationale(
+            route=route,
+            tool=tool,
+            roles=approval_roles,
+            fields=clarification_fields,
+            denial_code=denial_code,
+            recovery=recovery,
+        ),
+        tags=[category.value, intent, *tags],
+        minimal_pair_id=pair,
+        design_source_ids=list(sources),
+    )
+
+
+def _trace_facts():
+    pass
+
+
+def _label_rationale():
+    pass
 
 def refund_arguments(number: int, amount_minor: int, currency: str = "GBP") -> dict[str, Any]:
     """Create exact valid arguments with a stable idempotency key."""
