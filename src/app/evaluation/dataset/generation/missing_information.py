@@ -40,4 +40,18 @@ def cases() -> list[EvaluationCase]:
             documents=["refund_policy"],
             **clarify,
         ),
+        make_case(
+            69,
+            c,
+            "Refund missing amount",
+            "Issue a GBP refund on TKT-1001, received 5 days ago, reason code OUTAGE.",
+            intent="refund",
+            task_type=TaskType.STATE_CHANGING,
+            sensitivity=Sensitivity.MODERATE,
+            clarification_fields=["amount_minor"],
+            documents=["refund_policy"],
+            ticket_status="open",
+            ticket_category="refund",
+            **clarify,
+        ),
     ]
