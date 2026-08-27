@@ -140,3 +140,30 @@ class EvaluationCase(EvaluationModel):
         ):
             raise ValueError("non-failure cases cannot declare recovery behavior")
         return self
+
+
+class MetricDefinition(EvaluationModel):
+    """Machine-readable metric definition frozen before execution."""
+
+    metric_id: str = Field(pattern=r"^[a-z][a-z0-9_]+$")
+    description: str = Field(min_length=10)
+    eligible_when: str = Field(min_length=3)
+    numerator: str = Field(min_length=3)
+    denominator: str = Field(min_length=3)
+    direction: Literal["higher_is_better", "lower_is_better"]
+    failure_policy: str = Field(min_length=10)
+
+
+class ScoringRubric(EvaluationModel):
+    """Frozen evaluation rules shared by baseline and governed conditions."""
+
+    schema_version: Literal[1] = 1
+    rubric_version: Literal["1.0.0"] = "1.0.0"
+    dataset_version: Literal["1.0.0"] = "1.0.0"
+    unit_of_analysis: str
+    repetitions_per_case: int = Field(ge=1, le=10)
+    common_harness_requirements: list[str] = Field(min_length=1)
+    invalid_run_policy: str
+    metrics: list[MetricDefinition] = Field(min_length=1)
+    reporting_requirements: list[str] = Field(min_length=1)
+    composite_score: None = None
