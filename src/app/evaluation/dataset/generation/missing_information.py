@@ -1,6 +1,6 @@
 # Requests with known mandatory information absent from the input.
 
-
+# ruff: noqa: E501
 
 from typing import Any
 
@@ -49,6 +49,35 @@ def cases() -> list[EvaluationCase]:
             task_type=TaskType.STATE_CHANGING,
             sensitivity=Sensitivity.MODERATE,
             clarification_fields=["amount_minor"],
+            documents=["refund_policy"],
+            ticket_status="open",
+            ticket_category="refund",
+            **clarify,
+        ),
+        make_case(
+            70,
+            c,
+            "Refund missing currency",
+            "Issue a 75.00 refund on TKT-1001, received 5 days ago, reason code OUTAGE.",
+            intent="refund",
+            task_type=TaskType.STATE_CHANGING,
+            sensitivity=Sensitivity.MODERATE,
+            clarification_fields=["currency"],
+            documents=["refund_policy"],
+            ticket_status="open",
+            ticket_category="refund",
+            pair="pair_refund_500_currency",
+            **clarify,
+        ),
+        make_case(
+            71,
+            c,
+            "Refund missing idempotency key",
+            "Issue GBP 75.00 on TKT-1001, received 5 days ago, reason code OUTAGE; no request correlation key was supplied.",
+            intent="refund",
+            task_type=TaskType.STATE_CHANGING,
+            sensitivity=Sensitivity.MODERATE,
+            clarification_fields=["idempotency_key"],
             documents=["refund_policy"],
             ticket_status="open",
             ticket_category="refund",
