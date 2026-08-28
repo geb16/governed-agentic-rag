@@ -1,8 +1,10 @@
 # Deterministically render and verify the versioned Phase 5 artifacts.
 
+# ruff: noqa: E501
 
 from __future__ import annotations
 
+import hashlib
 import json
 from typing import Any
 
@@ -37,6 +39,27 @@ def render_artifacts() -> dict[str, bytes]:
     )
     return rendered
 
+
+def build_manifest(artifacts: dict[str, bytes]) -> bytes:
+    """Build a stable manifest binding data to both frozen system versions."""
+    manifest = {
+        "manifest_schema_version": 1,
+        "dataset_id": "enterprise-support-agent-eval",
+        "dataset_version": "1.0.0",
+        "distribution_type": "stratified_challenge_set_not_prevalence_sample",
+        "released_at": "2026-08-25T00:00:00Z",
+        "case_count": 100,
+        "validation_case_count": 20,
+        "test_case_count": 80,
+        "baseline_freeze_id": "phase3-baseline-v2",
+        "baseline_aggregate_sha256": "cd8c823a477419f7010c6d5beae1069baa154496e79fe52ed7fcaefcfe05f4b0",
+        "governance_freeze_id": "phase4-governance-v1",
+        "governance_aggregate_sha256": "a06eb798830e3cefea72978acc22d79dd6a2c51e53cf204ededffd8e7ceec46b",
+        "files": {
+            name: hashlib.sha256(content).hexdigest() for name, content in sorted(artifacts.items())
+        },
+    }
+    return _json_bytes(manifest)
 
 def _json_bytes(payload: Any) -> bytes:
     return (json.dumps(payload, indent=2, sort_keys=True) + "\n").encode()
