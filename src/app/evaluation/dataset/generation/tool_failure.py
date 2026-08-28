@@ -1,6 +1,5 @@
- # Deterministic transient, timeout, and permanent tool-failure scenarios.
-
-
+# Deterministic transient, timeout, and permanent tool-failure scenarios.
+# ruff: noqa: E501
 from app.evaluation.dataset.enums import (
     ExpectedRiskLevel as Risk,
 )
@@ -22,6 +21,7 @@ from app.evaluation.dataset.enums import (
 from app.evaluation.dataset.generation.common import (
     fault,
     make_case,
+    refund_arguments,
 )
 from app.evaluation.dataset.models import EvaluationCase
 
@@ -166,6 +166,27 @@ def cases() -> list[EvaluationCase]:
             recovery=Recovery.SAFE_TERMINATION,
             attempts=1,
             error_code="ticket_write_rejected",
+            sources=source,
+        ),
+        make_case(
+            91,
+            c,
+            "Transient refund recovery",
+            "Issue GBP 80.00 on TKT-1001, received 2 days ago, reason code OUTAGE, key eval0091refund, after one transient ledger error.",
+            route=Route.EXECUTE,
+            intent="refund",
+            task_type=TaskType.STATE_CHANGING,
+            sensitivity=Sensitivity.MODERATE,
+            risk=Risk.MEDIUM,
+            tool="issue_refund",
+            arguments=refund_arguments(91, 8_000),
+            documents=["refund_policy"],
+            ticket_status="open",
+            ticket_category="refund",
+            state_change=True,
+            fault_plans=[fault("issue_refund", "transient_error", 1, "refund_ledger_unavailable")],
+            recovery=Recovery.RETRIED_AND_SUCCEEDED,
+            attempts=2,
             sources=source,
         ),
     ]
