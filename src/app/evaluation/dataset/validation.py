@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from collections import Counter
+
 from pydantic import BaseModel
 
 from app.evaluation.dataset.enums import DatasetSplit, ScenarioCategory
+from app.evaluation.dataset.models import EvaluationCase
 from app.tools.access_role import ChangeAccessRoleArguments
 from app.tools.human_review import HumanReviewArguments
 from app.tools.policy_lookup import PolicyLookupArguments
@@ -34,3 +37,31 @@ _TOOL_INPUTS: dict[str, type[BaseModel]] = {
     "request_human_review": HumanReviewArguments,
 }
 
+
+def validate_dataset(cases: list[EvaluationCase]) -> None:
+    # Reject drift, duplicates, invalid gold actions, and coverage regression.
+    if len(cases) != EXPECTED_CASE_COUNT:
+        raise ValueError(f"Expected {EXPECTED_CASE_COUNT} cases, found {len(cases)}")
+    ids = [case.case_id for case in cases]
+    request_ids = [case.request.request_id for case in cases]
+    queries = [case.request.query.casefold() for case in cases]
+    if len(set(ids)) != len(ids) or len(set(request_ids)) != len(request_ids):
+        raise ValueError("Case and request identifiers must be unique")
+    if len(set(queries)) != len(queries):
+        raise ValueError("Evaluation queries must be unique")
+    if Counter(case.split for case in cases) != EXPECTED_SPLITS:
+        raise ValueError("Dataset split distribution does not match the frozen design")
+    if Counter(case.category for case in cases) != EXPECTED_CATEGORIES:
+        raise ValueError("Scenario distribution does not match the frozen design")
+
+    for case in cases:
+        expected_tool = case.expected.expected_tool
+        if expected_tool is not None:
+            model = _TOOL_INPUTS.get(expected_tool)
+            if model is None:
+                raise ValueError(f"{case.case_id} names an unallowlisted tool")
+            if case.expected.tool_arguments:
+                model.model_validate(case.expected.tool_arguments)
+        for plan in case.fixture.fault_plans:
+            if plan.tool_name not in _TOOL_INPUTS:
+                raise ValueError(f"{case.case_id} injects a fault into an unknown tool")
