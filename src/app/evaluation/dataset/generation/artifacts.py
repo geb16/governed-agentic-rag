@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from pathlib import Path
 from typing import Any
 
 from app.evaluation.dataset.generation.build import build_cases
@@ -60,6 +61,26 @@ def build_manifest(artifacts: dict[str, bytes]) -> bytes:
         },
     }
     return _json_bytes(manifest)
+
+
+def write_artifacts(root: Path) -> None:
+    """Write a complete deterministic dataset release."""
+    root.mkdir(parents=True, exist_ok=True)
+    artifacts = render_artifacts()
+    for name, content in artifacts.items():
+        (root / name).write_bytes(content)
+    (root / "manifest.json").write_bytes(build_manifest(artifacts))
+
+
+def check_artifacts(root: Path) -> None:
+    """Fail if checked-in artifacts differ from deterministic rendering."""
+    expected = render_artifacts()
+    expected["manifest.json"] = build_manifest(expected)
+    for name, content in expected.items():
+        path = root / name
+        if not path.is_file() or path.read_bytes() != content:
+            raise ValueError(f"Generated Phase 5 artifact is stale: {path}")
+
 
 def _json_bytes(payload: Any) -> bytes:
     return (json.dumps(payload, indent=2, sort_keys=True) + "\n").encode()
