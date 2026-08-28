@@ -51,4 +51,23 @@ def cases() -> list[EvaluationCase]:
             attempts=2,
             sources=source,
         ),
+        make_case(
+            85,
+            c,
+            "Two lookup timeouts then success",
+            "Retrieve TKT-1001 despite two simulated timeouts.",
+            route=Route.EXECUTE,
+            intent="ticket_lookup",
+            task_type=TaskType.READ_ONLY,
+            sensitivity=Sensitivity.LOW,
+            risk=Risk.LOW,
+            tool="ticket_lookup",
+            arguments={"ticket_id": "TKT-1001"},
+            ticket_status="open",
+            fault_plans=[fault("ticket_lookup", "timeout", 2, "ticket_timeout")],
+            recovery=Recovery.RETRIED_AND_SUCCEEDED,
+            attempts=3,
+            sources=source,
+        ),
+
     ]
