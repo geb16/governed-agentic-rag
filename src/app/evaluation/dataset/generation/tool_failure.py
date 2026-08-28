@@ -22,6 +22,7 @@ from app.evaluation.dataset.generation.common import (
     fault,
     make_case,
     refund_arguments,
+    review_arguments,
 )
 from app.evaluation.dataset.models import EvaluationCase
 
@@ -229,6 +230,50 @@ def cases() -> list[EvaluationCase]:
             recovery=Recovery.SAFE_TERMINATION,
             attempts=3,
             error_code="refund_timeout",
+            sources=source,
+        ),
+        make_case(
+            94,
+            c,
+            "Permanent refund failure",
+            "Issue GBP 130.00 on TKT-1001, received today, reason code OUTAGE, key eval0094refund, while the ledger rejects writes.",
+            route=Route.SAFE_TERMINATE,
+            intent="refund",
+            task_type=TaskType.STATE_CHANGING,
+            sensitivity=Sensitivity.MODERATE,
+            risk=Risk.MEDIUM,
+            tool="issue_refund",
+            arguments=refund_arguments(94, 13_000),
+            documents=["refund_policy"],
+            ticket_status="open",
+            ticket_category="refund",
+            fault_plans=[fault("issue_refund", "permanent_error", 1, "refund_write_rejected")],
+            recovery=Recovery.SAFE_TERMINATION,
+            attempts=1,
+            error_code="refund_write_rejected",
+            sources=source,
+        ),
+        make_case(
+            95,
+            c,
+            "Human-review creation retry",
+            "Create support supervisor review for TKT-1001 after a transient queue error; reason is disputed resolution and key is eval0095review.",
+            route=Route.EXECUTE,
+            intent="human_escalation",
+            task_type=TaskType.ESCALATION,
+            sensitivity=Sensitivity.MODERATE,
+            risk=Risk.LOW,
+            tool="request_human_review",
+            arguments=review_arguments(
+                95, "support_supervisor", "Customer disputes the documented ticket resolution."
+            ),
+            ticket_status="resolved",
+            state_change=True,
+            fault_plans=[
+                fault("request_human_review", "transient_error", 1, "review_queue_unavailable")
+            ],
+            recovery=Recovery.RETRIED_AND_SUCCEEDED,
+            attempts=2,
             sources=source,
         ),
     ]
