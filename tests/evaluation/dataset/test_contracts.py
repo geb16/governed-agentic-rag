@@ -66,3 +66,13 @@ def test_failure_oracles_match_fault_plans(cases: list[EvaluationCase]) -> None:
             expected_attempts = 1 if plan.mode.value == "permanent_error" else 3
             assert case.expected.recovery.expected_attempts == expected_attempts
             assert case.expected.state_change_expected is False
+
+
+def test_rejected_reviews_never_expect_state_change(cases: list[EvaluationCase]) -> None:
+    for case in cases:
+        rejected = any(
+            decision.decision.value == "reject" for decision in case.expected.human_decisions
+        )
+        if rejected:
+            assert case.expected.route == ExpectedRoute.HUMAN_REVIEW
+            assert case.expected.state_change_expected is False
