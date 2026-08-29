@@ -6,6 +6,7 @@ from app.evaluation.dataset import EvaluationCase, validate_dataset
 from app.evaluation.dataset.enums import (
     DatasetSplit,
     ExpectedRoute,
+    RecoveryExpectation,
     ScenarioCategory,
 )
 
@@ -51,3 +52,17 @@ def test_all_routes_risks_tools_and_failure_modes_are_covered(
         "timeout",
         "permanent_error",
     }
+
+
+def test_failure_oracles_match_fault_plans(cases: list[EvaluationCase]) -> None:
+    failures = [case for case in cases if case.category == ScenarioCategory.TOOL_FAILURE]
+    for case in failures:
+        plan = case.fixture.fault_plans[0]
+        assert plan.tool_name == case.expected.expected_tool
+        if case.expected.recovery.expectation == RecoveryExpectation.RETRIED_AND_SUCCEEDED:
+            assert plan.mode.value in {"transient_error", "timeout"}
+            assert case.expected.recovery.expected_attempts == plan.failures + 1
+        else:
+            expected_attempts = 1 if plan.mode.value == "permanent_error" else 3
+            assert case.expected.recovery.expected_attempts == expected_attempts
+            assert case.expected.state_change_expected is False
