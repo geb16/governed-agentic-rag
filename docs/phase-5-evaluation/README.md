@@ -21,6 +21,10 @@ Twenty cases are assigned to `validation` for harness verification and rubric
 calibration. The remaining 80 are assigned to `test`. Test labels must remain unchanged
 after comparative evaluation begins.
 
+The validation split covers every normalized route, allowlisted tool, deterministic failure
+mode, major intent, risk level, and approval outcome. Its four interaction channels are evenly
+represented so harness defects can be detected before the test split is opened.
+
 This is a production-grade **research artifact**. It is not production data and not evidence
 that the sample represents every enterprise deployment. It is deployment-like within
 the declared synthetic support domain. It contains no personal, customer, employee, or
