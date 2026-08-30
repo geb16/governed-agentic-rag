@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
@@ -54,10 +55,57 @@ def _frozen_files() -> list[Path]:
         files.update(matches)
     return sorted(files, key=lambda path: path.relative_to(PROJECT_ROOT).as_posix())
 
+def _read_manifest(path: Path, label: str) -> tuple[dict[str, Any], bytes]:
+    """Read one parent manifest as an object while preserving its exact bytes."""
+    try:
+        content = path.read_bytes()
+        payload: Any = json.loads(content)
+    except (OSError, json.JSONDecodeError) as error:
+        raise FreezeScopeError(f"{label} manifest cannot be read: {error}") from error
+    if not isinstance(payload, dict):
+        raise FreezeScopeError(f"{label} manifest root must be an object")
+    return payload, content
 
 
 def _parent_identity() -> dict[str, str]:
-    pass
+    """Validate Phase 3/4 identities and their recorded ancestry."""
+    phase3, phase3_bytes = _read_manifest(PHASE3_MANIFEST_PATH, "Phase 3")
+    phase4, phase4_bytes = _read_manifest(PHASE4_MANIFEST_PATH, "Phase 4")
+    phase3_manifest_hash = _sha256(phase3_bytes)
+    expected_values = (
+        (phase3.get("freeze_id"), PHASE3_FREEZE_ID, "Phase 3 freeze ID"),
+        (phase3.get("aggregate_sha256"), PHASE3_AGGREGATE_SHA256, "Phase 3 aggregate"),
+        (phase4.get("freeze_id"), PHASE4_FREEZE_ID, "Phase 4 freeze ID"),
+        (phase4.get("aggregate_sha256"), PHASE4_AGGREGATE_SHA256, "Phase 4 aggregate"),
+        (phase4.get("baseline_freeze_id"), PHASE3_FREEZE_ID, "Phase 4 baseline freeze ID"),
+        (
+            phase4.get("baseline_aggregate_sha256"),
+            PHASE3_AGGREGATE_SHA256,
+            "Phase 4 baseline aggregate",
+        ),
+        (
+            phase4.get("baseline_manifest_sha256"),
+            phase3_manifest_hash,
+            "Phase 4 baseline manifest hash",
+        ),
+    )
+    for actual, expected, label in expected_values:
+        if actual != expected:
+            raise FreezeScopeError(f"{label} does not match the reviewed release")
+    for value, _, label in expected_values:
+        if "ID" not in label and (
+            not isinstance(value, str) or _SHA256_PATTERN.fullmatch(value) is None
+        ):
+            raise FreezeScopeError(f"{label} is not a lowercase SHA-256 digest")
+    return {
+        "baseline_freeze_id": PHASE3_FREEZE_ID,
+        "baseline_aggregate_sha256": PHASE3_AGGREGATE_SHA256,
+        "baseline_manifest_sha256": phase3_manifest_hash,
+        "governance_freeze_id": PHASE4_FREEZE_ID,
+        "governance_aggregate_sha256": PHASE4_AGGREGATE_SHA256,
+        "governance_manifest_sha256": _sha256(phase4_bytes),
+    }
+
 
 def _canonical_aggregate(payload: Mapping[str, Any]) -> str:
     pass
