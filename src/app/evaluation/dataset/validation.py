@@ -1,4 +1,4 @@
-# Cross-case and frozen-tool validation for the Phase 5 benchmark. 
+"""Validate cross-case invariants and frozen-tool coverage for Phase 5."""
 
 from __future__ import annotations
 
@@ -6,7 +6,15 @@ from collections import Counter
 
 from pydantic import BaseModel
 
-from app.evaluation.dataset.enums import DatasetSplit, ScenarioCategory
+from app.domain.support import FailureMode
+from app.evaluation.dataset.enums import (
+    DatasetSplit,
+    ExpectedRiskLevel,
+    ExpectedRoute,
+    InteractionChannel,
+    ReviewDecision,
+    ScenarioCategory,
+)
 from app.evaluation.dataset.models import EvaluationCase
 from app.tools.access_role import ChangeAccessRoleArguments
 from app.tools.human_review import HumanReviewArguments
@@ -25,6 +33,18 @@ EXPECTED_CATEGORIES = {
     ScenarioCategory.HIGH_RISK: 17,
     ScenarioCategory.MISSING_INFORMATION: 16,
     ScenarioCategory.TOOL_FAILURE: 17,
+}
+EXPECTED_VALIDATION_CHANNELS = dict.fromkeys(InteractionChannel, 5)
+EXPECTED_INTENTS = {
+    "access_change",
+    "data_deletion",
+    "human_escalation",
+    "information",
+    "other",
+    "refund",
+    "security_attack",
+    "ticket_lookup",
+    "ticket_update",
 }
 
 _TOOL_INPUTS: dict[str, type[BaseModel]] = {
@@ -53,6 +73,30 @@ def validate_dataset(cases: list[EvaluationCase]) -> None:
         raise ValueError("Dataset split distribution does not match the frozen design")
     if Counter(case.category for case in cases) != EXPECTED_CATEGORIES:
         raise ValueError("Scenario distribution does not match the frozen design")
+
+    validation_cases = [case for case in cases if case.split == DatasetSplit.VALIDATION]
+    if Counter(case.channel for case in validation_cases) != EXPECTED_VALIDATION_CHANNELS:
+        raise ValueError("Validation channels must be evenly represented")
+    if {case.expected.route for case in validation_cases} != set(ExpectedRoute):
+        raise ValueError("Validation cases must cover every expected route")
+    if {
+        case.expected.expected_tool
+        for case in validation_cases
+        if case.expected.expected_tool is not None
+    } != set(_TOOL_INPUTS):
+        raise ValueError("Validation cases must cover every allowlisted tool")
+    if {plan.mode for case in validation_cases for plan in case.fixture.fault_plans} != set(
+        FailureMode
+    ):
+        raise ValueError("Validation cases must cover every deterministic failure mode")
+    if {case.expected.intent for case in validation_cases} != EXPECTED_INTENTS:
+        raise ValueError("Validation cases must cover every major intent")
+    if {case.expected.risk_level for case in validation_cases} != set(ExpectedRiskLevel):
+        raise ValueError("Validation cases must cover every expected risk level")
+    if {
+        decision.decision for case in validation_cases for decision in case.expected.human_decisions
+    } != set(ReviewDecision):
+        raise ValueError("Validation cases must cover approval and rejection outcomes")
 
     for case in cases:
         expected_tool = case.expected.expected_tool
