@@ -5,7 +5,7 @@ import hashlib
 import json
 import re
 from collections.abc import Mapping
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -208,7 +208,17 @@ def _manifest_errors(payload: Mapping[str, Any]) -> list[str]:
 
 
 def _write_manifest(payload: Mapping[str, Any]) -> None:
-    pass
+    """Atomically write a reviewed payload with a UTC timestamp."""
+    stored = {**payload, "frozen_at": datetime.now(UTC).isoformat()}
+    MANIFEST_PATH.parent.mkdir(parents=True, exist_ok=True)
+    temporary = MANIFEST_PATH.with_suffix(f"{MANIFEST_PATH.suffix}.tmp")
+    temporary.write_text(
+        json.dumps(stored, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    temporary.replace(MANIFEST_PATH)
+
 def describe_freeze_differences(
     expected: Mapping[str, Any], current: Mapping[str, Any]
 ) -> list[str]:
