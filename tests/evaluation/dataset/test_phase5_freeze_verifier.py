@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -131,3 +132,21 @@ def test_stored_manifest_rejects_schema_source_and_aggregate_drift(
     assert "source_files must map paths to lowercase SHA-256 digests" in verifier._manifest_errors(
         payload
     )
+
+
+def test_cli_writes_verifies_and_reports_file_drift(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Exercise the deliberate write path and normal read-only verification path."""
+    source = _configure_isolated_scope(monkeypatch, tmp_path)
+    monkeypatch.setattr(sys, "argv", ["verify_phase5_freeze.py", "--write"])
+    assert verifier.main() == 0
+    assert verifier.MANIFEST_PATH.is_file()
+
+    monkeypatch.setattr(sys, "argv", ["verify_phase5_freeze.py"])
+    assert verifier.main() == 0
+    source.write_text("RELEASE = 2\n", encoding="utf-8")
+    assert verifier.main() == 1
+    assert "modified: evaluation.py" in capsys.readouterr().out
