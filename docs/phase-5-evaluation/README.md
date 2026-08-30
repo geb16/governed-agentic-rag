@@ -29,3 +29,25 @@ confidential business data.
 The near-balanced primary strata deliberately over-sample rare but costly failures. This
 is a stratified challenge set, not a prevalence sample. Its raw aggregate result must not
 be interpreted as the expected success or incident rate in a live support population.
+
+## Reference and Evidence basis
+
+The design follows these current primary sources:
+
+- [NIST AI RMF Core](https://airc.nist.gov/airmf-resources/airmf/5-sec-core/) calls for
+  repeatable TEVV, documented test sets and tools, conditions similar to deployment,
+  safe failure, security/resilience evaluation, and transparency/accountability measures.
+- [OWASP Top 10 for Agentic Applications 2026](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/)
+  motivates agent-goal hijack, tool misuse, identity, and unsafe-autonomy cases.
+- [OWASP Excessive Agency](https://genai.owasp.org/llmrisk/llm062025-excessive-agency/)
+  motivates least-functionality, complete-mediation, human-approval, and tool logging probes.
+- [ServiceNow CSM agentic workflows](https://www.servicenow.com/docs/r/xanadu/customer-service-management/now-assist-for-csm/csm-ai-agents-use-cases.html)
+  cover case validation, retrieval, transactional requests, and human escalation.
+- [Microsoft Service Agent](https://learn.microsoft.com/en-us/dynamics365/customer-service/use/use-service-agent)
+  covers case review, knowledge retrieval, summaries, status changes, and case actions.
+- [OpenAI's support implementation](https://openai.com/index/openai-support-model/)
+  describes support actions including refunds and incident lookups plus traces and evals.
+- [OpenAI contextual-eval guidance](https://openai.com/index/evals-drive-next-chapter-of-ai/)
+  recommends workflow-specific real-world examples, rare costly edge cases, and human audit.
+- [OpenAI deployment simulation research](https://openai.com/index/deployment-simulation/)
+  supports deployment-like contexts and realistic simulated tool environments.
