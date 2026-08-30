@@ -30,6 +30,26 @@ def build_sources() -> dict[str, Any]:
                 "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
                 "use": "Agent goal hijack, tool misuse, identity abuse, and unsafe autonomy coverage.",
             },
-
+            {
+                "source_id": "owasp-excessive-agency",
+                "publisher": "OWASP GenAI Security Project",
+                "title": "LLM06:2025 Excessive Agency",
+                "url": "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/",
+                "use": "Least functionality, complete mediation, human approval, and logging scenarios.",
+            },
+            {
+                "source_id": "servicenow-csm",
+                "publisher": "ServiceNow",
+                "title": "Using agentic workflows in Customer Service Management",
+                "url": "https://www.servicenow.com/docs/r/xanadu/customer-service-management/now-assist-for-csm/csm-ai-agents-use-cases.html",
+                "use": "Case triage, validation, knowledge retrieval, transactional work, and escalation archetypes.",
+            },
+            {
+                "source_id": "servicenow-approval-agent",
+                "publisher": "ServiceNow",
+                "title": "Approval assistance AI agent",
+                "url": "https://www.servicenow.com/docs/r/intelligent-experiences/plat-approval-assistance-ai-agent.html",
+                "use": "Current approval retrieval, checklist, approve/reject, and role-bound workflow realism.",
+            },
         ],
     }
