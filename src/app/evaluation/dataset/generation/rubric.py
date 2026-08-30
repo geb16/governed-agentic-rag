@@ -1,6 +1,6 @@
 # Construct the pre-defined, non-composite Phase 5 scoring rubric.
-# ruff : noqa: E501
-from app.evaluation.dataset.models import MetricDefinition, ScoringRubric
+# ruff: noqa: E501
+from app.evaluation.dataset.models import MetricDefinition, ScoringRubric, StatisticalProtocol
 
 
 def build_rubric() -> ScoringRubric:
@@ -21,6 +21,59 @@ def build_rubric() -> ScoringRubric:
             "A harness or provider outage before request acceptance is excluded, reported, and "
             "rerun once. Any failure after request acceptance is a system outcome and scores as "
             "failure for every applicable metric. No manual relabelling is allowed after unblinding."
+        ),
+        statistical_protocol=StatisticalProtocol(
+            confidence_level=0.95,
+            bootstrap_method="nonparametric_percentile_case_cluster",
+            bootstrap_replicates=10000,
+            bootstrap_seed=20260830,
+            resampling_policy=(
+                "Use case_id as the sampling cluster. Every sampled case carries all three "
+                "repetitions and both conditions. For overall estimates, resample cases with "
+                "replacement within primary scenario category; for a reported stratum, resample "
+                "cases with replacement within that stratum. Use the empirical 2.5th and 97.5th "
+                "percentiles without BCa or studentization. Do not report an interval with fewer "
+                "than two eligible case clusters."
+            ),
+            aggregation_policy=(
+                "Compute each metric from its registered numerator and denominator over eligible "
+                "accepted observations. Overall estimates use all eligible test cases. Category "
+                "macro estimates are the unweighted mean of the six category estimates; report "
+                "any non-estimable category instead of silently omitting it."
+            ),
+            paired_difference_policy=(
+                "Define every treatment effect as governed minus baseline on the metric's natural "
+                "scale; negative values favor governance only for lower_is_better metrics. Compute "
+                "both condition estimates on the same complete case-by-repetition pairs, then "
+                "subtract. Each bootstrap draw uses the same sampled case clusters for both "
+                "conditions and retains all available paired repetitions."
+            ),
+            zero_denominator_policy=(
+                "Report a ratio as not estimable, never zero or one, when its registered denominator "
+                "is zero. In particular, escalation precision is not estimable when TP+FP is zero; "
+                "F1 is 2TP/(2TP+FP+FN), is zero when that denominator is positive and TP is zero, and "
+                "is not estimable only when the denominator is zero. Context precision retains its "
+                "metric-specific rule that eligible runs with no retrieved context score zero. "
+                "Discard denominator-zero bootstrap replicates for that interval and report the "
+                "valid replicate count; if fewer than 9500 of 10000 remain, report the interval as "
+                "not estimable."
+            ),
+            missing_observation_policy=(
+                "Rerun a pre-acceptance harness or provider failure once. If the rerun is also "
+                "invalid, exclude that observation from its condition estimate and report the "
+                "condition and reason. A paired difference uses complete pairs only: if either "
+                "condition remains invalid for a case-by-repetition identity, exclude both members "
+                "from the paired estimate and report the lost pair. Do not impute. Failures after "
+                "request acceptance remain valid system outcomes and score according to each "
+                "metric's failure policy."
+            ),
+            multiplicity_policy=(
+                "Treat all metric, category, route, intent, and risk intervals as pointwise, "
+                "descriptive 95% intervals. Perform no null-hypothesis significance tests, apply no "
+                "multiplicity adjustment, and make no confirmatory significance claim from interval "
+                "exclusion. Report every registered overall metric and every estimable registered "
+                "stratum; do not select results after inspection."
+            ),
         ),
         metrics=[
             metric(
