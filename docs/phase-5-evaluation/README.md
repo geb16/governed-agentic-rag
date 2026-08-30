@@ -79,3 +79,5 @@ uv run python scripts/build_phase5_dataset.py --check
 uv run pytest tests/evaluation
 ```
 
+The manifest hashes exact bytes and records the Phase-3(baseline) and Phase-4(governed) freeze identities and
+aggregate hashes. A release change requires a new semantic dataset version.
