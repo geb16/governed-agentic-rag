@@ -16,6 +16,21 @@ DATASET_MANIFEST_PATH = DATASET_ROOT / "manifest.json"
 PHASE5_FREEZE_ID = "phase5-evaluation-v1"
 MANIFEST_SCHEMA_VERSION = 1
 
+FROZEN_PATTERNS = (
+    "data/evaluation/phase5/v1/case.schema.json",
+    "data/evaluation/phase5/v1/cases.jsonl",
+    "data/evaluation/phase5/v1/manifest.json",
+    "data/evaluation/phase5/v1/rubric.schema.json",
+    "data/evaluation/phase5/v1/scoring-rubric.json",
+    "data/evaluation/phase5/v1/sources.json",
+    "docs/phase-5-evaluation/*.md",
+    "scripts/build_phase5_dataset.py",
+    "scripts/verify_phase5_freeze.py",
+    "src/app/evaluation/*.py",
+    "src/app/evaluation/**/*.py",
+    "tests/evaluation/*.py",
+    "tests/evaluation/**/*.py",
+)
 class FreezeScopeError(RuntimeError):
     """Raised when Phase 5 scope or inherited identities are unsafe."""
 
@@ -26,7 +41,20 @@ def _sha256(value: bytes) -> str:
 
 
 def _frozen_files() -> list[Path]:
-    pass
+    """Resolve a stable, nonempty, physical-file Phase 5 scope."""
+    files: set[Path] = set()
+    for pattern in FROZEN_PATTERNS:
+        matches = {candidate for candidate in PROJECT_ROOT.glob(pattern) if candidate.is_file()}
+        if not matches:
+            raise FreezeScopeError(f"Frozen pattern matched no files: {pattern}")
+        symlinks = sorted(candidate for candidate in matches if candidate.is_symlink())
+        if symlinks:
+            paths = ", ".join(path.relative_to(PROJECT_ROOT).as_posix() for path in symlinks)
+            raise FreezeScopeError(f"Frozen files must not be symbolic links: {paths}")
+        files.update(matches)
+    return sorted(files, key=lambda path: path.relative_to(PROJECT_ROOT).as_posix())
+
+
 
 def _parent_identity() -> dict[str, str]:
     pass
@@ -57,3 +85,47 @@ def build_freeze_payload() -> dict[str, Any]:
     }
     payload["aggregate_sha256"] = _canonical_aggregate(payload)
     return payload
+
+def main() -> int:
+    """Write or verify the Phase 5 manifest selected by the CLI."""
+    parser = argparse.ArgumentParser(description="Write or verify the Phase 5 release manifest.")
+    parser.add_argument("--write", action="store_true")
+    arguments = parser.parse_args()
+    try:
+        current = build_freeze_payload()
+    except FreezeScopeError as error:
+        print(f"Phase 5 freeze scope is invalid: {error}")
+        return 1
+    if arguments.write:
+        _write_manifest(current)
+        print(f"Wrote {PHASE5_FREEZE_ID}: {current['aggregate_sha256']}")
+        return 0
+    if not MANIFEST_PATH.exists():
+        print(f"Freeze manifest is missing: {MANIFEST_PATH}")
+        return 1
+    try:
+        expected: Any = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        print(f"Freeze manifest cannot be read: {error}")
+        return 1
+    if not isinstance(expected, dict):
+        print("Freeze manifest is invalid: the root value must be an object.")
+        return 1
+    errors = _manifest_errors(expected)
+    if errors:
+        print("Freeze manifest is invalid:")
+        for error in errors:
+            print(f"- {error}")
+        return 1
+    comparable = {key: expected.get(key) for key in COMPARABLE_KEYS}
+    if current != comparable:
+        print("Phase 5 freeze verification failed: frozen evaluation files changed.")
+        for difference in describe_freeze_differences(comparable, current):
+            print(f"- {difference}")
+        return 1
+    print(f"Verified {PHASE5_FREEZE_ID}: {current['aggregate_sha256']}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
