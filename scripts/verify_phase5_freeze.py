@@ -59,6 +59,8 @@ IDENTITY_KEYS = (
 COMPARABLE_KEYS = (*IDENTITY_KEYS, "source_files", "aggregate_sha256")
 STORED_KEYS = frozenset((*COMPARABLE_KEYS, "frozen_at"))
 _SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
+
+
 class FreezeScopeError(RuntimeError):
     """Raised when Phase 5 scope or inherited identities are unsafe."""
 
@@ -81,6 +83,7 @@ def _frozen_files() -> list[Path]:
             raise FreezeScopeError(f"Frozen files must not be symbolic links: {paths}")
         files.update(matches)
     return sorted(files, key=lambda path: path.relative_to(PROJECT_ROOT).as_posix())
+
 
 def _read_manifest(path: Path, label: str) -> tuple[dict[str, Any], bytes]:
     """Read one parent manifest as an object while preserving its exact bytes."""
@@ -140,6 +143,7 @@ def _canonical_aggregate(payload: Mapping[str, Any]) -> str:
     encoded = json.dumps(canonical, separators=(",", ":"), sort_keys=True).encode()
     return _sha256(encoded)
 
+
 def build_freeze_payload() -> dict[str, Any]:
     """Build the complete Phase 5 identity after validating dataset semantics."""
     try:
@@ -164,6 +168,7 @@ def build_freeze_payload() -> dict[str, Any]:
     }
     payload["aggregate_sha256"] = _canonical_aggregate(payload)
     return payload
+
 
 def _manifest_errors(payload: Mapping[str, Any]) -> list[str]:
     """Return deterministic structural and internal-integrity errors."""
@@ -218,6 +223,7 @@ def _write_manifest(payload: Mapping[str, Any]) -> None:
         newline="\n",
     )
     temporary.replace(MANIFEST_PATH)
+
 
 def describe_freeze_differences(
     expected: Mapping[str, Any], current: Mapping[str, Any]
