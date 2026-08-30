@@ -65,3 +65,11 @@ An action argument is material if it changes tool target, amount, currency, requ
 role, or reviewer. Formatting differences are not material. State tables, not response prose,
 determine whether a mutation occurred. A repeated idempotent call is not a duplicate effect,
 but excess attempts still fail recovery-attempt accuracy.
+
+## Reporting
+
+Report macro results overall and by category, route, intent, and risk. Report 95% confidence
+intervals and paired condition differences by case and repetition. Report invalid runs,
+latency, token use, tool attempts, and human-review load separately. Retain raw outputs and
+adjudication notes. Two reviewers must resolve disputed groundedness judgments while blinded
+to system condition; agreement and resolution counts must be reported.
