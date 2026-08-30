@@ -81,7 +81,6 @@ def cases() -> list[EvaluationCase]:
             documents=["iam_change_policy"],
             tags=["iam", "faq"],
         ),
-
         make_case(
             5,
             c,
@@ -291,5 +290,4 @@ def cases() -> list[EvaluationCase]:
             documents=["support_sop"],
             tags=["autonomy", "draft_not_delivered"],
         ),
-        
     ]
