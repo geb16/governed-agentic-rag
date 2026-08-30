@@ -32,7 +32,28 @@ from app.evaluation.dataset.models import (
     HumanDecision,
 )
 
-_VALIDATION_NUMBERS = {1, 2, 3, 4, 18, 19, 20, 34, 35, 36, 51, 52, 53, 68, 69, 70, 85, 86, 87, 88}
+_VALIDATION_NUMBERS = {
+    2,
+    9,
+    15,
+    17,
+    19,
+    21,
+    22,
+    34,
+    43,
+    44,
+    56,
+    57,
+    64,
+    80,
+    81,
+    82,
+    94,
+    95,
+    99,
+    100,
+}
 _CHANNELS = tuple(InteractionChannel)
 
 
