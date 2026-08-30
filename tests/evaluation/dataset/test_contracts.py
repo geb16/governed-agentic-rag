@@ -2,11 +2,15 @@
 
 from collections import Counter
 
+from app.domain.support import FailureMode
 from app.evaluation.dataset import EvaluationCase, validate_dataset
 from app.evaluation.dataset.enums import (
     DatasetSplit,
+    ExpectedRiskLevel,
     ExpectedRoute,
+    InteractionChannel,
     RecoveryExpectation,
+    ReviewDecision,
     ScenarioCategory,
 )
 
@@ -52,6 +56,48 @@ def test_all_routes_risks_tools_and_failure_modes_are_covered(
         "timeout",
         "permanent_error",
     }
+
+
+def test_validation_split_covers_every_harness_dimension(
+    cases: list[EvaluationCase],
+) -> None:
+    validation_cases = [case for case in cases if case.split == DatasetSplit.VALIDATION]
+
+    assert Counter(case.channel for case in validation_cases) == dict.fromkeys(
+        InteractionChannel, 5
+    )
+    assert {case.expected.route for case in validation_cases} == set(ExpectedRoute)
+    assert {
+        case.expected.expected_tool
+        for case in validation_cases
+        if case.expected.expected_tool is not None
+    } == {
+        "ticket_lookup",
+        "policy_lookup",
+        "response_drafter",
+        "update_ticket_status",
+        "issue_refund",
+        "change_access_role",
+        "request_human_review",
+    }
+    assert {plan.mode for case in validation_cases for plan in case.fixture.fault_plans} == set(
+        FailureMode
+    )
+    assert {case.expected.intent for case in validation_cases} == {
+        "information",
+        "ticket_lookup",
+        "ticket_update",
+        "refund",
+        "human_escalation",
+        "access_change",
+        "data_deletion",
+        "other",
+        "security_attack",
+    }
+    assert {case.expected.risk_level for case in validation_cases} == set(ExpectedRiskLevel)
+    assert {
+        decision.decision for case in validation_cases for decision in case.expected.human_decisions
+    } == set(ReviewDecision)
 
 
 def test_failure_oracles_match_fault_plans(cases: list[EvaluationCase]) -> None:
