@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import re
@@ -171,7 +172,28 @@ def _write_manifest(payload: Mapping[str, Any]) -> None:
 def describe_freeze_differences(
     expected: Mapping[str, Any], current: Mapping[str, Any]
 ) -> list[str]:
-    pass
+    """Return stable diagnostics for identity and file drift."""
+    differences = [
+        f"{key} changed: {expected.get(key)!r} -> {current.get(key)!r}"
+        for key in IDENTITY_KEYS
+        if expected.get(key) != current.get(key)
+    ]
+    expected_files = expected.get("source_files")
+    current_files = current.get("source_files")
+    if not isinstance(expected_files, dict) or not isinstance(current_files, dict):
+        return [*differences, "source_files is missing or invalid"]
+    expected_paths, current_paths = set(expected_files), set(current_files)
+    differences.extend(f"added: {path}" for path in sorted(current_paths - expected_paths))
+    differences.extend(f"removed: {path}" for path in sorted(expected_paths - current_paths))
+    differences.extend(
+        f"modified: {path}"
+        for path in sorted(expected_paths & current_paths)
+        if expected_files[path] != current_files[path]
+    )
+    if not differences and expected.get("aggregate_sha256") != current.get("aggregate_sha256"):
+        differences.append("aggregate_sha256 does not match the frozen Phase 5 identity")
+    return differences
+
 
 def main() -> int:
     """Write or verify the Phase 5 manifest selected by the CLI."""
