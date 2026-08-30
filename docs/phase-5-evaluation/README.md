@@ -51,3 +51,6 @@ The design follows these current primary sources:
   recommends workflow-specific real-world examples, rare costly edge cases, and human audit.
 - [OpenAI deployment simulation research](https://openai.com/index/deployment-simulation/)
   supports deployment-like contexts and realistic simulated tool environments.
+
+> *Note*: External sources inform scenario realism and evaluation method only. Gold policy decisions
+come exclusively from the frozen files in `data/knowledge_base` and frozen tool contracts.
