@@ -2,11 +2,18 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
 from app.evaluation.dataset.integrity import load_manifest, verify_manifest
+from app.evaluation.dataset.manifest import (
+    PHASE3_AGGREGATE_SHA256,
+    PHASE3_FREEZE_ID,
+    PHASE4_AGGREGATE_SHA256,
+    PHASE4_FREEZE_ID,
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-5-freeze-manifest.json"
@@ -32,6 +39,24 @@ FROZEN_PATTERNS = (
     "tests/evaluation/*.py",
     "tests/evaluation/**/*.py",
 )
+IDENTITY_KEYS = (
+    "manifest_schema_version",
+    "freeze_id",
+    "dataset_id",
+    "dataset_version",
+    "case_count",
+    "dataset_manifest_sha256",
+    "baseline_freeze_id",
+    "baseline_aggregate_sha256",
+    "baseline_manifest_sha256",
+    "governance_freeze_id",
+    "governance_aggregate_sha256",
+    "governance_manifest_sha256",
+)
+
+COMPARABLE_KEYS = (*IDENTITY_KEYS, "source_files", "aggregate_sha256")
+STORED_KEYS = frozenset((*COMPARABLE_KEYS, "frozen_at"))
+_SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 class FreezeScopeError(RuntimeError):
     """Raised when Phase 5 scope or inherited identities are unsafe."""
 
@@ -108,7 +133,11 @@ def _parent_identity() -> dict[str, str]:
 
 
 def _canonical_aggregate(payload: Mapping[str, Any]) -> str:
-    pass
+    """Derive the release aggregate from every stable comparable field."""
+    canonical = {key: payload[key] for key in COMPARABLE_KEYS if key != "aggregate_sha256"}
+    encoded = json.dumps(canonical, separators=(",", ":"), sort_keys=True).encode()
+    return _sha256(encoded)
+
 def build_freeze_payload() -> dict[str, Any]:
     """Build the complete Phase 5 identity after validating dataset semantics."""
     try:
@@ -133,6 +162,16 @@ def build_freeze_payload() -> dict[str, Any]:
     }
     payload["aggregate_sha256"] = _canonical_aggregate(payload)
     return payload
+
+def _manifest_errors(payload: Mapping[str, Any]) -> list[str]:
+    pass 
+
+def _write_manifest(payload: Mapping[str, Any]) -> None:
+    pass
+def describe_freeze_differences(
+    expected: Mapping[str, Any], current: Mapping[str, Any]
+) -> list[str]:
+    pass
 
 def main() -> int:
     """Write or verify the Phase 5 manifest selected by the CLI."""
