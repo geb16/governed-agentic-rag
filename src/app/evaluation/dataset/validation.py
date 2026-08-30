@@ -69,6 +69,14 @@ def validate_dataset(cases: list[EvaluationCase]) -> None:
         raise ValueError("Case and request identifiers must be unique")
     if len(set(queries)) != len(queries):
         raise ValueError("Evaluation queries must be unique")
+    minimal_pair_counts = Counter(
+        case.minimal_pair_id for case in cases if case.minimal_pair_id is not None
+    )
+    singleton_pairs = sorted(pair_id for pair_id, count in minimal_pair_counts.items() if count < 2)
+    if singleton_pairs:
+        raise ValueError(
+            "Minimal-pair groups require at least two cases: " + ", ".join(singleton_pairs)
+        )
     if Counter(case.split for case in cases) != EXPECTED_SPLITS:
         raise ValueError("Dataset split distribution does not match the frozen design")
     if Counter(case.category for case in cases) != EXPECTED_CATEGORIES:

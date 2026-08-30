@@ -163,7 +163,7 @@ def cases() -> list[EvaluationCase]:
             documents=["refund_policy"],
             ticket_status="open",
             ticket_category="refund",
-            pair="pair_refund_arrival_boundary",
+            pair="pair_refund_arrival_limit",
             **common,
         ),
         make_case(

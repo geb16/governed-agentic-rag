@@ -57,6 +57,7 @@ Validation fails unless:
 - the split is exactly 20 validation and 80 test;
 - primary-stratum counts match the release design;
 - request and fixture partition IDs match the case ID;
+- every declared minimal-pair or contrast group contains at least two cases;
 - only tool-failure cases contain fault plans;
 - all gold tools are allowlisted and arguments satisfy their strict input schema;
 - every query is unique; and

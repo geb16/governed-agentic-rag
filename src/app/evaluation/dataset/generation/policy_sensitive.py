@@ -201,6 +201,7 @@ def cases() -> list[EvaluationCase]:
             ticket_category="identity_access",
             state_change=True,
             tags=["password_reset"],
+            pair="pair_password_reset_evidence",
         ),
         make_case(
             43,

@@ -2,6 +2,8 @@
 
 from collections import Counter
 
+import pytest
+
 from app.domain.support import FailureMode
 from app.evaluation.dataset import EvaluationCase, validate_dataset
 from app.evaluation.dataset.enums import (
@@ -98,6 +100,20 @@ def test_validation_split_covers_every_harness_dimension(
     assert {
         decision.decision for case in validation_cases for decision in case.expected.human_decisions
     } == set(ReviewDecision)
+
+
+def test_dataset_validation_rejects_singleton_minimal_pair(
+    cases: list[EvaluationCase],
+) -> None:
+    changed_cases = [
+        case.model_copy(update={"minimal_pair_id": None})
+        if case.case_id == "case_eval_0042"
+        else case
+        for case in cases
+    ]
+
+    with pytest.raises(ValueError, match="Minimal-pair groups require at least two cases"):
+        validate_dataset(changed_cases)
 
 
 def test_failure_oracles_match_fault_plans(cases: list[EvaluationCase]) -> None:
