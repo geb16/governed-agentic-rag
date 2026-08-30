@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import re
+from typing import Literal, Self
+
+from pydantic import field_validator, model_validator
 
 from app.evaluation.dataset.models import EvaluationModel
 
@@ -30,7 +33,57 @@ _SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 
 
 class DatasetManifest(EvaluationModel):
-    pass
+    """Bind exact artifact bytes to the reviewed dataset and parent releases."""
+
+    manifest_schema_version: Literal[1]
+    dataset_id: Literal["enterprise-support-agent-eval"]
+    dataset_version: Literal["1.0.0"]
+    distribution_type: Literal["stratified_challenge_set_not_prevalence_sample"]
+    released_at: Literal["2026-08-25T00:00:00Z"]
+    case_count: Literal[100]
+    validation_case_count: Literal[20]
+    test_case_count: Literal[80]
+    baseline_freeze_id: Literal["phase3-baseline-v2"]
+    baseline_aggregate_sha256: str
+    governance_freeze_id: Literal["phase4-governance-v1"]
+    governance_aggregate_sha256: str
+    files: dict[str, str]
+
+    @field_validator(
+        "baseline_aggregate_sha256",
+        "governance_aggregate_sha256",
+    )
+    @classmethod
+    def validate_parent_digest(cls, value: str) -> str:
+        """Require canonical lowercase SHA-256 parent identities."""
+        if _SHA256_PATTERN.fullmatch(value) is None:
+            raise ValueError("parent identity must be a lowercase SHA-256 digest")
+        return value
+
+    @field_validator("files")
+    @classmethod
+    def validate_file_map(cls, value: dict[str, str]) -> dict[str, str]:
+        """Require the exact release allowlist and canonical artifact hashes."""
+        expected = set(DATASET_ARTIFACT_NAMES)
+        if set(value) != expected:
+            missing = sorted(expected - set(value))
+            unexpected = sorted(set(value) - expected)
+            details = [*(f"missing {name}" for name in missing)]
+            details.extend(f"unexpected {name}" for name in unexpected)
+            raise ValueError("artifact file set is invalid: " + ", ".join(details))
+        if any(_SHA256_PATTERN.fullmatch(digest) is None for digest in value.values()):
+            raise ValueError("artifact hashes must be lowercase SHA-256 digests")
+        return value
+
+    @model_validator(mode="after")
+    def validate_inherited_identities(self) -> Self:
+        """Reject substitution of either frozen system evaluated by this dataset."""
+        if self.baseline_aggregate_sha256 != PHASE3_AGGREGATE_SHA256:
+            raise ValueError("baseline aggregate does not match the Phase 3 release")
+        if self.governance_aggregate_sha256 != PHASE4_AGGREGATE_SHA256:
+            raise ValueError("governance aggregate does not match the Phase 4 release")
+        return self
+
 
 def create_dataset_manifest(file_hashes: dict[str, str]) -> DatasetManifest:
     """Create the canonical manifest from deterministic artifact hashes."""
