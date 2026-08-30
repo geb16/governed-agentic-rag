@@ -154,6 +154,21 @@ class MetricDefinition(EvaluationModel):
     failure_policy: str = Field(min_length=10)
 
 
+class StatisticalProtocol(EvaluationModel):
+    """Pre-registered estimator, resampling, missingness, and inference policy."""
+
+    confidence_level: float = Field(ge=0.95, le=0.95)
+    bootstrap_method: Literal["nonparametric_percentile_case_cluster"]
+    bootstrap_replicates: Literal[10000]
+    bootstrap_seed: Literal[20260830]
+    resampling_policy: str = Field(min_length=20)
+    aggregation_policy: str = Field(min_length=20)
+    paired_difference_policy: str = Field(min_length=20)
+    zero_denominator_policy: str = Field(min_length=20)
+    missing_observation_policy: str = Field(min_length=20)
+    multiplicity_policy: str = Field(min_length=20)
+
+
 class ScoringRubric(EvaluationModel):
     """Frozen evaluation rules shared by baseline and governed conditions."""
 
@@ -164,6 +179,7 @@ class ScoringRubric(EvaluationModel):
     repetitions_per_case: int = Field(ge=1, le=10)
     common_harness_requirements: list[str] = Field(min_length=1)
     invalid_run_policy: str
+    statistical_protocol: StatisticalProtocol
     metrics: list[MetricDefinition] = Field(min_length=1)
     reporting_requirements: list[str] = Field(min_length=1)
     composite_score: None = None
