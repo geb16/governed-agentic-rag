@@ -112,3 +112,22 @@ def test_freeze_scope_rejects_broken_phase4_ancestry(
     with pytest.raises(verifier.FreezeScopeError, match="baseline manifest hash"):
         verifier.build_freeze_payload()
 
+
+def test_stored_manifest_rejects_schema_source_and_aggregate_drift(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Validate closed fields, digest formats, and the canonical aggregate."""
+    _configure_isolated_scope(monkeypatch, tmp_path)
+    payload = {
+        **verifier.build_freeze_payload(),
+        "frozen_at": "2026-08-30T12:00:00+00:00",
+    }
+    assert verifier._manifest_errors(payload) == []
+
+    payload["unexpected"] = True
+    assert verifier._manifest_errors(payload) == ["unexpected field: unexpected"]
+    payload.pop("unexpected")
+    payload["source_files"] = {"evaluation.py": "invalid"}
+    assert "source_files must map paths to lowercase SHA-256 digests" in verifier._manifest_errors(
+        payload
+    )
