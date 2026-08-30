@@ -54,3 +54,28 @@ The design follows these current primary sources:
 
 > *Note*: External sources inform scenario realism and evaluation method only. Gold policy decisions
 come exclusively from the frozen files in `data/knowledge_base` and frozen tool contracts.
+
+## Release layout
+
+```text
+data/evaluation/phase5/v1/
+├── cases.jsonl
+├── case.schema.json
+├── scoring-rubric.json
+├── rubric.schema.json
+└── manifest.json
+```
+
+Regenerate deterministically:
+
+```bash
+uv run python scripts/build_phase5_dataset.py
+```
+
+Verify that checked-in artifacts are current:
+
+```bash
+uv run python scripts/build_phase5_dataset.py --check
+uv run pytest tests/evaluation
+```
+
