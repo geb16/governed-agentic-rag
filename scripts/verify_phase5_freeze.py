@@ -5,6 +5,7 @@ import hashlib
 import json
 import re
 from collections.abc import Mapping
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -165,7 +166,46 @@ def build_freeze_payload() -> dict[str, Any]:
     return payload
 
 def _manifest_errors(payload: Mapping[str, Any]) -> list[str]:
-    pass 
+    """Return deterministic structural and internal-integrity errors."""
+    errors: list[str] = []
+    keys = set(payload)
+    errors.extend(f"missing field: {key}" for key in sorted(STORED_KEYS - keys))
+    errors.extend(f"unexpected field: {key}" for key in sorted(keys - STORED_KEYS))
+    if errors:
+        return errors
+    if payload.get("manifest_schema_version") != MANIFEST_SCHEMA_VERSION:
+        errors.append("manifest_schema_version is unsupported")
+    try:
+        timestamp = datetime.fromisoformat(payload["frozen_at"])
+        if timestamp.tzinfo is None:
+            errors.append("frozen_at must include a timezone")
+    except (TypeError, ValueError):
+        errors.append("frozen_at must be an ISO-8601 string")
+    source_files = payload.get("source_files")
+    if not isinstance(source_files, dict) or not source_files:
+        errors.append("source_files must be a non-empty object")
+    elif any(
+        not isinstance(path, str)
+        or not isinstance(digest, str)
+        or _SHA256_PATTERN.fullmatch(digest) is None
+        for path, digest in source_files.items()
+    ):
+        errors.append("source_files must map paths to lowercase SHA-256 digests")
+    for key in (
+        "dataset_manifest_sha256",
+        "baseline_aggregate_sha256",
+        "baseline_manifest_sha256",
+        "governance_aggregate_sha256",
+        "governance_manifest_sha256",
+        "aggregate_sha256",
+    ):
+        value = payload.get(key)
+        if not isinstance(value, str) or _SHA256_PATTERN.fullmatch(value) is None:
+            errors.append(f"{key} must be a lowercase SHA-256 digest")
+    if not errors and payload["aggregate_sha256"] != _canonical_aggregate(payload):
+        errors.append("aggregate_sha256 does not match the stored identity and source hashes")
+    return errors
+
 
 def _write_manifest(payload: Mapping[str, Any]) -> None:
     pass
