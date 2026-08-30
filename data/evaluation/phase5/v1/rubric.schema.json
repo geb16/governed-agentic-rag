@@ -1,0 +1,134 @@
+{
+  "$defs": {
+    "MetricDefinition": {
+      "additionalProperties": false,
+      "description": "Machine-readable metric definition frozen before execution.",
+      "properties": {
+        "denominator": {
+          "minLength": 3,
+          "title": "Denominator",
+          "type": "string"
+        },
+        "description": {
+          "minLength": 10,
+          "title": "Description",
+          "type": "string"
+        },
+        "direction": {
+          "enum": [
+            "higher_is_better",
+            "lower_is_better"
+          ],
+          "title": "Direction",
+          "type": "string"
+        },
+        "eligible_when": {
+          "minLength": 3,
+          "title": "Eligible When",
+          "type": "string"
+        },
+        "failure_policy": {
+          "minLength": 10,
+          "title": "Failure Policy",
+          "type": "string"
+        },
+        "metric_id": {
+          "pattern": "^[a-z][a-z0-9_]+$",
+          "title": "Metric Id",
+          "type": "string"
+        },
+        "numerator": {
+          "minLength": 3,
+          "title": "Numerator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "metric_id",
+        "description",
+        "eligible_when",
+        "numerator",
+        "denominator",
+        "direction",
+        "failure_policy"
+      ],
+      "title": "MetricDefinition",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Frozen evaluation rules shared by baseline and governed conditions.",
+  "properties": {
+    "common_harness_requirements": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Common Harness Requirements",
+      "type": "array"
+    },
+    "composite_score": {
+      "default": null,
+      "title": "Composite Score",
+      "type": "null"
+    },
+    "dataset_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Dataset Version",
+      "type": "string"
+    },
+    "invalid_run_policy": {
+      "title": "Invalid Run Policy",
+      "type": "string"
+    },
+    "metrics": {
+      "items": {
+        "$ref": "#/$defs/MetricDefinition"
+      },
+      "minItems": 1,
+      "title": "Metrics",
+      "type": "array"
+    },
+    "repetitions_per_case": {
+      "maximum": 10,
+      "minimum": 1,
+      "title": "Repetitions Per Case",
+      "type": "integer"
+    },
+    "reporting_requirements": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Reporting Requirements",
+      "type": "array"
+    },
+    "rubric_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Rubric Version",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "unit_of_analysis": {
+      "title": "Unit Of Analysis",
+      "type": "string"
+    }
+  },
+  "required": [
+    "unit_of_analysis",
+    "repetitions_per_case",
+    "common_harness_requirements",
+    "invalid_run_policy",
+    "metrics",
+    "reporting_requirements"
+  ],
+  "title": "ScoringRubric",
+  "type": "object"
+}

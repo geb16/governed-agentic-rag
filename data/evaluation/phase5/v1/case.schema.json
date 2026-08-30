@@ -1,0 +1,552 @@
+{
+  "$defs": {
+    "AccessAccountRecord": {
+      "additionalProperties": false,
+      "description": "Versioned synthetic IAM account state.",
+      "properties": {
+        "role": {
+          "title": "Role",
+          "type": "string"
+        },
+        "subject_id": {
+          "pattern": "^USR-[0-9]{4}$",
+          "title": "Subject Id",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "subject_id",
+        "role",
+        "version"
+      ],
+      "title": "AccessAccountRecord",
+      "type": "object"
+    },
+    "DatasetSplit": {
+      "description": "Separate rubric validation from the final comparative test set.",
+      "enum": [
+        "validation",
+        "test"
+      ],
+      "title": "DatasetSplit",
+      "type": "string"
+    },
+    "ExpectedBehavior": {
+      "additionalProperties": false,
+      "description": "Common observable oracle, independent of either system architecture.",
+      "properties": {
+        "approval_roles": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Approval Roles",
+          "type": "array"
+        },
+        "clarification_fields": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Clarification Fields",
+          "type": "array"
+        },
+        "denial_reason_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Denial Reason Code"
+        },
+        "expected_tool": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Tool"
+        },
+        "human_decisions": {
+          "items": {
+            "$ref": "#/$defs/HumanDecision"
+          },
+          "title": "Human Decisions",
+          "type": "array"
+        },
+        "intent": {
+          "maxLength": 100,
+          "minLength": 2,
+          "title": "Intent",
+          "type": "string"
+        },
+        "recovery": {
+          "$ref": "#/$defs/ExpectedRecovery"
+        },
+        "required_trace_facts": {
+          "items": {
+            "$ref": "#/$defs/TraceFact"
+          },
+          "title": "Required Trace Facts",
+          "type": "array"
+        },
+        "retrieval_documents": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Retrieval Documents",
+          "type": "array"
+        },
+        "risk_flags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Risk Flags",
+          "type": "array"
+        },
+        "risk_level": {
+          "$ref": "#/$defs/ExpectedRiskLevel"
+        },
+        "route": {
+          "$ref": "#/$defs/ExpectedRoute"
+        },
+        "sensitivity": {
+          "$ref": "#/$defs/ExpectedSensitivity"
+        },
+        "state_change_expected": {
+          "default": false,
+          "title": "State Change Expected",
+          "type": "boolean"
+        },
+        "task_type": {
+          "$ref": "#/$defs/ExpectedTaskType"
+        },
+        "tool_arguments": {
+          "additionalProperties": true,
+          "title": "Tool Arguments",
+          "type": "object"
+        }
+      },
+      "required": [
+        "route",
+        "intent",
+        "task_type",
+        "sensitivity",
+        "risk_level"
+      ],
+      "title": "ExpectedBehavior",
+      "type": "object"
+    },
+    "ExpectedRecovery": {
+      "additionalProperties": false,
+      "description": "Gold recovery result for a deterministic fault plan.",
+      "properties": {
+        "expectation": {
+          "$ref": "#/$defs/RecoveryExpectation",
+          "default": "not_applicable"
+        },
+        "expected_attempts": {
+          "default": 0,
+          "maximum": 5,
+          "minimum": 0,
+          "title": "Expected Attempts",
+          "type": "integer"
+        },
+        "expected_error_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Error Code"
+        }
+      },
+      "title": "ExpectedRecovery",
+      "type": "object"
+    },
+    "ExpectedRiskLevel": {
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "title": "ExpectedRiskLevel",
+      "type": "string"
+    },
+    "ExpectedRoute": {
+      "description": "Governance-neutral intended handling observable in either condition.",
+      "enum": [
+        "answer",
+        "execute",
+        "human_review",
+        "clarify",
+        "deny",
+        "safe_terminate"
+      ],
+      "title": "ExpectedRoute",
+      "type": "string"
+    },
+    "ExpectedSensitivity": {
+      "enum": [
+        "low",
+        "moderate",
+        "high",
+        "critical"
+      ],
+      "title": "ExpectedSensitivity",
+      "type": "string"
+    },
+    "ExpectedTaskType": {
+      "enum": [
+        "read_only",
+        "state_changing",
+        "escalation",
+        "unsupported"
+      ],
+      "title": "ExpectedTaskType",
+      "type": "string"
+    },
+    "FailureMode": {
+      "description": "Deterministic failure categories available to evaluation fixtures.",
+      "enum": [
+        "transient_error",
+        "timeout",
+        "permanent_error"
+      ],
+      "title": "FailureMode",
+      "type": "string"
+    },
+    "FaultPlan": {
+      "additionalProperties": false,
+      "description": "Case-scoped deterministic failure plan for one tool.",
+      "properties": {
+        "error_code": {
+          "maxLength": 100,
+          "minLength": 3,
+          "title": "Error Code",
+          "type": "string"
+        },
+        "failures": {
+          "maximum": 20,
+          "minimum": 1,
+          "title": "Failures",
+          "type": "integer"
+        },
+        "mode": {
+          "$ref": "#/$defs/FailureMode"
+        },
+        "tool_name": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Tool Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tool_name",
+        "mode",
+        "failures",
+        "error_code"
+      ],
+      "title": "FaultPlan",
+      "type": "object"
+    },
+    "HumanDecision": {
+      "additionalProperties": false,
+      "description": "Deterministic human input replayed after a required review route.",
+      "properties": {
+        "decision": {
+          "$ref": "#/$defs/ReviewDecision"
+        },
+        "role": {
+          "maxLength": 100,
+          "minLength": 2,
+          "title": "Role",
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "decision"
+      ],
+      "title": "HumanDecision",
+      "type": "object"
+    },
+    "InteractionChannel": {
+      "description": "Synthetic enterprise request channel.",
+      "enum": [
+        "chat",
+        "email",
+        "portal",
+        "api"
+      ],
+      "title": "InteractionChannel",
+      "type": "string"
+    },
+    "RecoveryExpectation": {
+      "enum": [
+        "not_applicable",
+        "retried_and_succeeded",
+        "safe_termination"
+      ],
+      "title": "RecoveryExpectation",
+      "type": "string"
+    },
+    "ReviewDecision": {
+      "enum": [
+        "approve",
+        "reject"
+      ],
+      "title": "ReviewDecision",
+      "type": "string"
+    },
+    "ScenarioCategory": {
+      "description": "Primary mutually exclusive benchmark stratum.",
+      "enum": [
+        "normal",
+        "ambiguous",
+        "policy_sensitive",
+        "high_risk",
+        "missing_information",
+        "tool_failure"
+      ],
+      "title": "ScenarioCategory",
+      "type": "string"
+    },
+    "SyntheticCaseFixture": {
+      "additionalProperties": false,
+      "description": "Complete seed data for one isolated evaluation case.",
+      "properties": {
+        "access_accounts": {
+          "items": {
+            "$ref": "#/$defs/AccessAccountRecord"
+          },
+          "title": "Access Accounts",
+          "type": "array"
+        },
+        "case_id": {
+          "pattern": "^case_[a-zA-Z0-9_-]+$",
+          "title": "Case Id",
+          "type": "string"
+        },
+        "fault_plans": {
+          "items": {
+            "$ref": "#/$defs/FaultPlan"
+          },
+          "title": "Fault Plans",
+          "type": "array"
+        },
+        "tickets": {
+          "items": {
+            "$ref": "#/$defs/TicketRecord"
+          },
+          "title": "Tickets",
+          "type": "array"
+        }
+      },
+      "required": [
+        "case_id"
+      ],
+      "title": "SyntheticCaseFixture",
+      "type": "object"
+    },
+    "TaskRequest": {
+      "additionalProperties": false,
+      "description": "Governance-neutral request shared by both experimental conditions.",
+      "properties": {
+        "case_id": {
+          "default": "case_default",
+          "pattern": "^case_[a-zA-Z0-9_-]+$",
+          "title": "Case Id",
+          "type": "string"
+        },
+        "query": {
+          "maxLength": 4000,
+          "minLength": 5,
+          "title": "Query",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^req_[a-zA-Z0-9_-]+$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "requester_id": {
+          "maxLength": 128,
+          "minLength": 2,
+          "title": "Requester Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "requester_id",
+        "query"
+      ],
+      "title": "TaskRequest",
+      "type": "object"
+    },
+    "TicketRecord": {
+      "additionalProperties": false,
+      "description": "Versioned synthetic support ticket state.",
+      "properties": {
+        "category": {
+          "title": "Category",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        },
+        "ticket_id": {
+          "pattern": "^TKT-[0-9]{4}$",
+          "title": "Ticket Id",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ticket_id",
+        "status",
+        "category",
+        "summary",
+        "version"
+      ],
+      "title": "TicketRecord",
+      "type": "object"
+    },
+    "TraceFact": {
+      "enum": [
+        "request_identity",
+        "classification",
+        "retrieval_evidence",
+        "proposed_action",
+        "risk_decision",
+        "approval_route",
+        "approval_decision",
+        "tool_attempt",
+        "recovery_decision",
+        "final_outcome"
+      ],
+      "title": "TraceFact",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One isolated synthetic request, environment, and pre-adjudicated oracle.",
+  "properties": {
+    "case_id": {
+      "pattern": "^case_eval_[0-9]{4}$",
+      "title": "Case Id",
+      "type": "string"
+    },
+    "category": {
+      "$ref": "#/$defs/ScenarioCategory"
+    },
+    "channel": {
+      "$ref": "#/$defs/InteractionChannel"
+    },
+    "dataset_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Dataset Version",
+      "type": "string"
+    },
+    "design_source_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Design Source Ids",
+      "type": "array"
+    },
+    "expected": {
+      "$ref": "#/$defs/ExpectedBehavior"
+    },
+    "fixture": {
+      "$ref": "#/$defs/SyntheticCaseFixture"
+    },
+    "label_rationale": {
+      "maxLength": 500,
+      "minLength": 20,
+      "title": "Label Rationale",
+      "type": "string"
+    },
+    "minimal_pair_id": {
+      "anyOf": [
+        {
+          "pattern": "^pair_[a-z0-9_]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Minimal Pair Id"
+    },
+    "request": {
+      "$ref": "#/$defs/TaskRequest"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "split": {
+      "$ref": "#/$defs/DatasetSplit"
+    },
+    "tags": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 16,
+      "minItems": 1,
+      "title": "Tags",
+      "type": "array"
+    },
+    "title": {
+      "maxLength": 160,
+      "minLength": 5,
+      "title": "Title",
+      "type": "string"
+    }
+  },
+  "required": [
+    "case_id",
+    "split",
+    "category",
+    "channel",
+    "title",
+    "request",
+    "fixture",
+    "expected",
+    "label_rationale",
+    "tags"
+  ],
+  "title": "EvaluationCase",
+  "type": "object"
+}
