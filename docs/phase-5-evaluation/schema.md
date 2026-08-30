@@ -61,3 +61,6 @@ Validation fails unless:
 - every query is unique; and
 - the checked-in artifacts match the release manifest.
 
+Primary categories are mutually exclusive for stratified reporting. Secondary properties
+are multi-label tags: a tool-failure case can also be a refund and a high-impact action,
+without being counted twice in primary-category macro averages.
