@@ -51,5 +51,33 @@ def build_sources() -> dict[str, Any]:
                 "url": "https://www.servicenow.com/docs/r/intelligent-experiences/plat-approval-assistance-ai-agent.html",
                 "use": "Current approval retrieval, checklist, approve/reject, and role-bound workflow realism.",
             },
+            {
+                "source_id": "microsoft-service-agent",
+                "publisher": "Microsoft",
+                "title": "Use Service Agent in Customer Service",
+                "url": "https://learn.microsoft.com/en-us/dynamics365/customer-service/use/use-service-agent",
+                "use": "Knowledge-grounded case review, summarization, status update, and case action realism.",
+            },
+            {
+                "source_id": "openai-support",
+                "publisher": "OpenAI",
+                "title": "Improving support with every interaction at OpenAI",
+                "url": "https://openai.com/index/openai-support-model/",
+                "use": "Support refunds, incident lookups, traces, classifiers, and continuous evaluation.",
+            },
+            {
+                "source_id": "openai-contextual-evals",
+                "publisher": "OpenAI",
+                "title": "How evals drive the next chapter in AI for businesses",
+                "url": "https://openai.com/index/evals-drive-next-chapter-of-ai/",
+                "use": "Contextual workflow evals, real-world examples, costly edge cases, and human audit.",
+            },
+            {
+                "source_id": "openai-deployment-simulation",
+                "publisher": "OpenAI",
+                "title": "Predicting model behavior before release by simulating deployment",
+                "url": "https://openai.com/index/deployment-simulation/",
+                "use": "Deployment-like prompts, isolated state, and realistic simulated tool failure trajectories.",
+            },
         ],
     }
