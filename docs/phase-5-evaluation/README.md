@@ -67,6 +67,7 @@ data/evaluation/phase5/v1/
 ├── case.schema.json
 ├── scoring-rubric.json
 ├── rubric.schema.json
+├── sources.json
 └── manifest.json
 ```
 
@@ -83,5 +84,25 @@ uv run python scripts/build_phase5_dataset.py --check
 uv run pytest tests/evaluation
 ```
 
-The manifest hashes exact bytes and records the Phase-3(baseline) and Phase-4(governed) freeze identities and
-aggregate hashes. A release change requires a new semantic dataset version.
+The dataset manifest is a closed contract: it rejects missing or unexpected fields, files,
+noncanonical hashes, case/split count drift, and substitution of either inherited release.
+The Phase 5 freeze manifest additionally covers generator and evaluation code, the build and
+verification scripts, tests, documentation, all dataset artifacts, and the exact Phase 3/4
+manifest ancestry.
+
+After the complete release surface has been reviewed, generate its identity once:
+
+```bash
+uv run python scripts/verify_phase5_freeze.py --write
+git diff -- docs/phase-5-freeze-manifest.json
+```
+
+Normal verification is read-only:
+
+```bash
+uv run python scripts/verify_phase3_freeze.py
+uv run python scripts/verify_phase4_freeze.py
+uv run python scripts/verify_phase5_freeze.py
+```
+
+A released artifact change requires a new semantic dataset version and reviewed freeze identity.
