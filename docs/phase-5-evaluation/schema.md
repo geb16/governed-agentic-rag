@@ -20,6 +20,7 @@ Schema is `data/evaluation/phase5/v1/case.schema.json`.
 | `label_rationale` | Reviewer-facing reason for the gold route, derived from frozen policy/contracts. |
 | `tags` | Secondary analysis axes; not scoring instructions. |
 | `minimal_pair_id` | Optional controlled boundary/contrast group. |
+| `design_source_ids` | Source-registry entries informing scenario realism. |
 
 Request, ticket, account, and fault objects reuse the frozen shared domain contracts. The
 dataset validator also validates every gold tool argument object against the corresponding
