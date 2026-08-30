@@ -23,6 +23,13 @@ def build_sources() -> dict[str, Any]:
                 "url": "https://airc.nist.gov/airmf-resources/airmf/5-sec-core/",
                 "use": "Repeatable TEVV, deployment-like conditions, safe failure, security, and accountability.",
             },
+            {
+                "source_id": "owasp-agentic-top10",
+                "publisher": "OWASP GenAI Security Project",
+                "title": "OWASP Top 10 for Agentic Applications 2026",
+                "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+                "use": "Agent goal hijack, tool misuse, identity abuse, and unsafe autonomy coverage.",
+            },
 
         ],
     }
