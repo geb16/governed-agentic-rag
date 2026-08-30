@@ -54,6 +54,77 @@
       ],
       "title": "MetricDefinition",
       "type": "object"
+    },
+    "StatisticalProtocol": {
+      "additionalProperties": false,
+      "description": "Pre-registered estimator, resampling, missingness, and inference policy.",
+      "properties": {
+        "aggregation_policy": {
+          "minLength": 20,
+          "title": "Aggregation Policy",
+          "type": "string"
+        },
+        "bootstrap_method": {
+          "const": "nonparametric_percentile_case_cluster",
+          "title": "Bootstrap Method",
+          "type": "string"
+        },
+        "bootstrap_replicates": {
+          "const": 10000,
+          "title": "Bootstrap Replicates",
+          "type": "integer"
+        },
+        "bootstrap_seed": {
+          "const": 20260830,
+          "title": "Bootstrap Seed",
+          "type": "integer"
+        },
+        "confidence_level": {
+          "maximum": 0.95,
+          "minimum": 0.95,
+          "title": "Confidence Level",
+          "type": "number"
+        },
+        "missing_observation_policy": {
+          "minLength": 20,
+          "title": "Missing Observation Policy",
+          "type": "string"
+        },
+        "multiplicity_policy": {
+          "minLength": 20,
+          "title": "Multiplicity Policy",
+          "type": "string"
+        },
+        "paired_difference_policy": {
+          "minLength": 20,
+          "title": "Paired Difference Policy",
+          "type": "string"
+        },
+        "resampling_policy": {
+          "minLength": 20,
+          "title": "Resampling Policy",
+          "type": "string"
+        },
+        "zero_denominator_policy": {
+          "minLength": 20,
+          "title": "Zero Denominator Policy",
+          "type": "string"
+        }
+      },
+      "required": [
+        "confidence_level",
+        "bootstrap_method",
+        "bootstrap_replicates",
+        "bootstrap_seed",
+        "resampling_policy",
+        "aggregation_policy",
+        "paired_difference_policy",
+        "zero_denominator_policy",
+        "missing_observation_policy",
+        "multiplicity_policy"
+      ],
+      "title": "StatisticalProtocol",
+      "type": "object"
     }
   },
   "additionalProperties": false,
@@ -116,6 +187,9 @@
       "title": "Schema Version",
       "type": "integer"
     },
+    "statistical_protocol": {
+      "$ref": "#/$defs/StatisticalProtocol"
+    },
     "unit_of_analysis": {
       "title": "Unit Of Analysis",
       "type": "string"
@@ -126,6 +200,7 @@
     "repetitions_per_case",
     "common_harness_requirements",
     "invalid_run_policy",
+    "statistical_protocol",
     "metrics",
     "reporting_requirements"
   ],
