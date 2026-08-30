@@ -1,7 +1,5 @@
 # Deterministically render and verify the versioned Phase 5 artifacts.
 
-# ruff: noqa: E501
-
 from __future__ import annotations
 
 import hashlib
@@ -12,13 +10,10 @@ from typing import Any
 from app.evaluation.dataset.generation.build import build_cases
 from app.evaluation.dataset.generation.rubric import build_rubric
 from app.evaluation.dataset.generation.sources import build_sources
-
-_ARTIFACT_NAMES = (
-    "cases.jsonl",
-    "case.schema.json",
-    "scoring-rubric.json",
-    "rubric.schema.json",
-    "sources.json",
+from app.evaluation.dataset.manifest import (
+    DATASET_ARTIFACT_NAMES,
+    DATASET_RELEASE_NAMES,
+    create_dataset_manifest,
 )
 
 
@@ -33,7 +28,9 @@ def render_artifacts() -> dict[str, bytes]:
         "sources.json": build_sources(),
     }
     rendered = {
-        name: _json_bytes(payloads[name]) for name in _ARTIFACT_NAMES if name != "cases.jsonl"
+        name: _json_bytes(payloads[name])
+        for name in DATASET_ARTIFACT_NAMES
+        if name != "cases.jsonl"
     }
     rendered["cases.jsonl"] = b"".join(
         _compact_json_bytes(case.model_dump(mode="json")) for case in cases
@@ -43,29 +40,16 @@ def render_artifacts() -> dict[str, bytes]:
 
 def build_manifest(artifacts: dict[str, bytes]) -> bytes:
     """Build a stable manifest binding data to both frozen system versions."""
-    manifest = {
-        "manifest_schema_version": 1,
-        "dataset_id": "enterprise-support-agent-eval",
-        "dataset_version": "1.0.0",
-        "distribution_type": "stratified_challenge_set_not_prevalence_sample",
-        "released_at": "2026-08-25T00:00:00Z",
-        "case_count": 100,
-        "validation_case_count": 20,
-        "test_case_count": 80,
-        "baseline_freeze_id": "phase3-baseline-v2",
-        "baseline_aggregate_sha256": "cd8c823a477419f7010c6d5beae1069baa154496e79fe52ed7fcaefcfe05f4b0",
-        "governance_freeze_id": "phase4-governance-v1",
-        "governance_aggregate_sha256": "a06eb798830e3cefea72978acc22d79dd6a2c51e53cf204ededffd8e7ceec46b",
-        "files": {
-            name: hashlib.sha256(content).hexdigest() for name, content in sorted(artifacts.items())
-        },
-    }
-    return _json_bytes(manifest)
+    manifest = create_dataset_manifest(
+        {name: hashlib.sha256(content).hexdigest() for name, content in sorted(artifacts.items())}
+    )
+    return _json_bytes(manifest.model_dump(mode="json"))
 
 
 def write_artifacts(root: Path) -> None:
     """Write a complete deterministic dataset release."""
     root.mkdir(parents=True, exist_ok=True)
+    _reject_unexpected_entries(root)
     artifacts = render_artifacts()
     for name, content in artifacts.items():
         (root / name).write_bytes(content)
@@ -74,12 +58,39 @@ def write_artifacts(root: Path) -> None:
 
 def check_artifacts(root: Path) -> None:
     """Fail if checked-in artifacts differ from deterministic rendering."""
+    _require_exact_release_entries(root)
     expected = render_artifacts()
     expected["manifest.json"] = build_manifest(expected)
     for name, content in expected.items():
         path = root / name
         if not path.is_file() or path.read_bytes() != content:
             raise ValueError(f"Generated Phase 5 artifact is stale: {path}")
+
+
+def _reject_unexpected_entries(root: Path) -> None:
+    """Refuse to overwrite a release directory containing undeclared entries."""
+    unexpected = sorted(
+        entry.name for entry in root.iterdir() if entry.name not in DATASET_RELEASE_NAMES
+    )
+    if unexpected:
+        raise ValueError("Dataset release contains unexpected entries: " + ", ".join(unexpected))
+    unsafe = sorted(entry.name for entry in root.iterdir() if entry.is_symlink())
+    if unsafe:
+        raise ValueError("Dataset release entries must not be symbolic links: " + ", ".join(unsafe))
+
+
+def _require_exact_release_entries(root: Path) -> None:
+    """Require the deterministic release to contain exactly the declared files."""
+    if not root.is_dir() or root.is_symlink():
+        raise ValueError("Dataset release root must be a physical directory")
+    names = {entry.name for entry in root.iterdir()}
+    if names != DATASET_RELEASE_NAMES:
+        missing = sorted(DATASET_RELEASE_NAMES - names)
+        unexpected = sorted(names - DATASET_RELEASE_NAMES)
+        details = [*(f"missing {name}" for name in missing)]
+        details.extend(f"unexpected {name}" for name in unexpected)
+        raise ValueError("Dataset release file set is invalid: " + ", ".join(details))
+    _reject_unexpected_entries(root)
 
 
 def _json_bytes(payload: Any) -> bytes:
