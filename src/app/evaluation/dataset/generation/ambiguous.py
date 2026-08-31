@@ -25,7 +25,11 @@ from app.evaluation.dataset.models import EvaluationCase
 
 
 def cases() -> list[EvaluationCase]:
-    """Return 16 realistic ambiguity cases with explicit clarification oracles."""
+    """Build realistic ambiguity cases with explicit clarification oracles.
+
+    Returns:
+        Sixteen strictly validated ambiguous-request cases.
+    """
     c = ScenarioCategory.AMBIGUOUS
     common: dict[str, Any] = {"route": Route.CLARIFY, "risk": Risk.HIGH}
     return [
