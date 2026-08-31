@@ -1,5 +1,5 @@
 {
-  "aggregate_sha256": "f3f300a444a956dd1d609fda3a06c7ccfcaf6b177bea0c67861a2ef1d25b6153",
+  "aggregate_sha256": "7ca87c1dff175078cf0e7c6420a4b9ce57814dc480ad72fca54e357860f03033",
   "baseline_aggregate_sha256": "cd8c823a477419f7010c6d5beae1069baa154496e79fe52ed7fcaefcfe05f4b0",
   "baseline_freeze_id": "phase3-baseline-v2",
   "baseline_manifest_sha256": "51926fa9a95b9e21a1537db02f57741a31cabb89560ee1e7a54250a03f9afaff",
@@ -8,7 +8,7 @@
   "dataset_manifest_sha256": "e222b41792481fbc0663b1acc5d2f4d42764000c3c4e955569455d26bf3cddc7",
   "dataset_version": "1.0.0",
   "freeze_id": "phase5-evaluation-v1",
-  "frozen_at": "2026-08-31T10:18:57.070458+00:00",
+  "frozen_at": "2026-08-31T11:20:09.426080+00:00",
   "governance_aggregate_sha256": "a06eb798830e3cefea72978acc22d79dd6a2c51e53cf204ededffd8e7ceec46b",
   "governance_freeze_id": "phase4-governance-v1",
   "governance_manifest_sha256": "dbd2b68a86cde8b1bb6926176fd49ce568f160885ab72b19f96f4df5dd9120f8",
@@ -25,7 +25,7 @@
     "docs/phase-5-evaluation/schema.md": "e081c898c60a5bb44ab8da69d96341bebd7311bf4554a5260950ededdfd23213",
     "docs/phase-5-evaluation/scoring-rubric.md": "51b374ebe9b646fcb1a9bad986adb60878bfb2fe6a1ebe1a50834a429b7e76de",
     "scripts/build_phase5_dataset.py": "a712c551c8388b2ddb43ddb94a81c98c13ebab97a37ce31be5d4ef6479778a85",
-    "scripts/verify_phase5_freeze.py": "17ef6598a12ee1e340df11dabf3f184456023cb34c709890312aab3fd4ad8e42",
+    "scripts/verify_phase5_freeze.py": "123371a7145c310a3701bdfc2d6098b5caa3de76cbea78e2c60b115f30275a8e",
     "src/app/evaluation/__init__.py": "2a903eff181b7c7d5cb011f821995f02bcb30e4552a0e0b0722f10d017eeb5e0",
     "src/app/evaluation/dataset/__init__.py": "35cb16c21e11a6fb878421cddba9573a28eed37f65e5680976dcd34cfd71588e",
     "src/app/evaluation/dataset/enums.py": "1c385ed567deb71a39fcd872399e610fade1e28e16c1faa863ac867b5a471104",
@@ -52,7 +52,7 @@
     "tests/evaluation/dataset/conftest.py": "22e6ca7b2cb189b0009ef90c5d02c894bba761a7306de743b65d6355685f2a97",
     "tests/evaluation/dataset/test_contracts.py": "63f0bcc49f2294b56417b63365d0c21743c216798dcf15cbd09d10077a8d5186",
     "tests/evaluation/dataset/test_integrity.py": "f72d41c0a13f3c169092efc8f29d36142859fe63763fdfbe0e29d9b8eb913c3f",
-    "tests/evaluation/dataset/test_phase5_freeze_verifier.py": "3374c249825012dc7368d11b2a7e6c9403c5f18cfa0d50ce7cd7189a2805a826",
+    "tests/evaluation/dataset/test_phase5_freeze_verifier.py": "165976ca349b17751d621b84d955467a8239047b2c301a995aad6dac7197335e",
     "tests/evaluation/dataset/test_rubric.py": "616462ca4400395885c348c93b4511bc2cd89eb2c6687a21312bbe1df100050c",
     "tests/evaluation/dataset/test_source_and_privacy.py": "bdb5bde4d7a4686c5c16d099912425529894dc10a99aee69ab020f384b4a5f99"
   }
