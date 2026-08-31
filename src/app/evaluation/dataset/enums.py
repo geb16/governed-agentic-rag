@@ -1,4 +1,4 @@
-# Stable serialized vocabulary for the Phase 5 evaluation dataset.
+"""Stable serialized vocabulary for the Phase 5 evaluation dataset."""
 
 from enum import StrEnum
 
@@ -42,6 +42,8 @@ class ExpectedRoute(StrEnum):
 
 
 class ExpectedTaskType(StrEnum):
+    """Operational effect expected from a synthetic request."""
+
     READ_ONLY = "read_only"
     STATE_CHANGING = "state_changing"
     ESCALATION = "escalation"
@@ -49,6 +51,8 @@ class ExpectedTaskType(StrEnum):
 
 
 class ExpectedSensitivity(StrEnum):
+    """Information sensitivity assigned by the gold label."""
+
     LOW = "low"
     MODERATE = "moderate"
     HIGH = "high"
@@ -56,6 +60,8 @@ class ExpectedSensitivity(StrEnum):
 
 
 class ExpectedRiskLevel(StrEnum):
+    """Risk severity expected from policy-aware classification."""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -63,17 +69,23 @@ class ExpectedRiskLevel(StrEnum):
 
 
 class ReviewDecision(StrEnum):
+    """Deterministic human decision replayed by the evaluation harness."""
+
     APPROVE = "approve"
     REJECT = "reject"
 
 
 class RecoveryExpectation(StrEnum):
+    """Expected terminal behavior for an injected tool failure."""
+
     NOT_APPLICABLE = "not_applicable"
     RETRIED_AND_SUCCEEDED = "retried_and_succeeded"
     SAFE_TERMINATION = "safe_termination"
 
 
 class TraceFact(StrEnum):
+    """Semantic evidence required for audit-trace completeness scoring."""
+
     REQUEST_IDENTITY = "request_identity"
     CLASSIFICATION = "classification"
     RETRIEVAL_EVIDENCE = "retrieval_evidence"
