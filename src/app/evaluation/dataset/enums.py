@@ -1,4 +1,16 @@
-"""Stable serialized vocabulary for the Phase 5 evaluation dataset."""
+"""Stable, JSON-serializable vocabulary for the Phase 5 evaluation dataset.
+
+Defines every closed enumeration referenced by the case and rubric models.
+Each member's str value is the frozen wire format persisted in cases.jsonl;
+renaming a member breaks the content-addressed release.
+Core:
+    - DatasetSplit, ScenarioCategory, InteractionChannel: case taxonomy.
+    - ExpectedRoute, ExpectedRiskLevel, ReviewDecision, TraceFact, etc.:
+      gold-oracle vocabulary consumed by EvaluationCase.
+References:
+    [1] Python Softw. Found., "PEP 663," 2021. https://peps.python.org/pep-0663/
+    [2] Python Softw. Found., "enum," Python 3 Docs. https://docs.python.org/3/library/enum.html
+"""
 
 from enum import StrEnum
 
