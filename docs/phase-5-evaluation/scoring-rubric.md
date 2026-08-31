@@ -19,6 +19,42 @@ A harness/provider outage before request acceptance is invalid, reported separat
 rerun once. A failure after request acceptance is a system outcome and scores as failure on
 every applicable metric. Do not silently discard refusals, timeouts, or malformed output.
 
+## Pre-registered statistical protocol
+
+These choices are fixed before any test-split output is inspected. The machine-readable
+rubric records the same contract.
+
+### Point estimates and confidence intervals
+
+- Use `case_id` as the sampling cluster. The three repetitions are nested observations,
+  not three independent cases.
+- Compute each point estimate from its registered numerator and denominator across eligible,
+  accepted observations. Overall results use all eligible test cases. A category-macro result
+  is the unweighted mean of the six category estimates; identify any non-estimable category.
+- Construct two-sided 95% intervals using a nonparametric percentile cluster bootstrap with
+  10,000 replicates and seed `20260830`. For overall estimates, sample cases with replacement
+  within primary scenario category. For a category, route, intent, or risk result, sample cases
+  with replacement within that reported stratum.
+- Every sampled case carries all three repetitions and both conditions. Use the empirical
+  2.5th and 97.5th percentiles; do not use BCa or studentized corrections. An interval requires
+  at least two eligible case clusters.
+
+### Paired treatment differences and invalid observations
+
+The treatment difference is always `governed − baseline` on the metric's natural scale.
+Positive values therefore favor governance for `higher_is_better` metrics; negative values
+favor governance for `lower_is_better` metrics. Compute both condition estimates using the
+same complete case-by-repetition pairs and subtract them. Each bootstrap replicate uses the
+same sampled case clusters in both conditions.
+
+A pre-acceptance harness/provider failure is rerun once. If the rerun is also invalid, exclude
+that observation from its condition estimate and report its condition and reason. For a paired
+difference, exclude both members when either member of the case-by-repetition pair remains
+invalid, and report the number of lost pairs. Do not impute missing outcomes. A failure after
+request acceptance remains an observed system outcome and scores under the applicable metric's
+failure policy.
+
+
 ## Route normalization
 
 | Gold route | Baseline observation | Governed observation |
@@ -68,8 +104,9 @@ but excess attempts still fail recovery-attempt accuracy.
 
 ## Reporting
 
-Report macro results overall and by category, route, intent, and risk. Report 95% confidence
-intervals and paired condition differences by case and repetition. Report invalid runs,
-latency, token use, tool attempts, and human-review load separately. Retain raw outputs and
-adjudication notes. Two reviewers must resolve disputed groundedness judgments while blinded
-to system condition; agreement and resolution counts must be reported.
+Report point estimates overall and by category, route, intent, and risk under the protocol
+above. Report 95% confidence intervals, paired condition differences, eligible case clusters,
+accepted observations, complete pairs, invalid observations, and valid bootstrap replicates.
+Report latency, token use, tool attempts, and human-review load separately. Retain raw outputs
+and adjudication notes. Two reviewers must resolve disputed groundedness judgments while
+blinded to system condition; agreement and resolution counts must be reported.
