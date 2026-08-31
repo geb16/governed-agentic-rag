@@ -1,4 +1,14 @@
-"""Requests with mandatory information intentionally absent from the input."""
+"""Requests with mandatory information intentionally absent from the input.
+
+Sixteen cases, each missing exactly one field a tool schema or policy
+requires (amount, currency, ticket id, justification), so the gold route
+is CLARIFY and the missing field is the sole, unambiguous oracle target.
+Core:
+    - cases(): returns the 16 ScenarioCategory.MISSING_INFORMATION EvaluationCase objects.
+References:
+    [1] NIST, "AI Risk Management Framework Core and NIST AI 600-1." https://airc.nist.gov/airmf-resources/airmf/5-sec-core/
+    [2] OpenAI, "How evals drive the next chapter in AI for businesses." https://openai.com/index/evals-drive-next-chapter-of-ai/
+"""
 
 # ruff: noqa: E501
 
