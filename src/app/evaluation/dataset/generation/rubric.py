@@ -1,4 +1,15 @@
-"""Construct the pre-registered, non-composite Phase 5 scoring rubric."""
+"""Construct the pre-registered, non-composite Phase 5 scoring rubric.
+
+Encodes the frozen statistical protocol (bootstrap, condition ordering,
+zero-denominator, missing-observation policies) and thirteen metric
+definitions agreed before any test-split output exists, so scoring choices
+cannot be tuned after seeing results.
+Core:
+    - build_rubric(): returns the single ScoringRubric instance.
+References:
+    [1] B. Efron and R. J. Tibshirani, An Introduction to the Bootstrap. Chapman & Hall/CRC, 1993.
+    [2] NIST, "Artificial Intelligence Risk Management Framework (AI RMF 1.0)," NIST AI 100-1, 2023. https://doi.org/10.6028/NIST.AI.100-1
+"""
 
 # ruff: noqa: E501
 from app.evaluation.dataset.models import MetricDefinition, ScoringRubric, StatisticalProtocol
