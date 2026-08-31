@@ -1,4 +1,16 @@
-"""Build the reviewed source registry supporting evaluation-design realism."""
+"""Build the reviewed source registry supporting evaluation-design realism.
+
+Lists external frameworks and vendor references that informed scenario
+archetypes and security coverage; per its own policy_authority field,
+these sources never override the local gold labels in data/knowledge_base.
+Core:
+    - build_sources(): returns the versioned, reviewed source registry.
+References:
+    [1] NIST, "AI Risk Management Framework Core and NIST AI 600-1." https://airc.nist.gov/airmf-resources/airmf/5-sec-core/
+    [2] OWASP GenAI Security Project, "OWASP Top 10 for Agentic Applications 2026." https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/
+    [3] ServiceNow, "Using agentic workflows in Customer Service Management." https://www.servicenow.com/docs/r/xanadu/customer-service-management/now-assist-for-csm/csm-ai-agents-use-cases.html
+    [4] OpenAI, "How evals drive the next chapter in AI for businesses." https://openai.com/index/evals-drive-next-chapter-of-ai/
+"""
 
 # URLs and source-use statements are kept intact in the generated registry.
 # ruff: noqa: E501
