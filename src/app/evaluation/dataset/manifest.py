@@ -55,7 +55,17 @@ class DatasetManifest(EvaluationModel):
     )
     @classmethod
     def validate_parent_digest(cls, value: str) -> str:
-        """Require canonical lowercase SHA-256 parent identities."""
+        """Validate a parent-release digest.
+
+        Args:
+            value: Digest supplied by the manifest.
+
+        Returns:
+            The unchanged canonical digest.
+
+        Raises:
+            ValueError: If the value is not a lowercase SHA-256 digest.
+        """
         if _SHA256_PATTERN.fullmatch(value) is None:
             raise ValueError("parent identity must be a lowercase SHA-256 digest")
         return value
@@ -63,7 +73,17 @@ class DatasetManifest(EvaluationModel):
     @field_validator("files")
     @classmethod
     def validate_file_map(cls, value: dict[str, str]) -> dict[str, str]:
-        """Require the exact release allowlist and canonical artifact hashes."""
+        """Validate the closed artifact allowlist and its hashes.
+
+        Args:
+            value: Relative artifact names mapped to expected digests.
+
+        Returns:
+            The validated mapping unchanged.
+
+        Raises:
+            ValueError: If file membership or any digest is invalid.
+        """
         expected = set(DATASET_ARTIFACT_NAMES)
         if set(value) != expected:
             missing = sorted(expected - set(value))
@@ -77,7 +97,14 @@ class DatasetManifest(EvaluationModel):
 
     @model_validator(mode="after")
     def validate_inherited_identities(self) -> Self:
-        """Reject substitution of either frozen system evaluated by this dataset."""
+        """Bind the dataset to the reviewed Phase 3 and Phase 4 releases.
+
+        Returns:
+            The validated manifest instance.
+
+        Raises:
+            ValueError: If either inherited aggregate differs from its frozen release.
+        """
         if self.baseline_aggregate_sha256 != PHASE3_AGGREGATE_SHA256:
             raise ValueError("baseline aggregate does not match the Phase 3 release")
         if self.governance_aggregate_sha256 != PHASE4_AGGREGATE_SHA256:
@@ -86,7 +113,17 @@ class DatasetManifest(EvaluationModel):
 
 
 def create_dataset_manifest(file_hashes: dict[str, str]) -> DatasetManifest:
-    """Create the canonical manifest from deterministic artifact hashes."""
+    """Create the canonical manifest for deterministic artifact hashes.
+
+    Args:
+        file_hashes: Exact release artifact names mapped to SHA-256 digests.
+
+    Returns:
+        Manifest pinned to the reviewed dataset and inherited releases.
+
+    Raises:
+        ValueError: If the artifact map violates the closed manifest contract.
+    """
     return DatasetManifest(
         manifest_schema_version=1,
         dataset_id=DATASET_ID,
