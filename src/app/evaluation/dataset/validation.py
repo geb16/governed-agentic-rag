@@ -59,7 +59,14 @@ _TOOL_INPUTS: dict[str, type[BaseModel]] = {
 
 
 def validate_dataset(cases: list[EvaluationCase]) -> None:
-    # Reject drift, duplicates, invalid gold actions, and coverage regression.
+    """Validate release-wide identity, distribution, and coverage invariants.
+
+    Args:
+        cases: Complete candidate case sequence.
+
+    Raises:
+        ValueError: If identities, labels, tool contracts, or coverage drift.
+    """
     if len(cases) != EXPECTED_CASE_COUNT:
         raise ValueError(f"Expected {EXPECTED_CASE_COUNT} cases, found {len(cases)}")
     ids = [case.case_id for case in cases]
