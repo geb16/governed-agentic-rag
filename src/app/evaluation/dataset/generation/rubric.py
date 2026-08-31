@@ -1,10 +1,15 @@
-# Construct the pre-defined, non-composite Phase 5 scoring rubric.
+"""Construct the pre-registered, non-composite Phase 5 scoring rubric."""
+
 # ruff: noqa: E501
 from app.evaluation.dataset.models import MetricDefinition, ScoringRubric, StatisticalProtocol
 
 
 def build_rubric() -> ScoringRubric:
-    """Return rubric version 1.0.0 shared by both experimental conditions."""
+    """Build the pre-registered rubric shared by both conditions.
+
+    Returns:
+        Strict rubric version 1.0.0 with metrics and statistical protocol.
+    """
     metric = MetricDefinition
     return ScoringRubric(
         unit_of_analysis="one system condition x case x independent repetition",
