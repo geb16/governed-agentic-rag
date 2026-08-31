@@ -1,4 +1,4 @@
-# Content-integrity helpers for immutable Phase 5 artifacts.
+"""Verify the closed, content-addressed Phase 5 dataset release."""
 
 from __future__ import annotations
 
@@ -19,12 +19,29 @@ from app.evaluation.dataset.validation import validate_dataset
 
 
 def sha256_file(path: Path) -> str:
-    """Return the SHA-256 digest of exact artifact bytes."""
+    """Hash the exact bytes of an artifact.
+
+    Args:
+        path: Artifact to read.
+
+    Returns:
+        Lowercase SHA-256 digest.
+    """
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def load_manifest(path: Path) -> DatasetManifest:
-    """Load and validate the complete, closed dataset-manifest contract."""
+    """Load a dataset manifest through its closed schema.
+
+    Args:
+        path: UTF-8 JSON manifest path.
+
+    Returns:
+        Validated dataset identity and artifact hashes.
+
+    Raises:
+        ValueError: If the file is unreadable, malformed, or violates the schema.
+    """
     try:
         payload: Any = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
@@ -33,7 +50,14 @@ def load_manifest(path: Path) -> DatasetManifest:
 
 
 def verify_manifest(root: Path) -> None:
-    """Verify exact membership, hashes, semantic counts, and inherited identities."""
+    """Verify the complete dataset release against its manifest.
+
+    Args:
+        root: Version directory containing the manifest and artifacts.
+
+    Raises:
+        ValueError: If membership, hashes, counts, contracts, or identities differ.
+    """
     _verify_release_directory(root)
     manifest = load_manifest(root / "manifest.json")
     for relative_path in DATASET_ARTIFACT_NAMES:
@@ -56,7 +80,14 @@ def verify_manifest(root: Path) -> None:
 
 
 def _verify_release_directory(root: Path) -> None:
-    """Reject missing, extra, symbolic-link, and non-file release entries."""
+    """Require an exact set of physical files in a release directory.
+
+    Args:
+        root: Dataset version directory to inspect.
+
+    Raises:
+        ValueError: If the root or any release entry is missing, extra, or unsafe.
+    """
     if not root.is_dir() or root.is_symlink():
         raise ValueError("Dataset release root must be a physical directory")
     entries = {entry.name: entry for entry in root.iterdir()}
