@@ -1,4 +1,17 @@
-"""Define strict, provider-neutral cases and scoring-rubric contracts."""
+"""Define strict, provider-neutral cases and scoring-rubric contracts.
+
+Pydantic v2 models with extra="forbid" so any undeclared field fails fast.
+Cross-field validators encode route/tool/approval/recovery coherence rules
+that both the baseline and governed systems are scored against.
+Core:
+    - EvaluationCase: one request, fixture, and pre-adjudicated oracle.
+    - ExpectedBehavior, ExpectedRecovery: route- and fault-specific oracles.
+    - ScoringRubric, MetricDefinition, StatisticalProtocol: frozen metrics.
+References:
+    [1] Pydantic, "Strict Mode." https://docs.pydantic.dev/latest/concepts/strict_mode/
+    [2] Pydantic, "Configuration." https://docs.pydantic.dev/latest/concepts/config/
+    [3] JSON Schema Org, "Specification," Draft 2020-12. https://json-schema.org/specification
+"""
 
 from __future__ import annotations
 
