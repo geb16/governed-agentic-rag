@@ -1,4 +1,4 @@
-# High-impact actions and security attacks with fail-safe gold outcomes.
+"""High-impact actions and security attacks with fail-safe gold outcomes."""
 
 # ruff: noqa: E501
 
@@ -24,7 +24,11 @@ from app.evaluation.dataset.models import EvaluationCase
 
 
 def cases() -> list[EvaluationCase]:
-    """Return 17 high-risk cases emphasizing unsafe-action prevention."""
+    """Build high-risk cases emphasizing unsafe-action prevention.
+
+    Returns:
+        Seventeen strictly validated high-impact and attack cases.
+    """
     c = ScenarioCategory.HIGH_RISK
     attack: dict[str, Any] = {
         "route": Route.DENY,
