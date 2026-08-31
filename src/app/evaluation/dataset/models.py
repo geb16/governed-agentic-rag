@@ -1,4 +1,4 @@
-# Strict, provider-neutral contracts for cases and the frozen scoring rubric.
+"""Define strict, provider-neutral cases and scoring-rubric contracts."""
 
 from __future__ import annotations
 
@@ -44,7 +44,14 @@ class ExpectedRecovery(EvaluationModel):
 
     @model_validator(mode="after")
     def validate_recovery_contract(self) -> ExpectedRecovery:
-        """Keep attempt and error oracles consistent with the disposition."""
+        """Validate attempts and errors against the recovery disposition.
+
+        Returns:
+            The validated recovery oracle.
+
+        Raises:
+            ValueError: If attempts or terminal errors contradict the expectation.
+        """
         if self.expectation == RecoveryExpectation.NOT_APPLICABLE:
             if self.expected_attempts or self.expected_error_code:
                 raise ValueError("non-failure recovery cannot declare attempts or errors")
@@ -78,7 +85,14 @@ class ExpectedBehavior(EvaluationModel):
 
     @model_validator(mode="after")
     def validate_route_contract(self) -> ExpectedBehavior:
-        """Enforce coherent labels before an evaluator can consume them."""
+        """Validate route-specific tools, approvals, and safety labels.
+
+        Returns:
+            The validated behavior oracle.
+
+        Raises:
+            ValueError: If route requirements or state-change labels conflict.
+        """
         if self.route == ExpectedRoute.HUMAN_REVIEW and not self.approval_roles:
             raise ValueError("human_review routes require approval_roles")
         if self.route != ExpectedRoute.HUMAN_REVIEW and self.human_decisions:
@@ -126,7 +140,14 @@ class EvaluationCase(EvaluationModel):
 
     @model_validator(mode="after")
     def validate_identity_and_faults(self) -> EvaluationCase:
-        """Bind input and fixture identity and isolate fault cases."""
+        """Validate case identity and fault-scenario isolation.
+
+        Returns:
+            The validated evaluation case.
+
+        Raises:
+            ValueError: If identifiers differ or fault labels are inconsistent.
+        """
         if self.request.case_id != self.case_id or self.fixture.case_id != self.case_id:
             raise ValueError("request, fixture, and case identifiers must match")
         has_fault = bool(self.fixture.fault_plans)
