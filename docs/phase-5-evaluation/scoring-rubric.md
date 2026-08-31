@@ -54,6 +54,27 @@ invalid, and report the number of lost pairs. Do not impute missing outcomes. A 
 request acceptance remains an observed system outcome and scores under the applicable metric's
 failure policy.
 
+### Zero denominators
+
+Report a ratio as `not estimable` (`NA`), never zero or one, when its registered denominator is
+zero. Escalation precision is therefore `NA` when `TP + FP = 0`. Calculate escalation F1 as
+`2TP / (2TP + FP + FN)`: it is zero when this denominator is positive and `TP = 0`, and `NA`
+only when the denominator is zero. Context precision retains its metric-specific rule: an
+eligible run with no retrieved context scores zero.
+
+For a bootstrap replicate whose ratio denominator is zero, omit that replicate for that
+interval and report the valid-replicate count. If fewer than 9,500 of 10,000 replicates remain,
+report the interval as `NA`. A paired ratio difference is `NA` when either condition's point
+estimate is not estimable.
+
+### Multiplicity
+
+All metric and stratum intervals are pointwise, descriptive 95% intervals. This pilot performs
+no null-hypothesis significance tests, applies no multiplicity adjustment, and makes no
+confirmatory significance claim from an interval excluding zero. Report every registered
+overall metric and every estimable registered category, route, intent, and risk stratum; do not
+select results after inspection. Any later confirmatory analysis requires a separately frozen
+protocol and independent data.
 
 ## Route normalization
 
