@@ -1,4 +1,14 @@
-"""Validate cross-case invariants and frozen-tool coverage for Phase 5."""
+"""Validate cross-case invariants and frozen-tool coverage for Phase 5.
+
+Enforces release-wide rules a single EvaluationCase cannot check alone:
+unique identifiers, the frozen split/category distribution, minimal-pair
+completeness, and full validation-split coverage of every governed
+dimension (route, tool, intent, risk, decision, failure mode).
+Core:
+    - validate_dataset(): the single entry point for all release invariants.
+References:
+    [1] NIST, AI RMF 1.0 (NIST AI 100-1), 2023. https://doi.org/10.6028/NIST.AI.100-1
+"""
 
 from __future__ import annotations
 
