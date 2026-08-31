@@ -1,4 +1,14 @@
-"""Deterministic transient, timeout, and permanent tool-failure scenarios."""
+"""Deterministic transient, timeout, and permanent tool-failure scenarios.
+
+Seventeen cases injecting a bounded FaultPlan per tool so retry and
+safe-termination behavior is scored against an exact attempt count and
+terminal error code instead of an unconstrained failure narrative.
+Core:
+    - cases(): returns the 17 ScenarioCategory.TOOL_FAILURE EvaluationCase objects.
+References:
+    [1] NIST, "AI Risk Management Framework Core and NIST AI 600-1." https://airc.nist.gov/airmf-resources/airmf/5-sec-core/
+    [2] OpenAI, "Predicting model behavior before release by simulating deployment." https://openai.com/index/deployment-simulation/
+"""
 
 # ruff: noqa: E501
 from app.evaluation.dataset.enums import (
