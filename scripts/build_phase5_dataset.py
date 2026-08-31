@@ -1,4 +1,4 @@
-# Build or verify the deterministic Phase-5 dataset release.
+"""Build or verify the deterministic Phase 5 dataset release."""
 
 from __future__ import annotations
 
@@ -9,7 +9,11 @@ from app.evaluation.dataset.generation.artifacts import check_artifacts, write_a
 
 
 def main() -> None:
-    """Render the release, or verify it when --check is supplied."""
+    """Render artifacts or compare them with the release when ``--check`` is set.
+
+    Raises:
+        ValueError: If generation inputs or checked-in artifacts violate the release contract.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
