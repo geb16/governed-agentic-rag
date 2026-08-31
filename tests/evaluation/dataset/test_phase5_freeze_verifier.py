@@ -77,6 +77,7 @@ def test_freeze_scope_covers_complete_phase5_release() -> None:
 
     assert isinstance(source_files, dict)
     assert {
+        ".gitattributes",
         "data/evaluation/phase5/v1/cases.jsonl",
         "data/evaluation/phase5/v1/manifest.json",
         "docs/phase-5-evaluation/README.md",
@@ -96,6 +97,28 @@ def test_freeze_scope_covers_complete_phase5_release() -> None:
     assert payload["baseline_aggregate_sha256"] == verifier.PHASE3_AGGREGATE_SHA256
     assert payload["governance_aggregate_sha256"] == verifier.PHASE4_AGGREGATE_SHA256
     assert payload["aggregate_sha256"] == verifier._canonical_aggregate(payload)
+
+
+def test_line_ending_policy_is_lf_and_phase5_scoped() -> None:
+    """Keep byte-hashed Phase 5 files portable without touching prior freezes."""
+    policy_path = verifier.PROJECT_ROOT / ".gitattributes"
+    rules = {
+        line
+        for raw_line in policy_path.read_text(encoding="utf-8").splitlines()
+        if (line := raw_line.strip()) and not line.startswith("#")
+    }
+
+    assert rules == {
+        "/.gitattributes text eol=lf",
+        "/data/evaluation/phase5/v1/*.json text eol=lf",
+        "/data/evaluation/phase5/v1/*.jsonl text eol=lf",
+        "/docs/phase-5-evaluation/*.md text eol=lf",
+        "/docs/phase-5-freeze-manifest.json text eol=lf",
+        "/scripts/build_phase5_dataset.py text eol=lf",
+        "/scripts/verify_phase5_freeze.py text eol=lf",
+        "/src/app/evaluation/** text eol=lf",
+        "/tests/evaluation/** text eol=lf",
+    }
 
 
 def test_freeze_scope_rejects_empty_patterns(
