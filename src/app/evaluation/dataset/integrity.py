@@ -1,4 +1,16 @@
-"""Verify the closed, content-addressed Phase 5 dataset release."""
+"""Verify the closed, content-addressed Phase 5 dataset release.
+
+Confirms a release directory contains exactly its declared physical files,
+that every artifact's bytes match the manifest's SHA-256 digests, and that
+the parsed cases and rubric satisfy their contracts.
+Core:
+    - sha256_file(): hashes exact artifact bytes.
+    - load_manifest(): parses manifest.json through DatasetManifest.
+    - verify_manifest(): end-to-end membership, hash, and count checks.
+References:
+    [1] NIST, "Secure Hash Standard," FIPS 180-4, 2015. https://doi.org/10.6028/NIST.FIPS.180-4
+    [2] SLSA, "Build: Provenance," v1.0, 2023. https://slsa.dev/spec/v1.0/provenance
+"""
 
 from __future__ import annotations
 
