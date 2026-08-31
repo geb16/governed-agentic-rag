@@ -2,14 +2,21 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+import shutil
 import sys
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
+from app.evaluation.dataset.generation.artifacts import check_artifacts as real_check_artifacts
+from app.evaluation.dataset.integrity import load_manifest as real_load_manifest
+from app.evaluation.dataset.integrity import verify_manifest as real_verify_manifest
 from scripts import verify_phase5_freeze as verifier
+
+REAL_DATASET_ROOT = Path("data/evaluation/phase5/v1")
 
 
 def _configure_isolated_scope(monkeypatch: pytest.MonkeyPatch, root: Path) -> Path:
@@ -58,6 +65,7 @@ def _configure_isolated_scope(monkeypatch: pytest.MonkeyPatch, root: Path) -> Pa
     monkeypatch.setattr(verifier, "DATASET_MANIFEST_PATH", dataset_manifest)
     monkeypatch.setattr(verifier, "FROZEN_PATTERNS", ("evaluation.py",))
     monkeypatch.setattr(verifier, "verify_manifest", lambda _: None)
+    monkeypatch.setattr(verifier, "check_artifacts", lambda _: None)
     monkeypatch.setattr(
         verifier,
         "load_manifest",
@@ -97,6 +105,46 @@ def test_freeze_scope_covers_complete_phase5_release() -> None:
     assert payload["baseline_aggregate_sha256"] == verifier.PHASE3_AGGREGATE_SHA256
     assert payload["governance_aggregate_sha256"] == verifier.PHASE4_AGGREGATE_SHA256
     assert payload["aggregate_sha256"] == verifier._canonical_aggregate(payload)
+
+
+def test_freeze_rejects_stale_generated_artifacts(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Reject a checked-in artifact that no longer matches its generator.
+
+    A hand-edited artifact can still carry a self-consistent manifest hash, so
+    ``verify_manifest`` alone would accept it. The freeze must also re-render
+    every artifact and reject drift from the deterministic generator.
+
+    Args:
+        monkeypatch: Fixture used to isolate verifier dependencies.
+        tmp_path: Pytest-managed isolation directory.
+    """
+    _configure_isolated_scope(monkeypatch, tmp_path)
+    dataset_root = tmp_path / "dataset"
+    shutil.copytree(REAL_DATASET_ROOT, dataset_root)
+
+    sources_path = dataset_root / "sources.json"
+    sources_payload = json.loads(sources_path.read_text(encoding="utf-8"))
+    sources_payload["reviewed_on"] = "2099-01-01"
+    mutated_sources = (json.dumps(sources_payload, indent=2, sort_keys=True) + "\n").encode()
+    sources_path.write_bytes(mutated_sources)
+
+    manifest_path = dataset_root / "manifest.json"
+    manifest_payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest_payload["files"]["sources.json"] = hashlib.sha256(mutated_sources).hexdigest()
+    manifest_path.write_text(json.dumps(manifest_payload), encoding="utf-8")
+
+    monkeypatch.setattr(verifier, "DATASET_ROOT", dataset_root)
+    monkeypatch.setattr(verifier, "DATASET_MANIFEST_PATH", manifest_path)
+    monkeypatch.setattr(verifier, "verify_manifest", real_verify_manifest)
+    monkeypatch.setattr(verifier, "check_artifacts", real_check_artifacts)
+    monkeypatch.setattr(verifier, "load_manifest", real_load_manifest)
+
+    real_verify_manifest(dataset_root)  # manifest hashes are self-consistent despite the edit
+
+    with pytest.raises(verifier.FreezeScopeError, match=r"sources\.json"):
+        verifier.build_freeze_payload()
 
 
 def test_line_ending_policy_is_lf_and_phase5_scoped() -> None:
