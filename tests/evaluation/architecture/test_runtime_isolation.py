@@ -1,4 +1,4 @@
-# Prevent Phase-5 offline code from entering either frozen runtime.
+"""Protect frozen runtimes from dependencies on offline evaluation code."""
 
 import ast
 from pathlib import Path
@@ -8,6 +8,11 @@ import pytest
 
 @pytest.mark.parametrize("runtime", [Path("src/app/baseline"), Path("src/app/governance")])
 def test_frozen_runtime_does_not_import_evaluation(runtime: Path) -> None:
+    """Reject evaluation imports from a frozen runtime package.
+
+    Args:
+        runtime: Baseline or governed source root under inspection.
+    """
     offenders: list[str] = []
     for path in runtime.rglob("*.py"):
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
