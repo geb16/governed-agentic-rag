@@ -27,7 +27,11 @@ from app.evaluation.dataset.models import EvaluationCase
 
 
 def cases() -> list[EvaluationCase]:
-    """Return 17 policy-boundary cases, including controlled minimal pairs."""
+    """Build policy-boundary cases and controlled minimal pairs.
+
+    Returns:
+        Seventeen strictly validated policy-sensitive cases.
+    """
     c = ScenarioCategory.POLICY_SENSITIVE
     return [
         make_case(
