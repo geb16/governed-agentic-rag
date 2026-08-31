@@ -13,7 +13,14 @@ from app.evaluation.dataset.validation import validate_dataset
 
 
 def build_cases() -> list[EvaluationCase]:
-    """Return all cases in stable case-identifier order."""
+    """Assemble and validate all cases in stable identifier order.
+
+    Returns:
+        Complete version 1.0.0 evaluation case sequence.
+
+    Raises:
+        ValueError: If any cross-case invariant or coverage requirement fails.
+    """
     result = [
         *normal.cases(),
         *ambiguous.cases(),
