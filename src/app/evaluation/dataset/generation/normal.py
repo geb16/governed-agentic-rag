@@ -25,7 +25,11 @@ from app.evaluation.dataset.models import EvaluationCase
 
 
 def cases() -> list[EvaluationCase]:
-    """Return 17 routine requests spanning retrieval and bounded tools."""
+    """Build routine requests spanning retrieval and bounded tools.
+
+    Returns:
+        Seventeen strictly validated normal-operation cases.
+    """
     c = ScenarioCategory.NORMAL
     return [
         make_case(

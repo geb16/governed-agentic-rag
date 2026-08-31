@@ -1,4 +1,5 @@
-# Deterministic transient, timeout, and permanent tool-failure scenarios.
+"""Deterministic transient, timeout, and permanent tool-failure scenarios."""
+
 # ruff: noqa: E501
 from app.evaluation.dataset.enums import (
     ExpectedRiskLevel as Risk,
@@ -28,7 +29,11 @@ from app.evaluation.dataset.models import EvaluationCase
 
 
 def cases() -> list[EvaluationCase]:
-    """Return 17 failure trajectories with deterministic attempt oracles."""
+    """Build failure trajectories with deterministic attempt oracles.
+
+    Returns:
+        Seventeen strictly validated recovery and safe-termination cases.
+    """
     c = ScenarioCategory.TOOL_FAILURE
     source = ["nist-ai-rmf", "openai-deployment-simulation"]
     return [
