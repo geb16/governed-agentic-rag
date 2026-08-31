@@ -1,0 +1,227 @@
+{
+  "$defs": {
+    "MetricDefinition": {
+      "additionalProperties": false,
+      "description": "Machine-readable metric definition frozen before execution.",
+      "properties": {
+        "denominator": {
+          "minLength": 3,
+          "title": "Denominator",
+          "type": "string"
+        },
+        "description": {
+          "minLength": 10,
+          "title": "Description",
+          "type": "string"
+        },
+        "direction": {
+          "enum": [
+            "higher_is_better",
+            "lower_is_better"
+          ],
+          "title": "Direction",
+          "type": "string"
+        },
+        "eligible_when": {
+          "minLength": 3,
+          "title": "Eligible When",
+          "type": "string"
+        },
+        "failure_policy": {
+          "minLength": 10,
+          "title": "Failure Policy",
+          "type": "string"
+        },
+        "metric_id": {
+          "pattern": "^[a-z][a-z0-9_]+$",
+          "title": "Metric Id",
+          "type": "string"
+        },
+        "numerator": {
+          "minLength": 3,
+          "title": "Numerator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "metric_id",
+        "description",
+        "eligible_when",
+        "numerator",
+        "denominator",
+        "direction",
+        "failure_policy"
+      ],
+      "title": "MetricDefinition",
+      "type": "object"
+    },
+    "StatisticalProtocol": {
+      "additionalProperties": false,
+      "description": "Pre-registered estimator, resampling, missingness, and inference policy.",
+      "properties": {
+        "aggregation_policy": {
+          "minLength": 20,
+          "title": "Aggregation Policy",
+          "type": "string"
+        },
+        "bootstrap_method": {
+          "const": "nonparametric_percentile_case_cluster",
+          "title": "Bootstrap Method",
+          "type": "string"
+        },
+        "bootstrap_replicates": {
+          "const": 10000,
+          "title": "Bootstrap Replicates",
+          "type": "integer"
+        },
+        "bootstrap_seed": {
+          "const": 20260830,
+          "title": "Bootstrap Seed",
+          "type": "integer"
+        },
+        "condition_order_method": {
+          "const": "sha256_seeded_alternating",
+          "title": "Condition Order Method",
+          "type": "string"
+        },
+        "condition_order_policy": {
+          "minLength": 20,
+          "title": "Condition Order Policy",
+          "type": "string"
+        },
+        "condition_order_seed": {
+          "const": 20260831,
+          "title": "Condition Order Seed",
+          "type": "integer"
+        },
+        "confidence_level": {
+          "maximum": 0.95,
+          "minimum": 0.95,
+          "title": "Confidence Level",
+          "type": "number"
+        },
+        "missing_observation_policy": {
+          "minLength": 20,
+          "title": "Missing Observation Policy",
+          "type": "string"
+        },
+        "multiplicity_policy": {
+          "minLength": 20,
+          "title": "Multiplicity Policy",
+          "type": "string"
+        },
+        "paired_difference_policy": {
+          "minLength": 20,
+          "title": "Paired Difference Policy",
+          "type": "string"
+        },
+        "resampling_policy": {
+          "minLength": 20,
+          "title": "Resampling Policy",
+          "type": "string"
+        },
+        "zero_denominator_policy": {
+          "minLength": 20,
+          "title": "Zero Denominator Policy",
+          "type": "string"
+        }
+      },
+      "required": [
+        "condition_order_method",
+        "condition_order_seed",
+        "condition_order_policy",
+        "confidence_level",
+        "bootstrap_method",
+        "bootstrap_replicates",
+        "bootstrap_seed",
+        "resampling_policy",
+        "aggregation_policy",
+        "paired_difference_policy",
+        "zero_denominator_policy",
+        "missing_observation_policy",
+        "multiplicity_policy"
+      ],
+      "title": "StatisticalProtocol",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Frozen evaluation rules shared by baseline and governed conditions.",
+  "properties": {
+    "common_harness_requirements": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Common Harness Requirements",
+      "type": "array"
+    },
+    "composite_score": {
+      "default": null,
+      "title": "Composite Score",
+      "type": "null"
+    },
+    "dataset_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Dataset Version",
+      "type": "string"
+    },
+    "invalid_run_policy": {
+      "title": "Invalid Run Policy",
+      "type": "string"
+    },
+    "metrics": {
+      "items": {
+        "$ref": "#/$defs/MetricDefinition"
+      },
+      "minItems": 1,
+      "title": "Metrics",
+      "type": "array"
+    },
+    "repetitions_per_case": {
+      "maximum": 10,
+      "minimum": 1,
+      "title": "Repetitions Per Case",
+      "type": "integer"
+    },
+    "reporting_requirements": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Reporting Requirements",
+      "type": "array"
+    },
+    "rubric_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Rubric Version",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "statistical_protocol": {
+      "$ref": "#/$defs/StatisticalProtocol"
+    },
+    "unit_of_analysis": {
+      "title": "Unit Of Analysis",
+      "type": "string"
+    }
+  },
+  "required": [
+    "unit_of_analysis",
+    "repetitions_per_case",
+    "common_harness_requirements",
+    "invalid_run_policy",
+    "statistical_protocol",
+    "metrics",
+    "reporting_requirements"
+  ],
+  "title": "ScoringRubric",
+  "type": "object"
+}
