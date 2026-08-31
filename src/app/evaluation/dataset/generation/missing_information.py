@@ -1,4 +1,4 @@
-# Requests with known mandatory information absent from the input.
+"""Requests with mandatory information intentionally absent from the input."""
 
 # ruff: noqa: E501
 
@@ -24,7 +24,11 @@ from app.evaluation.dataset.models import EvaluationCase
 
 
 def cases() -> list[EvaluationCase]:
-    """Return 16 cases whose missing fields are explicitly adjudicated."""
+    """Build cases whose missing material fields are adjudicated.
+
+    Returns:
+        Sixteen strictly validated missing-information cases.
+    """
     c = ScenarioCategory.MISSING_INFORMATION
     clarify: dict[str, Any] = {"route": Route.CLARIFY, "risk": Risk.HIGH}
     return [
