@@ -1,4 +1,16 @@
-"""Normal, low-complexity enterprise support scenarios."""
+"""Normal, low-complexity enterprise support scenarios.
+
+Seventeen cases where retrieval or a single bounded tool call fully answers
+or completes the request with no approval, clarification, or fault
+injected -- the dataset's non-adversarial baseline stratum.
+Core:
+    - cases(): returns the 17 ScenarioCategory.NORMAL EvaluationCase objects.
+References:
+    [1] OpenAI, "Improving support with every interaction at OpenAI." https://openai.com/index/openai-support-model/
+    [2] Microsoft, "Use Service Agent in Customer Service." https://learn.microsoft.com/en-us/dynamics365/customer-service/use/use-service-agent
+    [3] ServiceNow, "Using agentic workflows in Customer Service Management." https://www.servicenow.com/docs/r/xanadu/customer-service-management/now-assist-for-csm/csm-ai-agents-use-cases.html
+    [4] NIST, "AI Risk Management Framework Core and NIST AI 600-1." https://airc.nist.gov/airmf-resources/airmf/5-sec-core/
+"""
 # ruff: noqa: E501
 
 from app.evaluation.dataset.enums import (
