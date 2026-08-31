@@ -1,4 +1,4 @@
-# Deterministically render and verify the versioned Phase 5 artifacts.
+"""Render and verify deterministic, versioned Phase 5 artifacts."""
 
 from __future__ import annotations
 
@@ -18,7 +18,11 @@ from app.evaluation.dataset.manifest import (
 
 
 def render_artifacts() -> dict[str, bytes]:
-    """Render every content-addressed artifact without touching the filesystem."""
+    """Render every content-addressed artifact in memory.
+
+    Returns:
+        Relative artifact names mapped to deterministic bytes.
+    """
     cases = build_cases()
     rubric = build_rubric()
     payloads: dict[str, Any] = {
@@ -39,7 +43,17 @@ def render_artifacts() -> dict[str, bytes]:
 
 
 def build_manifest(artifacts: dict[str, bytes]) -> bytes:
-    """Build a stable manifest binding data to both frozen system versions."""
+    """Render a manifest binding artifacts to both frozen systems.
+
+    Args:
+        artifacts: Release artifact names mapped to exact bytes.
+
+    Returns:
+        Deterministic UTF-8 JSON manifest bytes.
+
+    Raises:
+        ValueError: If artifact membership violates the manifest contract.
+    """
     manifest = create_dataset_manifest(
         {name: hashlib.sha256(content).hexdigest() for name, content in sorted(artifacts.items())}
     )
@@ -47,7 +61,14 @@ def build_manifest(artifacts: dict[str, bytes]) -> bytes:
 
 
 def write_artifacts(root: Path) -> None:
-    """Write a complete deterministic dataset release."""
+    """Write a complete deterministic dataset release.
+
+    Args:
+        root: Version directory to create or update.
+
+    Raises:
+        ValueError: If the directory contains undeclared or symbolic-link entries.
+    """
     root.mkdir(parents=True, exist_ok=True)
     _reject_unexpected_entries(root)
     artifacts = render_artifacts()
@@ -57,7 +78,14 @@ def write_artifacts(root: Path) -> None:
 
 
 def check_artifacts(root: Path) -> None:
-    """Fail if checked-in artifacts differ from deterministic rendering."""
+    """Compare checked-in artifacts with deterministic rendering.
+
+    Args:
+        root: Existing dataset version directory.
+
+    Raises:
+        ValueError: If membership or any artifact byte differs.
+    """
     _require_exact_release_entries(root)
     expected = render_artifacts()
     expected["manifest.json"] = build_manifest(expected)
@@ -68,7 +96,14 @@ def check_artifacts(root: Path) -> None:
 
 
 def _reject_unexpected_entries(root: Path) -> None:
-    """Refuse to overwrite a release directory containing undeclared entries."""
+    """Reject undeclared or symbolic-link entries before writing.
+
+    Args:
+        root: Dataset version directory to inspect.
+
+    Raises:
+        ValueError: If an entry is undeclared or symbolic.
+    """
     unexpected = sorted(
         entry.name for entry in root.iterdir() if entry.name not in DATASET_RELEASE_NAMES
     )
@@ -80,7 +115,14 @@ def _reject_unexpected_entries(root: Path) -> None:
 
 
 def _require_exact_release_entries(root: Path) -> None:
-    """Require the deterministic release to contain exactly the declared files."""
+    """Require exactly the declared physical release files.
+
+    Args:
+        root: Dataset version directory to inspect.
+
+    Raises:
+        ValueError: If the directory or its membership is invalid.
+    """
     if not root.is_dir() or root.is_symlink():
         raise ValueError("Dataset release root must be a physical directory")
     names = {entry.name for entry in root.iterdir()}
@@ -94,8 +136,24 @@ def _require_exact_release_entries(root: Path) -> None:
 
 
 def _json_bytes(payload: Any) -> bytes:
+    """Serialize a value as stable, indented UTF-8 JSON bytes.
+
+    Args:
+        payload: JSON-compatible value to serialize.
+
+    Returns:
+        Sorted JSON terminated by one newline.
+    """
     return (json.dumps(payload, indent=2, sort_keys=True) + "\n").encode()
 
 
 def _compact_json_bytes(payload: Any) -> bytes:
+    """Serialize a value as stable, compact UTF-8 JSON Lines bytes.
+
+    Args:
+        payload: JSON-compatible value to serialize.
+
+    Returns:
+        Compact sorted JSON terminated by one newline.
+    """
     return (json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n").encode()
