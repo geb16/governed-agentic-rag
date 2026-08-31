@@ -1,4 +1,4 @@
-# Ensure deterministic rendering, strict manifests, and closed release membership.
+"""Test deterministic rendering, strict manifests, and closed release membership."""
 
 import json
 import shutil
@@ -13,22 +13,37 @@ DATA_ROOT = Path("data/evaluation/phase5/v1")
 
 
 def test_release_matches_deterministic_generator() -> None:
+    """Keep checked-in artifacts byte-identical to deterministic rendering."""
     check_artifacts(DATA_ROOT)
 
 
 def test_release_matches_content_manifest() -> None:
+    """Verify the checked-in release against its closed content manifest."""
     verify_manifest(DATA_ROOT)
 
 
 def _copy_release(destination: Path) -> Path:
-    """Copy the checked-in release so failure paths cannot mutate source artifacts."""
+    """Copy the release so negative tests cannot mutate source artifacts.
+
+    Args:
+        destination: Temporary parent directory.
+
+    Returns:
+        Path to the isolated release copy.
+    """
     root = destination / "v1"
     shutil.copytree(DATA_ROOT, root)
     return root
 
 
 def _mutate_manifest(root: Path, mutation: str, value: object = None) -> None:
-    """Apply one structural or identity mutation to a temporary manifest."""
+    """Apply one structural or identity mutation to a copied manifest.
+
+    Args:
+        root: Isolated release directory.
+        mutation: Field to replace, or ``remove`` to delete a field.
+        value: Replacement value or field name to remove.
+    """
     path = root / "manifest.json"
     payload = json.loads(path.read_text(encoding="utf-8"))
     if mutation == "remove":
@@ -39,7 +54,11 @@ def _mutate_manifest(root: Path, mutation: str, value: object = None) -> None:
 
 
 def test_integrity_and_generation_reject_an_unexpected_release_file(tmp_path: Path) -> None:
-    """Prevent undeclared content from hiding beside the hashed artifacts."""
+    """Prevent undeclared content from accompanying hashed artifacts.
+
+    Args:
+        tmp_path: Pytest-managed isolation directory.
+    """
     root = _copy_release(tmp_path)
     (root / "notes.txt").write_text("undeclared\n", encoding="utf-8")
 
@@ -65,7 +84,13 @@ def test_integrity_rejects_manifest_schema_count_and_parent_drift(
     mutation: str,
     value: object,
 ) -> None:
-    """Fail closed when the release contract or inherited experiment identity drifts."""
+    """Reject manifest schema, count, and parent-identity drift.
+
+    Args:
+        tmp_path: Pytest-managed isolation directory.
+        mutation: Manifest field operation under test.
+        value: Mutation-specific field name or replacement value.
+    """
     root = _copy_release(tmp_path)
     _mutate_manifest(root, mutation, value)
 
@@ -74,7 +99,11 @@ def test_integrity_rejects_manifest_schema_count_and_parent_drift(
 
 
 def test_integrity_rejects_invalid_artifact_hash_format(tmp_path: Path) -> None:
-    """Reject noncanonical digests before attempting content verification."""
+    """Reject a noncanonical digest before content verification.
+
+    Args:
+        tmp_path: Pytest-managed isolation directory.
+    """
     root = _copy_release(tmp_path)
     path = root / "manifest.json"
     payload = json.loads(path.read_text(encoding="utf-8"))
