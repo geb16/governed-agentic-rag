@@ -1,4 +1,17 @@
-"""Render and verify deterministic, versioned Phase 5 artifacts."""
+"""Render and verify deterministic, versioned Phase 5 artifacts.
+
+Serializes cases, rubric, schemas, and sources to stable, sorted-key JSON
+(and compact JSONL) bytes, then binds them to a manifest. check_artifacts()
+re-renders in memory and compares bytes so a stale file fails closed
+instead of silently diverging from the generator.
+Core:
+    - render_artifacts(), build_manifest(): deterministic byte rendering.
+    - write_artifacts(): writes a fresh release to disk.
+    - check_artifacts(): rejects drift from deterministic regeneration.
+References:
+    [1] Rundgren et al., "JCS," RFC 8785, IETF, 2020. https://doi.org/10.17487/RFC8785
+    [2] NIST, "Secure Hash Standard," FIPS 180-4, 2015. https://doi.org/10.6028/NIST.FIPS.180-4
+"""
 
 from __future__ import annotations
 
