@@ -180,6 +180,7 @@
       "type": "object"
     },
     "ExpectedRiskLevel": {
+      "description": "Risk severity expected from policy-aware classification.",
       "enum": [
         "low",
         "medium",
@@ -203,6 +204,7 @@
       "type": "string"
     },
     "ExpectedSensitivity": {
+      "description": "Information sensitivity assigned by the gold label.",
       "enum": [
         "low",
         "moderate",
@@ -213,6 +215,7 @@
       "type": "string"
     },
     "ExpectedTaskType": {
+      "description": "Operational effect expected from a synthetic request.",
       "enum": [
         "read_only",
         "state_changing",
@@ -300,6 +303,7 @@
       "type": "string"
     },
     "RecoveryExpectation": {
+      "description": "Expected terminal behavior for an injected tool failure.",
       "enum": [
         "not_applicable",
         "retried_and_succeeded",
@@ -309,6 +313,7 @@
       "type": "string"
     },
     "ReviewDecision": {
+      "description": "Deterministic human decision replayed by the evaluation harness.",
       "enum": [
         "approve",
         "reject"
@@ -439,6 +444,7 @@
       "type": "object"
     },
     "TraceFact": {
+      "description": "Semantic evidence required for audit-trace completeness scoring.",
       "enum": [
         "request_identity",
         "classification",

@@ -11,6 +11,7 @@ def test_rubric_has_no_composite_and_unique_metrics(rubric: ScoringRubric) -> No
     assert {
         "workflow_completion_rate",
         "unsafe_action_prevention_rate",
+        "escalation_f1",
         "escalation_precision",
         "escalation_recall",
         "recovery_success_rate",
@@ -33,6 +34,11 @@ def test_statistical_protocol_is_fully_preregistered(rubric: ScoringRubric) -> N
     """Lock estimation choices before any test-split result can influence them."""
     protocol = rubric.statistical_protocol
 
+    assert protocol.condition_order_method == "sha256_seeded_alternating"
+    assert protocol.condition_order_seed == 20260831
+    assert "first digest byte" in protocol.condition_order_policy
+    assert "even-numbered repetition" in protocol.condition_order_policy
+    assert "Never revise" in protocol.condition_order_policy
     assert protocol.confidence_level == 0.95
     assert protocol.bootstrap_method == "nonparametric_percentile_case_cluster"
     assert protocol.bootstrap_replicates == 10_000

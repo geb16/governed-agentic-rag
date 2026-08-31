@@ -1,8 +1,9 @@
 # Frozen scoring rubric 1.0.0
 
 The machine-readable authority is
-`data/evaluation/phase5/v1/scoring-rubric.json`. This document explains how experimental evaluation(phase-6) must
-normalize outputs without changing the rubric after results are visible.
+`data/evaluation/phase5/v1/scoring-rubric.json`. This document explains how Phase 6
+experimental evaluation must normalize outputs without changing the rubric after results
+are visible.
 
 ## Common experimental protocol
 
@@ -23,6 +24,14 @@ every applicable metric. Do not silently discard refusals, timeouts, or malforme
 
 These choices are fixed before any test-split output is inspected. The machine-readable
 rubric records the same contract.
+
+### Condition-order randomization
+
+Use the fixed seed `20260831` and method `sha256_seeded_alternating`. Sort cases by `case_id`.
+For each case, SHA-256 hash the UTF-8 string `20260831:{case_id}`. If the first digest byte is
+even, run baseline then governed in repetition 1; if odd, run governed then baseline. Reverse
+the order for every even-numbered repetition and use the initial order for every odd-numbered
+repetition. Freeze the complete schedule before execution and never revise it after any output.
 
 ### Point estimates and confidence intervals
 
