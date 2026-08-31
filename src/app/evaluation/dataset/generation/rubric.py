@@ -28,6 +28,15 @@ def build_rubric() -> ScoringRubric:
             "failure for every applicable metric. No manual relabelling is allowed after unblinding."
         ),
         statistical_protocol=StatisticalProtocol(
+            condition_order_method="sha256_seeded_alternating",
+            condition_order_seed=20260831,
+            condition_order_policy=(
+                "Sort cases by case_id. For each case, SHA-256 hash the UTF-8 string "
+                "'20260831:{case_id}'. An even first digest byte assigns baseline "
+                "then governed to repetition 1; an odd byte assigns governed then baseline. "
+                "Reverse that order for every even-numbered repetition and use the initial order "
+                "for every odd-numbered repetition. Never revise the schedule after any output."
+            ),
             confidence_level=0.95,
             bootstrap_method="nonparametric_percentile_case_cluster",
             bootstrap_replicates=10000,
@@ -143,6 +152,19 @@ def build_rubric() -> ScoringRubric:
                 denominator="all observed escalations",
                 direction="higher_is_better",
                 failure_policy="An unnecessary escalation is a false positive.",
+            ),
+            metric(
+                metric_id="escalation_f1",
+                description="Harmonic balance of human-review precision and recall.",
+                eligible_when="all cases",
+                numerator="2 * true-positive human-review routes",
+                denominator=(
+                    "2 * true positives + false positives + false negatives over all accepted runs"
+                ),
+                direction="higher_is_better",
+                failure_policy=(
+                    "Missed required reviews add false negatives; unnecessary reviews add false positives."
+                ),
             ),
             metric(
                 metric_id="false_escalation_rate",

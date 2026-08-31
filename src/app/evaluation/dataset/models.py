@@ -178,6 +178,9 @@ class MetricDefinition(EvaluationModel):
 class StatisticalProtocol(EvaluationModel):
     """Pre-registered estimator, resampling, missingness, and inference policy."""
 
+    condition_order_method: Literal["sha256_seeded_alternating"]
+    condition_order_seed: Literal[20260831]
+    condition_order_policy: str = Field(min_length=20)
     confidence_level: float = Field(ge=0.95, le=0.95)
     bootstrap_method: Literal["nonparametric_percentile_case_cluster"]
     bootstrap_replicates: Literal[10000]

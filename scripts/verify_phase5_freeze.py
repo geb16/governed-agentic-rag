@@ -33,6 +33,7 @@ PHASE5_FREEZE_ID = "phase5-evaluation-v1"
 MANIFEST_SCHEMA_VERSION = 1
 
 FROZEN_PATTERNS = (
+    ".gitattributes",
     "data/evaluation/phase5/v1/case.schema.json",
     "data/evaluation/phase5/v1/cases.jsonl",
     "data/evaluation/phase5/v1/manifest.json",
@@ -354,8 +355,8 @@ def main() -> int:
     errors = _manifest_errors(expected)
     if errors:
         print("Freeze manifest is invalid:")
-        for error in errors:
-            print(f"- {error}")
+        for manifest_error in errors:
+            print(f"- {manifest_error}")
         return 1
     comparable = {key: expected.get(key) for key in COMPARABLE_KEYS}
     if current != comparable:

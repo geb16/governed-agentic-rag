@@ -79,6 +79,21 @@
           "title": "Bootstrap Seed",
           "type": "integer"
         },
+        "condition_order_method": {
+          "const": "sha256_seeded_alternating",
+          "title": "Condition Order Method",
+          "type": "string"
+        },
+        "condition_order_policy": {
+          "minLength": 20,
+          "title": "Condition Order Policy",
+          "type": "string"
+        },
+        "condition_order_seed": {
+          "const": 20260831,
+          "title": "Condition Order Seed",
+          "type": "integer"
+        },
         "confidence_level": {
           "maximum": 0.95,
           "minimum": 0.95,
@@ -112,6 +127,9 @@
         }
       },
       "required": [
+        "condition_order_method",
+        "condition_order_seed",
+        "condition_order_policy",
         "confidence_level",
         "bootstrap_method",
         "bootstrap_replicates",

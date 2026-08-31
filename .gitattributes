@@ -1,0 +1,10 @@
+# Phase 5 hashes exact bytes; keep its release surface stable across platforms.
+/.gitattributes text eol=lf
+/data/evaluation/phase5/v1/*.json text eol=lf
+/data/evaluation/phase5/v1/*.jsonl text eol=lf
+/docs/phase-5-evaluation/*.md text eol=lf
+/docs/phase-5-freeze-manifest.json text eol=lf
+/scripts/build_phase5_dataset.py text eol=lf
+/scripts/verify_phase5_freeze.py text eol=lf
+/src/app/evaluation/** text eol=lf
+/tests/evaluation/** text eol=lf
