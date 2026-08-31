@@ -1,4 +1,15 @@
-"""Strict identity contract for the versioned Phase 5 dataset release."""
+"""Strict identity contract for the versioned Phase 5 dataset release.
+
+Pins the dataset's identity constants and binds its manifest to the exact
+reviewed Phase 3 baseline and Phase 4 governance aggregate hashes, so a
+substituted parent release fails validation instead of silently drifting.
+Core:
+    - DatasetManifest: closed file-set and SHA-256 schema with ancestry checks.
+    - create_dataset_manifest(): builds the canonical manifest from file hashes.
+References:
+    [1] NIST, "Secure Hash Standard," FIPS 180-4, 2015. https://doi.org/10.6028/NIST.FIPS.180-4
+    [2] SLSA, "Build: Provenance," v1.0, 2023. https://slsa.dev/spec/v1.0/provenance
+"""
 
 from __future__ import annotations
 
