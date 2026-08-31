@@ -1,3 +1,9 @@
+"""Create or verify the cryptographic identity of the Phase 5 release.
+
+Normal execution is read-only and fails closed on release-scope, dataset, or inherited
+identity drift. The ``--write`` path is reserved for a deliberately reviewed release.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -66,12 +72,26 @@ class FreezeScopeError(RuntimeError):
 
 
 def _sha256(value: bytes) -> str:
-    """Return the lowercase SHA-256 digest of exact bytes."""
+    """Hash exact bytes with SHA-256.
+
+    Args:
+        value: Bytes to hash without normalization.
+
+    Returns:
+        Lowercase hexadecimal digest.
+    """
     return hashlib.sha256(value).hexdigest()
 
 
 def _frozen_files() -> list[Path]:
-    """Resolve a stable, nonempty, physical-file Phase 5 scope."""
+    """Resolve the declared Phase 5 release scope.
+
+    Returns:
+        Physical files ordered by project-relative POSIX path.
+
+    Raises:
+        FreezeScopeError: If a pattern is empty or includes a symbolic link.
+    """
     files: set[Path] = set()
     for pattern in FROZEN_PATTERNS:
         matches = {candidate for candidate in PROJECT_ROOT.glob(pattern) if candidate.is_file()}
@@ -86,7 +106,18 @@ def _frozen_files() -> list[Path]:
 
 
 def _read_manifest(path: Path, label: str) -> tuple[dict[str, Any], bytes]:
-    """Read one parent manifest as an object while preserving its exact bytes."""
+    """Read a parent manifest while preserving its exact bytes.
+
+    Args:
+        path: Manifest JSON path.
+        label: Release label used in diagnostics.
+
+    Returns:
+        Parsed object and the original file bytes.
+
+    Raises:
+        FreezeScopeError: If the manifest is unreadable, malformed, or not an object.
+    """
     try:
         content = path.read_bytes()
         payload: Any = json.loads(content)
@@ -98,7 +129,14 @@ def _read_manifest(path: Path, label: str) -> tuple[dict[str, Any], bytes]:
 
 
 def _parent_identity() -> dict[str, str]:
-    """Validate Phase 3/4 identities and their recorded ancestry."""
+    """Validate the Phase 3 and Phase 4 release ancestry.
+
+    Returns:
+        Parent freeze IDs, aggregate hashes, and manifest hashes.
+
+    Raises:
+        FreezeScopeError: If an identity, ancestry link, or digest is invalid.
+    """
     phase3, phase3_bytes = _read_manifest(PHASE3_MANIFEST_PATH, "Phase 3")
     phase4, phase4_bytes = _read_manifest(PHASE4_MANIFEST_PATH, "Phase 4")
     phase3_manifest_hash = _sha256(phase3_bytes)
@@ -138,14 +176,28 @@ def _parent_identity() -> dict[str, str]:
 
 
 def _canonical_aggregate(payload: Mapping[str, Any]) -> str:
-    """Derive the release aggregate from every stable comparable field."""
+    """Derive an aggregate from all stable comparable fields.
+
+    Args:
+        payload: Freeze identity and source-file hashes.
+
+    Returns:
+        SHA-256 digest of the canonical JSON representation.
+    """
     canonical = {key: payload[key] for key in COMPARABLE_KEYS if key != "aggregate_sha256"}
     encoded = json.dumps(canonical, separators=(",", ":"), sort_keys=True).encode()
     return _sha256(encoded)
 
 
 def build_freeze_payload() -> dict[str, Any]:
-    """Build the complete Phase 5 identity after validating dataset semantics."""
+    """Build the complete Phase 5 release identity.
+
+    Returns:
+        Comparable identities and per-file hashes with their aggregate.
+
+    Raises:
+        FreezeScopeError: If the dataset, scope, or inherited releases are invalid.
+    """
     try:
         verify_manifest(DATASET_ROOT)
         dataset_manifest = load_manifest(DATASET_MANIFEST_PATH)
@@ -171,7 +223,14 @@ def build_freeze_payload() -> dict[str, Any]:
 
 
 def _manifest_errors(payload: Mapping[str, Any]) -> list[str]:
-    """Return deterministic structural and internal-integrity errors."""
+    """Validate a stored freeze manifest without reading release files.
+
+    Args:
+        payload: Parsed stored manifest.
+
+    Returns:
+        Stable structural and internal-integrity diagnostics.
+    """
     errors: list[str] = []
     keys = set(payload)
     errors.extend(f"missing field: {key}" for key in sorted(STORED_KEYS - keys))
@@ -213,7 +272,11 @@ def _manifest_errors(payload: Mapping[str, Any]) -> list[str]:
 
 
 def _write_manifest(payload: Mapping[str, Any]) -> None:
-    """Atomically write a reviewed payload with a UTC timestamp."""
+    """Atomically persist a reviewed payload with a UTC timestamp.
+
+    Args:
+        payload: Valid comparable freeze payload.
+    """
     stored = {**payload, "frozen_at": datetime.now(UTC).isoformat()}
     MANIFEST_PATH.parent.mkdir(parents=True, exist_ok=True)
     temporary = MANIFEST_PATH.with_suffix(f"{MANIFEST_PATH.suffix}.tmp")
@@ -228,7 +291,15 @@ def _write_manifest(payload: Mapping[str, Any]) -> None:
 def describe_freeze_differences(
     expected: Mapping[str, Any], current: Mapping[str, Any]
 ) -> list[str]:
-    """Return stable diagnostics for identity and file drift."""
+    """Describe identity and file drift in stable order.
+
+    Args:
+        expected: Comparable fields from the stored manifest.
+        current: Comparable fields computed from the workspace.
+
+    Returns:
+        Human-readable added, removed, modified, and identity differences.
+    """
     differences = [
         f"{key} changed: {expected.get(key)!r} -> {current.get(key)!r}"
         for key in IDENTITY_KEYS
@@ -252,7 +323,11 @@ def describe_freeze_differences(
 
 
 def main() -> int:
-    """Write or verify the Phase 5 manifest selected by the CLI."""
+    """Run the selected write or read-only verification command.
+
+    Returns:
+        Process exit code: zero on success, otherwise one.
+    """
     parser = argparse.ArgumentParser(description="Write or verify the Phase 5 release manifest.")
     parser.add_argument("--write", action="store_true")
     arguments = parser.parse_args()
