@@ -1,4 +1,13 @@
-"""Assemble and validate the complete version 1.0.0 case sequence."""
+"""Assemble and validate the complete version 1.0.0 case sequence.
+
+Concatenates all six category modules in the fixed, stable identifier
+order the release depends on, then runs validate_dataset() before
+returning so a broken invariant fails at build time, not release time.
+Core:
+    - build_cases(): the single source of truth for the 100-case sequence.
+References:
+    [1] NIST, AI RMF 1.0 (NIST AI 100-1), 2023. https://doi.org/10.6028/NIST.AI.100-1
+"""
 
 from app.evaluation.dataset.generation import (
     ambiguous,
