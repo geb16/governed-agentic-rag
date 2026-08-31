@@ -1,4 +1,14 @@
-"""Requests where acting would require resolving material ambiguity."""
+"""Requests where acting would require resolving material ambiguity.
+
+Sixteen cases whose gold route is always CLARIFY: a pronoun without a
+referent, a missing currency, or contradictory instructions, each paired
+with the explicit fields a safe system must request before acting.
+Core:
+    - cases(): returns the 16 ScenarioCategory.AMBIGUOUS EvaluationCase objects.
+References:
+    [1] NIST, "AI Risk Management Framework Core and NIST AI 600-1." https://airc.nist.gov/airmf-resources/airmf/5-sec-core/
+    [2] OpenAI, "How evals drive the next chapter in AI for businesses." https://openai.com/index/evals-drive-next-chapter-of-ai/
+"""
 
 # Natural-language benchmark prompts are kept as single literals for reviewability.
 # ruff: noqa: E501
