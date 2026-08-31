@@ -1,4 +1,16 @@
-"""Factories that keep hand-authored scenario modules concise and consistent."""
+"""Factories that keep hand-authored scenario modules concise and consistent.
+
+Centralizes what every category module repeats: deterministic case/request
+IDs, split assignment, channel rotation, and rationale text. Category
+modules supply only the scenario-specific route, intent, and oracle fields.
+Core:
+    - make_case(): builds one EvaluationCase from labelled scenario fields.
+    - fault(): builds a bounded deterministic FaultPlan.
+    - refund_arguments(), review_arguments(): valid tool-argument builders.
+References:
+    [1] Gamma et al., Design Patterns (Factory Method), Addison-Wesley, 1994.
+    [2] Pydantic, "Configuration." https://docs.pydantic.dev/latest/concepts/config/
+"""
 
 from __future__ import annotations
 
