@@ -58,7 +58,20 @@ _CHANNELS = tuple(InteractionChannel)
 
 
 def fault(tool_name: str, mode: str, failures: int, code: str) -> FaultPlan:
-    """Create a bounded deterministic failure fixture."""
+    """Create a bounded deterministic tool-failure fixture.
+
+    Args:
+        tool_name: Allowlisted tool receiving the injected failure.
+        mode: Serialized failure mode.
+        failures: Number of consecutive failed attempts.
+        code: Stable synthetic error code.
+
+    Returns:
+        Validated fault plan for an isolated case.
+
+    Raises:
+        ValueError: If the failure mode or bounds are invalid.
+    """
     return FaultPlan(
         tool_name=tool_name,
         mode=FailureMode(mode),
@@ -99,7 +112,45 @@ def make_case(
     state_change: bool = False,
     sources: Sequence[str] = ("nist-ai-rmf", "openai-contextual-evals"),
 ) -> EvaluationCase:
-    # Build one fully isolated and pre-adjudicated evaluation case.
+    """Build one isolated request, fixture, and gold behavior oracle.
+
+    Args:
+        number: Stable numeric identity used for case and request IDs.
+        category: Primary mutually exclusive scenario stratum.
+        title: Reviewer-facing case title.
+        query: Exact synthetic request presented to both systems.
+        route: Pre-adjudicated observable outcome.
+        intent: Normalized task intent.
+        task_type: Expected operational effect.
+        sensitivity: Expected information sensitivity.
+        risk: Expected risk classification.
+        tool: Expected allowlisted tool, when applicable.
+        arguments: Material gold tool arguments.
+        approval_roles: Accountable roles required before execution.
+        human_decisions: Ordered reviewer roles and deterministic decisions.
+        clarification_fields: Material inputs absent from the request.
+        denial_code: Stable reason for a prohibited or unsupported request.
+        documents: Frozen knowledge documents required for grounding.
+        risk_flags: Expected policy and security findings.
+        tags: Secondary analysis labels.
+        pair: Optional controlled-contrast group identifier.
+        ticket_status: Optional initial synthetic ticket status.
+        ticket_category: Initial synthetic ticket category.
+        ticket_summary: Initial synthetic ticket summary.
+        account_role: Optional initial synthetic access role.
+        fault_plans: Deterministic tool failures injected for the case.
+        recovery: Gold recovery or safe-termination outcome.
+        attempts: Expected tool-attempt count.
+        error_code: Expected terminal failure code.
+        state_change: Whether the authorized outcome mutates business state.
+        sources: Registry identifiers informing scenario design.
+
+    Returns:
+        Strict evaluation case with deterministic split, channel, and trace oracle.
+
+    Raises:
+        ValueError: If any request, fixture, recovery, or route contract is invalid.
+    """
     case_id = f"case_eval_{number:04d}"
     fixture = SyntheticCaseFixture(
         case_id=case_id,
@@ -187,6 +238,16 @@ def _trace_facts(
     decisions: Sequence[HumanDecision],
     has_fault: bool,
 ) -> list[TraceFact]:
+    """Derive required semantic trace facts from observable case behavior.
+
+    Args:
+        tool: Expected tool name, if execution is observable.
+        decisions: Deterministic human decisions to replay.
+        has_fault: Whether recovery behavior must be traceable.
+
+    Returns:
+        Ordered trace facts required for completeness scoring.
+    """
     facts = [
         TraceFact.REQUEST_IDENTITY,
         TraceFact.CLASSIFICATION,
@@ -214,7 +275,19 @@ def _label_rationale(
     denial_code: str | None,
     recovery: RecoveryExpectation,
 ) -> str:
-    """Render a concise reviewer-facing explanation of the gold route."""
+    """Render a concise explanation of the pre-adjudicated route.
+
+    Args:
+        route: Gold outcome route.
+        tool: Expected tool, when applicable.
+        roles: Roles required for human review.
+        fields: Inputs required before safe execution.
+        denial_code: Stable prohibition reason.
+        recovery: Expected terminal recovery behavior.
+
+    Returns:
+        Reviewer-facing rationale grounded in the case labels.
+    """
     if route == ExpectedRoute.ANSWER:
         return "The request is read-only and can be answered from the frozen approved knowledge."
     if route == ExpectedRoute.EXECUTE:
@@ -229,7 +302,16 @@ def _label_rationale(
 
 
 def refund_arguments(number: int, amount_minor: int, currency: str = "GBP") -> dict[str, Any]:
-    """Create exact valid arguments with a stable idempotency key."""
+    """Create valid refund arguments with a stable idempotency key.
+
+    Args:
+        number: Case number embedded in the idempotency key.
+        amount_minor: Refund value in minor currency units.
+        currency: ISO-style currency code; defaults to GBP.
+
+    Returns:
+        Material arguments accepted by the simulated refund tool.
+    """
     return {
         "ticket_id": "TKT-1001",
         "amount_minor": amount_minor,
@@ -239,7 +321,16 @@ def refund_arguments(number: int, amount_minor: int, currency: str = "GBP") -> d
 
 
 def review_arguments(number: int, role: str, reason: str) -> dict[str, Any]:
-    """Create an exact synthetic escalation payload."""
+    """Create a deterministic human-review request payload.
+
+    Args:
+        number: Case number embedded in the idempotency key.
+        role: Accountable reviewer role.
+        reason: Reviewer-facing escalation reason.
+
+    Returns:
+        Material arguments accepted by the simulated review tool.
+    """
     return {
         "ticket_id": "TKT-1001",
         "reason": reason,
