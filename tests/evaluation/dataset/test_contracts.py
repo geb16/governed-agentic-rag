@@ -1,4 +1,4 @@
-# Validating release identity, distributions, and oracle coherence.
+"""Validate release identity, distributions, coverage, and oracle coherence."""
 
 from collections import Counter
 
@@ -18,6 +18,11 @@ from app.evaluation.dataset.enums import (
 
 
 def test_release_has_frozen_count_and_distribution(cases: list[EvaluationCase]) -> None:
+    """Preserve the registered split and primary-stratum distribution.
+
+    Args:
+        cases: Strict checked-in evaluation cases.
+    """
     validate_dataset(cases)
     assert Counter(case.split for case in cases) == {
         DatasetSplit.VALIDATION: 20,
@@ -36,6 +41,11 @@ def test_release_has_frozen_count_and_distribution(cases: list[EvaluationCase]) 
 def test_all_routes_risks_tools_and_failure_modes_are_covered(
     cases: list[EvaluationCase],
 ) -> None:
+    """Require full release coverage of governed behavior dimensions.
+
+    Args:
+        cases: Strict checked-in evaluation cases.
+    """
     routes = {case.expected.route for case in cases}
     assert routes == set(ExpectedRoute)
     assert {case.expected.risk_level.value for case in cases} == {
@@ -63,6 +73,11 @@ def test_all_routes_risks_tools_and_failure_modes_are_covered(
 def test_validation_split_covers_every_harness_dimension(
     cases: list[EvaluationCase],
 ) -> None:
+    """Keep validation cases sufficient for harness calibration.
+
+    Args:
+        cases: Strict checked-in evaluation cases.
+    """
     validation_cases = [case for case in cases if case.split == DatasetSplit.VALIDATION]
 
     assert Counter(case.channel for case in validation_cases) == dict.fromkeys(
@@ -105,6 +120,11 @@ def test_validation_split_covers_every_harness_dimension(
 def test_dataset_validation_rejects_singleton_minimal_pair(
     cases: list[EvaluationCase],
 ) -> None:
+    """Reject a contrast group that no longer contains a valid pair.
+
+    Args:
+        cases: Strict checked-in evaluation cases used to create the mutation.
+    """
     changed_cases = [
         case.model_copy(update={"minimal_pair_id": None})
         if case.case_id == "case_eval_0042"
@@ -117,6 +137,11 @@ def test_dataset_validation_rejects_singleton_minimal_pair(
 
 
 def test_failure_oracles_match_fault_plans(cases: list[EvaluationCase]) -> None:
+    """Keep retry and safe-termination labels consistent with fault plans.
+
+    Args:
+        cases: Strict checked-in evaluation cases.
+    """
     failures = [case for case in cases if case.category == ScenarioCategory.TOOL_FAILURE]
     for case in failures:
         plan = case.fixture.fault_plans[0]
@@ -131,6 +156,11 @@ def test_failure_oracles_match_fault_plans(cases: list[EvaluationCase]) -> None:
 
 
 def test_rejected_reviews_never_expect_state_change(cases: list[EvaluationCase]) -> None:
+    """Ensure a rejected review never authorizes business-state mutation.
+
+    Args:
+        cases: Strict checked-in evaluation cases.
+    """
     for case in cases:
         rejected = any(
             decision.decision.value == "reject" for decision in case.expected.human_decisions
