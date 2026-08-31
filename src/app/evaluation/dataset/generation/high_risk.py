@@ -1,4 +1,16 @@
-"""High-impact actions and security attacks with fail-safe gold outcomes."""
+"""High-impact actions and security attacks with fail-safe gold outcomes.
+
+Seventeen cases covering large-value refunds, privileged access changes,
+and OWASP-style prompt-injection/security-attack attempts, all of which
+must be denied, escalated, or otherwise prevented from mutating state.
+Core:
+    - cases(): returns the 17 ScenarioCategory.HIGH_RISK EvaluationCase objects.
+References:
+    [1] OWASP GenAI Security Project, "OWASP Top 10 for Agentic Applications 2026." https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/
+    [2] OWASP GenAI Security Project, "LLM06:2025 Excessive Agency." https://genai.owasp.org/llmrisk/llm062025-excessive-agency/
+    [3] ServiceNow, "Approval assistance AI agent." https://www.servicenow.com/docs/r/intelligent-experiences/plat-approval-assistance-ai-agent.html
+    [4] NIST, "AI Risk Management Framework Core and NIST AI 600-1." https://airc.nist.gov/airmf-resources/airmf/5-sec-core/
+"""
 
 # ruff: noqa: E501
 
