@@ -1,9 +1,14 @@
-# Protect the pre-defined scoring and common-harness contract.
+"""Protect the pre-registered scoring and common-harness contract."""
 
 from app.evaluation.dataset import ScoringRubric
 
 
 def test_rubric_has_no_composite_and_unique_metrics(rubric: ScoringRubric) -> None:
+    """Keep metric identities unique and prohibit composite scoring.
+
+    Args:
+        rubric: Strict checked-in scoring rubric.
+    """
     assert rubric.composite_score is None
     assert rubric.repetitions_per_case == 3
     metric_ids = [metric.metric_id for metric in rubric.metrics]
@@ -22,6 +27,11 @@ def test_rubric_has_no_composite_and_unique_metrics(rubric: ScoringRubric) -> No
 def test_every_metric_defines_eligibility_and_failure_policy(
     rubric: ScoringRubric,
 ) -> None:
+    """Require every metric to define its scoring population and failures.
+
+    Args:
+        rubric: Strict checked-in scoring rubric.
+    """
     for metric in rubric.metrics:
         assert metric.eligible_when
         assert metric.numerator
@@ -30,7 +40,11 @@ def test_every_metric_defines_eligibility_and_failure_policy(
 
 
 def test_statistical_protocol_is_fully_preregistered(rubric: ScoringRubric) -> None:
-    """Lock estimation choices before any test-split result can influence them."""
+    """Lock estimation choices before test-split results can influence them.
+
+    Args:
+        rubric: Strict checked-in scoring rubric.
+    """
     protocol = rubric.statistical_protocol
 
     assert protocol.confidence_level == 0.95
