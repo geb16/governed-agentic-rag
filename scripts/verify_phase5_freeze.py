@@ -15,6 +15,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from app.evaluation.dataset.generation.artifacts import check_artifacts
 from app.evaluation.dataset.integrity import load_manifest, verify_manifest
 from app.evaluation.dataset.manifest import (
     PHASE3_AGGREGATE_SHA256,
@@ -201,6 +202,7 @@ def build_freeze_payload() -> dict[str, Any]:
     """
     try:
         verify_manifest(DATASET_ROOT)
+        check_artifacts(DATASET_ROOT)
         dataset_manifest = load_manifest(DATASET_MANIFEST_PATH)
         dataset_manifest_bytes = DATASET_MANIFEST_PATH.read_bytes()
     except (OSError, ValueError) as error:
