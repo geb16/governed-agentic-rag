@@ -1,4 +1,15 @@
-"""Load versioned evaluation artifacts through strict domain contracts."""
+"""Load versioned evaluation artifacts through strict domain contracts.
+
+Parses the checked-in JSON Lines case file and rubric JSON, rejecting any
+line or document that violates the Pydantic contracts in models.py.
+Errors are re-raised with the offending line number for fast triage.
+Core:
+    - load_cases(): strict, order-preserving JSONL case loader.
+    - load_rubric(): strict scoring-rubric JSON loader.
+References:
+    [1] JSON Lines, "JSON Lines Documentation." https://jsonlines.org/
+    [2] Pydantic, "Strict Mode." https://docs.pydantic.dev/latest/concepts/strict_mode/
+"""
 
 from __future__ import annotations
 
