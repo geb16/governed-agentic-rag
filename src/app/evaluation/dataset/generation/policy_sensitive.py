@@ -1,4 +1,16 @@
-"""Boundary and exception cases grounded only in the frozen synthetic policies."""
+"""Boundary and exception cases grounded only in the frozen synthetic policies.
+
+Seventeen cases probing policy thresholds and controlled minimal pairs
+(e.g. a refund at vs. just below the approval limit) so reported metrics
+can attribute failures to a specific, documented policy boundary.
+Core:
+    - cases(): returns the 17 ScenarioCategory.POLICY_SENSITIVE EvaluationCase objects.
+References:
+    [1] OpenAI, "Improving support with every interaction at OpenAI." https://openai.com/index/openai-support-model/
+    [2] OWASP GenAI Security Project, "LLM06:2025 Excessive Agency." https://genai.owasp.org/llmrisk/llm062025-excessive-agency/
+    [3] ServiceNow, "Approval assistance AI agent." https://www.servicenow.com/docs/r/intelligent-experiences/plat-approval-assistance-ai-agent.html
+    [4] NIST, "AI Risk Management Framework Core and NIST AI 600-1." https://airc.nist.gov/airmf-resources/airmf/5-sec-core/
+"""
 
 # Natural-language benchmark prompts are kept as single literals for reviewability.
 # ruff: noqa: E501
