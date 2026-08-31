@@ -1,0 +1,170 @@
+"""Validate release identity, distributions, coverage, and oracle coherence."""
+
+from collections import Counter
+
+import pytest
+
+from app.domain.support import FailureMode
+from app.evaluation.dataset import EvaluationCase, validate_dataset
+from app.evaluation.dataset.enums import (
+    DatasetSplit,
+    ExpectedRiskLevel,
+    ExpectedRoute,
+    InteractionChannel,
+    RecoveryExpectation,
+    ReviewDecision,
+    ScenarioCategory,
+)
+
+
+def test_release_has_frozen_count_and_distribution(cases: list[EvaluationCase]) -> None:
+    """Preserve the registered split and primary-stratum distribution.
+
+    Args:
+        cases: Strict checked-in evaluation cases.
+    """
+    validate_dataset(cases)
+    assert Counter(case.split for case in cases) == {
+        DatasetSplit.VALIDATION: 20,
+        DatasetSplit.TEST: 80,
+    }
+    assert Counter(case.category for case in cases) == {
+        ScenarioCategory.NORMAL: 17,
+        ScenarioCategory.AMBIGUOUS: 16,
+        ScenarioCategory.POLICY_SENSITIVE: 17,
+        ScenarioCategory.HIGH_RISK: 17,
+        ScenarioCategory.MISSING_INFORMATION: 16,
+        ScenarioCategory.TOOL_FAILURE: 17,
+    }
+
+
+def test_all_routes_risks_tools_and_failure_modes_are_covered(
+    cases: list[EvaluationCase],
+) -> None:
+    """Require full release coverage of governed behavior dimensions.
+
+    Args:
+        cases: Strict checked-in evaluation cases.
+    """
+    routes = {case.expected.route for case in cases}
+    assert routes == set(ExpectedRoute)
+    assert {case.expected.risk_level.value for case in cases} == {
+        "low",
+        "medium",
+        "high",
+        "critical",
+    }
+    assert {case.expected.expected_tool for case in cases if case.expected.expected_tool} == {
+        "ticket_lookup",
+        "policy_lookup",
+        "response_drafter",
+        "update_ticket_status",
+        "issue_refund",
+        "change_access_role",
+        "request_human_review",
+    }
+    assert {plan.mode.value for case in cases for plan in case.fixture.fault_plans} == {
+        "transient_error",
+        "timeout",
+        "permanent_error",
+    }
+
+
+def test_validation_split_covers_every_harness_dimension(
+    cases: list[EvaluationCase],
+) -> None:
+    """Keep validation cases sufficient for harness calibration.
+
+    Args:
+        cases: Strict checked-in evaluation cases.
+    """
+    validation_cases = [case for case in cases if case.split == DatasetSplit.VALIDATION]
+
+    assert Counter(case.channel for case in validation_cases) == dict.fromkeys(
+        InteractionChannel, 5
+    )
+    assert {case.expected.route for case in validation_cases} == set(ExpectedRoute)
+    assert {
+        case.expected.expected_tool
+        for case in validation_cases
+        if case.expected.expected_tool is not None
+    } == {
+        "ticket_lookup",
+        "policy_lookup",
+        "response_drafter",
+        "update_ticket_status",
+        "issue_refund",
+        "change_access_role",
+        "request_human_review",
+    }
+    assert {plan.mode for case in validation_cases for plan in case.fixture.fault_plans} == set(
+        FailureMode
+    )
+    assert {case.expected.intent for case in validation_cases} == {
+        "information",
+        "ticket_lookup",
+        "ticket_update",
+        "refund",
+        "human_escalation",
+        "access_change",
+        "data_deletion",
+        "other",
+        "security_attack",
+    }
+    assert {case.expected.risk_level for case in validation_cases} == set(ExpectedRiskLevel)
+    assert {
+        decision.decision for case in validation_cases for decision in case.expected.human_decisions
+    } == set(ReviewDecision)
+
+
+def test_dataset_validation_rejects_singleton_minimal_pair(
+    cases: list[EvaluationCase],
+) -> None:
+    """Reject a contrast group that no longer contains a valid pair.
+
+    Args:
+        cases: Strict checked-in evaluation cases used to create the mutation.
+    """
+    changed_cases = [
+        case.model_copy(update={"minimal_pair_id": None})
+        if case.case_id == "case_eval_0042"
+        else case
+        for case in cases
+    ]
+
+    with pytest.raises(ValueError, match="Minimal-pair groups require at least two cases"):
+        validate_dataset(changed_cases)
+
+
+def test_failure_oracles_match_fault_plans(cases: list[EvaluationCase]) -> None:
+    """Keep retry and safe-termination labels consistent with fault plans.
+
+    Args:
+        cases: Strict checked-in evaluation cases.
+    """
+    failures = [case for case in cases if case.category == ScenarioCategory.TOOL_FAILURE]
+    for case in failures:
+        plan = case.fixture.fault_plans[0]
+        assert plan.tool_name == case.expected.expected_tool
+        if case.expected.recovery.expectation == RecoveryExpectation.RETRIED_AND_SUCCEEDED:
+            assert plan.mode.value in {"transient_error", "timeout"}
+            assert case.expected.recovery.expected_attempts == plan.failures + 1
+        else:
+            expected_attempts = 1 if plan.mode.value == "permanent_error" else 3
+            assert case.expected.recovery.expected_attempts == expected_attempts
+            assert case.expected.state_change_expected is False
+
+
+def test_rejected_reviews_never_expect_state_change(cases: list[EvaluationCase]) -> None:
+    """Ensure a rejected review never authorizes business-state mutation.
+
+    Args:
+        cases: Strict checked-in evaluation cases.
+    """
+    for case in cases:
+        rejected = any(
+            decision.decision.value == "reject" for decision in case.expected.human_decisions
+        )
+        if rejected:
+            assert case.expected.route == ExpectedRoute.HUMAN_REVIEW
+            assert case.expected.state_change_expected is False

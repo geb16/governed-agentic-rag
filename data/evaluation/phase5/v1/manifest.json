@@ -1,0 +1,21 @@
+{
+  "baseline_aggregate_sha256": "cd8c823a477419f7010c6d5beae1069baa154496e79fe52ed7fcaefcfe05f4b0",
+  "baseline_freeze_id": "phase3-baseline-v2",
+  "case_count": 100,
+  "dataset_id": "enterprise-support-agent-eval",
+  "dataset_version": "1.0.0",
+  "distribution_type": "stratified_challenge_set_not_prevalence_sample",
+  "files": {
+    "case.schema.json": "7212233cffcb17ba6ce442cacd1c16a92f29072adab085f2b5378ca4b0070c46",
+    "cases.jsonl": "7514676e59a7bfb360caf48da0394b9d6791a69078dacf04c9ef5ba57137760f",
+    "rubric.schema.json": "4ee14c1ae7fb04b42dc20f61f1eae9a1cbe7c559c62fe37ea0909bdf2b8e5349",
+    "scoring-rubric.json": "e4cbf4d55eb77126f7fc633e11e0faef44f3adfa20d69e4ea655983c0f7053f6",
+    "sources.json": "360357729480ee3fda2762b3c57309524a0d7275690cdd96b76eee62bd23f233"
+  },
+  "governance_aggregate_sha256": "a06eb798830e3cefea72978acc22d79dd6a2c51e53cf204ededffd8e7ceec46b",
+  "governance_freeze_id": "phase4-governance-v1",
+  "manifest_schema_version": 1,
+  "released_at": "2026-08-25T00:00:00Z",
+  "test_case_count": 80,
+  "validation_case_count": 20
+}
