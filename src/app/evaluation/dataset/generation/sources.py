@@ -1,4 +1,4 @@
-# Trusted source registry used to justify scenario and evaluation design.
+"""Build the reviewed source registry supporting evaluation-design realism."""
 
 # URLs and source-use statements are kept intact in the generated registry.
 # ruff: noqa: E501
@@ -7,7 +7,11 @@ from typing import Any
 
 
 def build_sources() -> dict[str, Any]:
-    """Return sources; these inform realism but never override local gold policy."""
+    """Build the reviewed evaluation-design source registry.
+
+    Returns:
+        Registry whose sources inform realism but never override local gold policy.
+    """
     return {
         "schema_version": 1,
         "reviewed_on": "2026-08-26",
