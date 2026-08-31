@@ -13,7 +13,15 @@ from scripts import verify_phase5_freeze as verifier
 
 
 def _configure_isolated_scope(monkeypatch: pytest.MonkeyPatch, root: Path) -> Path:
-    """Create a minimal valid verifier scope with both parent identities."""
+    """Configure a minimal valid scope with both parent identities.
+
+    Args:
+        monkeypatch: Fixture used to isolate verifier dependencies.
+        root: Temporary project root.
+
+    Returns:
+        Source file included in the isolated freeze scope.
+    """
     source = root / "evaluation.py"
     source.write_text("RELEASE = 1\n", encoding="utf-8")
     phase3 = root / "phase3.json"
@@ -63,7 +71,7 @@ def _configure_isolated_scope(monkeypatch: pytest.MonkeyPatch, root: Path) -> Pa
 
 
 def test_freeze_scope_covers_complete_phase5_release() -> None:
-    """Freeze code, generator, tests, docs, data, and inherited identities together."""
+    """Freeze code, generation, tests, docs, data, and parent identities together."""
     payload = verifier.build_freeze_payload()
     source_files = payload["source_files"]
 
@@ -93,7 +101,12 @@ def test_freeze_scope_covers_complete_phase5_release() -> None:
 def test_freeze_scope_rejects_empty_patterns(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    """Fail closed when a renamed path silently leaves the declared release scope."""
+    """Fail closed when a renamed path leaves the release scope.
+
+    Args:
+        monkeypatch: Fixture used to replace verifier paths and patterns.
+        tmp_path: Pytest-managed isolation directory.
+    """
     monkeypatch.setattr(verifier, "PROJECT_ROOT", tmp_path)
     monkeypatch.setattr(verifier, "FROZEN_PATTERNS", ("missing/*.py",))
 
@@ -104,7 +117,12 @@ def test_freeze_scope_rejects_empty_patterns(
 def test_freeze_scope_rejects_broken_phase4_ancestry(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    """Prevent Phase 5 from accepting a Phase 4 manifest pinned to another control."""
+    """Reject a Phase 4 manifest pinned to another control.
+
+    Args:
+        monkeypatch: Fixture used to isolate verifier dependencies.
+        tmp_path: Pytest-managed isolation directory.
+    """
     _configure_isolated_scope(monkeypatch, tmp_path)
     phase4 = json.loads(verifier.PHASE4_MANIFEST_PATH.read_text(encoding="utf-8"))
     phase4["baseline_manifest_sha256"] = "0" * 64
@@ -117,7 +135,12 @@ def test_freeze_scope_rejects_broken_phase4_ancestry(
 def test_stored_manifest_rejects_schema_source_and_aggregate_drift(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    """Validate closed fields, digest formats, and the canonical aggregate."""
+    """Reject stored schema, source-digest, and aggregate drift.
+
+    Args:
+        monkeypatch: Fixture used to isolate verifier dependencies.
+        tmp_path: Pytest-managed isolation directory.
+    """
     _configure_isolated_scope(monkeypatch, tmp_path)
     payload = {
         **verifier.build_freeze_payload(),
@@ -139,7 +162,13 @@ def test_cli_writes_verifies_and_reports_file_drift(
     tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """Exercise the deliberate write path and normal read-only verification path."""
+    """Verify deliberate writes, read-only checks, and drift diagnostics.
+
+    Args:
+        monkeypatch: Fixture used to isolate CLI arguments and verifier dependencies.
+        tmp_path: Pytest-managed isolation directory.
+        capsys: Fixture capturing CLI diagnostics.
+    """
     source = _configure_isolated_scope(monkeypatch, tmp_path)
     monkeypatch.setattr(sys, "argv", ["verify_phase5_freeze.py", "--write"])
     assert verifier.main() == 0
