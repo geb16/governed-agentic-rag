@@ -32,6 +32,7 @@ class AuditEventType(StrEnum):
     DECISION_RECORDED = "decision_recorded"
     APPROVAL_REQUESTED = "approval_requested"
     APPROVAL_RECORDED = "approval_recorded"
+    APPROVAL_EXPIRED = "approval_expired"
     WORKFLOW_PAUSED = "workflow_paused"
     WORKFLOW_RESUMED = "workflow_resumed"
     TOOL_ATTEMPTED = "tool_attempted"

@@ -72,3 +72,15 @@ class SqliteGovernanceRepository:
             expected_version=expected_version,
             comment=comment,
         )
+
+    def expire_pending_approvals(
+        self,
+        *,
+        workflow_id: str,
+        expected_version: int,
+    ) -> WorkflowState:
+        """Deny a workflow and expire its still-pending role approvals."""
+        return self._approvals.expire_pending_approvals(
+            workflow_id=workflow_id,
+            expected_version=expected_version,
+        )
