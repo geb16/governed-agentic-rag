@@ -15,6 +15,7 @@ from app.governance.contracts import (
     GovernedResponse,
     WorkflowConflictError,
     WorkflowStage,
+    WorkflowState,
     WorkflowStatus,
     WorkflowSummary,
 )
@@ -188,18 +189,53 @@ class GovernedWorkflow:
     def get_response(self, workflow_id: str) -> GovernedResponse:
         """Return the complete response for an existing workflow.
 
+        A read that finds the approval window elapsed with no full decision denies
+        and finalizes the workflow before projecting its response.
+
         Raises:
             UnknownWorkflowError: If the workflow does not exist.
         """
-        return self._states.response(self._states.require(workflow_id))
+        return self._states.response(self._read_and_sweep(workflow_id))
 
     def get_summary(self, workflow_id: str) -> WorkflowSummary:
         """Return the compact summary for an existing workflow.
 
+        A read that finds the approval window elapsed with no full decision denies
+        and finalizes the workflow before projecting its summary.
+
         Raises:
             UnknownWorkflowError: If the workflow does not exist.
         """
-        return self._states.summary(self._states.require(workflow_id))
+        return self._states.summary(self._read_and_sweep(workflow_id))
+
+    def _read_and_sweep(self, workflow_id: str) -> WorkflowState:
+        """Load a workflow, denying it first if its approval window has elapsed.
+
+        Also finalizes a workflow left denied but unfinalized by a decision
+        attempt that observed the same elapsed window and deterministically
+        rejected instead of finalizing (finalization belongs to this use case,
+        not the approval service), so a read always returns a fully terminal
+        projection regardless of which caller first noticed the expiry.
+
+        Raises:
+            UnknownWorkflowError: If the workflow does not exist.
+        """
+        state = self._states.require(workflow_id)
+        swept = self._approvals.sweep_expired(state)
+        unfinalized_denial = (
+            swept.status == WorkflowStatus.DENIED
+            and swept.current_stage != WorkflowStage.FINAL_RESPONSE_AUDIT
+        )
+        if unfinalized_denial:
+            try:
+                swept = self._finalization.run(swept)
+            except Exception as exc:
+                swept = self._finalization.fail_closed(
+                    swept,
+                    exc,
+                    stage=WorkflowStage.FINAL_RESPONSE_AUDIT,
+                )
+        return swept
 
     def audit_trace(self, workflow_id: str) -> AuditTrace:
         """Return the verified keyed audit chain for an existing workflow.
