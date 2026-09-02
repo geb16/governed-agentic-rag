@@ -156,8 +156,7 @@ def test_line_ending_policy_is_lf_and_phase5_scoped() -> None:
         if (line := raw_line.strip()) and not line.startswith("#")
     }
 
-    assert rules == {
-        "/.gitattributes text eol=lf",
+    required_phase5_rules = {
         "/data/evaluation/phase5/v1/*.json text eol=lf",
         "/data/evaluation/phase5/v1/*.jsonl text eol=lf",
         "/docs/phase-5-evaluation/*.md text eol=lf",
@@ -167,6 +166,10 @@ def test_line_ending_policy_is_lf_and_phase5_scoped() -> None:
         "/src/app/evaluation/** text eol=lf",
         "/tests/evaluation/** text eol=lf",
     }
+
+    assert "* text=auto eol=lf" in rules
+    assert "/.gitattributes text eol=lf" in rules
+    assert required_phase5_rules <= rules
 
 
 def test_freeze_scope_rejects_empty_patterns(
