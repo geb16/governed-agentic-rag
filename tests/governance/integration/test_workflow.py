@@ -472,6 +472,79 @@ def test_decision_after_expiry_is_rejected_deterministically(
     assert len(expiry_events) == 1
 
 
+def test_workflow_reaches_finalized_terminal_state_after_expiry(
+    settings,
+    retriever: KnowledgeRetriever,
+    repository: SqliteSyntheticRepository,
+) -> None:
+    """A swept workflow is fully finalized, not merely marked denied."""
+
+    workflow = build_governed_workflow(
+        settings=settings,
+        retriever=retriever,
+        repository=repository,
+        model=_refund_model(75_000),
+    )
+    pending = workflow.invoke(
+        GovernedRequest(
+            requester_id="support-user",
+            query="Issue a GBP 750 refund on ticket TKT-1003 with all details",
+        )
+    )
+    _expire_approval_route(
+        settings,
+        pending.workflow_id,
+        when=datetime.now(UTC) - timedelta(seconds=1),
+    )
+
+    response = workflow.get_response(pending.workflow_id)
+
+    assert response.status == WorkflowStatus.DENIED
+    assert response.current_stage == WorkflowStage.FINAL_RESPONSE_AUDIT
+    assert response.answer is not None
+    assert response.tool_calls == []
+    trace = workflow.audit_trace(pending.workflow_id)
+    assert trace.chain_valid is True
+    assert any(event.event_type == AuditEventType.WORKFLOW_COMPLETED for event in trace.events)
+
+
+def test_expired_denial_persists_and_reloads_from_a_fresh_repository(
+    settings,
+    retriever: KnowledgeRetriever,
+    repository: SqliteSyntheticRepository,
+) -> None:
+    """A swept, finalized denial survives reconstruction from the durable store."""
+
+    workflow = build_governed_workflow(
+        settings=settings,
+        retriever=retriever,
+        repository=repository,
+        model=_refund_model(75_000),
+    )
+    pending = workflow.invoke(
+        GovernedRequest(
+            requester_id="support-user",
+            query="Issue a GBP 750 refund on ticket TKT-1003 with all details",
+        )
+    )
+    _expire_approval_route(
+        settings,
+        pending.workflow_id,
+        when=datetime.now(UTC) - timedelta(seconds=1),
+    )
+    workflow.get_response(pending.workflow_id)
+
+    reloaded_repository = SqliteGovernanceRepository(settings.synthetic_database_path)
+    reloaded = reloaded_repository.get(pending.workflow_id)
+
+    assert reloaded is not None
+    assert reloaded.status == WorkflowStatus.DENIED
+    assert reloaded.error_code == "approval_expired"
+    assert reloaded.current_stage == WorkflowStage.FINAL_RESPONSE_AUDIT
+    assert reloaded.final is not None
+    assert [item.status for item in reloaded.approvals] == [ApprovalStatus.EXPIRED]
+
+
 def test_rejected_approval_denies_without_executing_the_tool(
     settings,
     retriever: KnowledgeRetriever,
