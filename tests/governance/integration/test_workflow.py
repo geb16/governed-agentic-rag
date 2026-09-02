@@ -421,6 +421,55 @@ def test_repeated_reads_after_expiry_emit_one_audit_event(
     assert len(expiry_events) == 1
 
 
+def test_decision_after_expiry_is_rejected_deterministically(
+    settings,
+    retriever: KnowledgeRetriever,
+    repository: SqliteSyntheticRepository,
+) -> None:
+    """A decision attempt against an elapsed route is rejected, not silently applied."""
+
+    workflow = build_governed_workflow(
+        settings=settings,
+        retriever=retriever,
+        repository=repository,
+        model=_refund_model(75_000),
+    )
+    pending = workflow.invoke(
+        GovernedRequest(
+            requester_id="support-user",
+            query="Issue a GBP 750 refund on ticket TKT-1003 with all details",
+        )
+    )
+    assert pending.approval_route is not None
+    _expire_approval_route(
+        settings,
+        pending.workflow_id,
+        when=datetime.now(UTC) - timedelta(seconds=1),
+    )
+
+    with pytest.raises(WorkflowConflictError):
+        workflow.approve(
+            pending.workflow_id,
+            ApprovalCommand(
+                role="finance_manager",
+                approved=True,
+                proposal_digest=pending.approval_route.proposal_digest,
+                expected_state_version=pending.state_version,
+                comment="Late approval attempt after the window elapsed.",
+            ),
+            TEST_APPROVAL_PRINCIPAL,
+        )
+
+    # The decision attempt already swept the workflow; a later read must not
+    # finalize it twice or emit a second expiry event.
+    denied = workflow.get_response(pending.workflow_id)
+    assert denied.status == WorkflowStatus.DENIED
+    assert denied.error_code == "approval_expired"
+    events = workflow.audit_trace(pending.workflow_id).events
+    expiry_events = [
+        event for event in events if event.event_type == AuditEventType.APPROVAL_EXPIRED
+    ]
+    assert len(expiry_events) == 1
 
 
 def test_rejected_approval_denies_without_executing_the_tool(
