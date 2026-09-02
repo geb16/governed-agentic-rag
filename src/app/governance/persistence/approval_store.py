@@ -187,6 +187,78 @@ class ApprovalStore:
                 raise WorkflowConflictError(f"Stale workflow state for {workflow_id}")
         return updated
 
+    def expire_pending_approvals(
+        self,
+        *,
+        workflow_id: str,
+        expected_version: int,
+    ) -> WorkflowState:
+        """Expire every still-pending role approval without transitioning status.
+
+        Mirrors :meth:`decide`: only approval rows and the aggregate's ``approvals``
+        and version change here. The caller applies the resulting terminal status
+        transition through the same compare-and-swap ``update`` operation used
+        everywhere else a workflow becomes ``denied``, keeping one validated path
+        for status transitions.
+
+        Args:
+            workflow_id: Pending workflow whose approval window has elapsed.
+            expected_version: Current workflow version for optimistic concurrency.
+
+        Returns:
+            Updated workflow state, still ``pending_approval``, with every
+            previously pending approval marked ``expired``.
+
+        Raises:
+            KeyError: If the workflow does not exist.
+            WorkflowConflictError: If the workflow is stale or no longer pending.
+            sqlite3.Error: If the atomic persistence operation fails.
+        """
+        decided_at = datetime.now(UTC)
+        with self._connections.connect() as connection:
+            begin_immediate(connection)
+            workflow = workflow_row(connection, workflow_id)
+            validate_active(workflow, workflow_id, expected_version)
+            connection.execute(
+                """
+                UPDATE governance_approvals
+                SET status = ?, decided_at = ?
+                WHERE workflow_id = ? AND status = ?
+                """,
+                (
+                    ApprovalStatus.EXPIRED.value,
+                    decided_at.isoformat(),
+                    workflow_id,
+                    ApprovalStatus.PENDING.value,
+                ),
+            )
+            approvals = list_approvals(connection, workflow_id)
+            state = WorkflowState.model_validate_json(workflow["state_json"])
+            updated = state.model_copy(
+                update={
+                    "approvals": approvals,
+                    "state_version": expected_version + 1,
+                    "updated_at": decided_at,
+                }
+            )
+            result = connection.execute(
+                """
+                UPDATE governance_workflows
+                SET state_version = ?, state_json = ?, updated_at = ?
+                WHERE workflow_id = ? AND state_version = ?
+                """,
+                (
+                    updated.state_version,
+                    updated.model_dump_json(),
+                    updated.updated_at.isoformat(),
+                    workflow_id,
+                    expected_version,
+                ),
+            )
+            if result.rowcount != 1:
+                raise WorkflowConflictError(f"Stale workflow state for {workflow_id}")
+        return updated
+
     @staticmethod
     def _assert_version(
         connection: sqlite3.Connection,
