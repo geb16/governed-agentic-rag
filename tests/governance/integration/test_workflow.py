@@ -381,6 +381,46 @@ def test_expiry_immediately_after_deadline_denies_on_read(
     assert len(expiry_events) == 1
 
 
+def test_repeated_reads_after_expiry_emit_one_audit_event(
+    settings,
+    retriever: KnowledgeRetriever,
+    repository: SqliteSyntheticRepository,
+) -> None:
+    """Repeated reads after expiry are idempotent and never duplicate the event."""
+
+    workflow = build_governed_workflow(
+        settings=settings,
+        retriever=retriever,
+        repository=repository,
+        model=_refund_model(75_000),
+    )
+    pending = workflow.invoke(
+        GovernedRequest(
+            requester_id="support-user",
+            query="Issue a GBP 750 refund on ticket TKT-1003 with all details",
+        )
+    )
+    _expire_approval_route(
+        settings,
+        pending.workflow_id,
+        when=datetime.now(UTC) - timedelta(seconds=1),
+    )
+
+    first = workflow.get_response(pending.workflow_id)
+    second = workflow.get_response(pending.workflow_id)
+    summary = workflow.get_summary(pending.workflow_id)
+
+    assert first.status == WorkflowStatus.DENIED
+    assert first.state_version == second.state_version
+    assert second.status == WorkflowStatus.DENIED
+    assert summary.status == WorkflowStatus.DENIED
+    events = workflow.audit_trace(pending.workflow_id).events
+    expiry_events = [
+        event for event in events if event.event_type == AuditEventType.APPROVAL_EXPIRED
+    ]
+    assert len(expiry_events) == 1
+
+
 
 
 def test_rejected_approval_denies_without_executing_the_tool(
