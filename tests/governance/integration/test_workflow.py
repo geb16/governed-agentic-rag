@@ -10,17 +10,21 @@ from app.audit.schemas import AuditEventType
 from app.domain.support import FailureMode, FaultPlan
 from app.governance.contracts import (
     ApprovalCommand,
+    ApprovalStatus,
     ApprovalValidationError,
     ClassificationDraft,
     GovernedFinalDraft,
     GovernedRequest,
     ProposedActionDraft,
+    ProposedActionKind,
     Sensitivity,
     TaskIntent,
     TaskType,
     WorkflowConflictError,
+    WorkflowStage,
     WorkflowStatus,
 )
+from app.governance.persistence import SqliteGovernanceRepository
 from app.infrastructure.persistence.sqlite import SqliteSyntheticRepository
 from app.rag.retriever import KnowledgeRetriever
 from tests.governance.support import (
@@ -47,7 +51,7 @@ def _refund_model(
         ],
         proposals=[
             ProposedActionDraft(
-                kind="tool",  # type: ignore
+                kind=ProposedActionKind.TOOL,
                 tool_name="issue_refund",
                 arguments_json=json.dumps(
                     {
@@ -126,7 +130,7 @@ def test_incomplete_request_requires_clarification_without_tool_execution(
         ],
         proposals=[
             ProposedActionDraft(
-                kind="respond",  # type: ignore[arg-type]
+                kind=ProposedActionKind.RESPOND,
                 response_text="Please provide the ticket identifier.",
                 confidence=0.95,
                 missing_information=["ticket_id"],
@@ -288,6 +292,257 @@ def test_expired_approval_cannot_resume_execution(
             ),
             TEST_APPROVAL_PRINCIPAL,
         )
+
+
+def _expire_approval_route(settings, workflow_id: str, *, when: datetime) -> None:
+    """Force a pending workflow's approval route past `when` across both signals."""
+    with sqlite3.connect(settings.synthetic_database_path) as connection:
+        connection.row_factory = sqlite3.Row
+        row = connection.execute(
+            "SELECT state_json FROM governance_workflows WHERE workflow_id = ?",
+            (workflow_id,),
+        ).fetchone()
+        payload = json.loads(row["state_json"])
+        assert payload["approval_route"] is not None
+        payload["approval_route"]["expires_at"] = when.isoformat()
+        connection.execute(
+            "UPDATE governance_workflows SET state_json = ? WHERE workflow_id = ?",
+            (json.dumps(payload), workflow_id),
+        )
+        connection.execute(
+            "UPDATE governance_approvals SET expires_at = ? WHERE workflow_id = ?",
+            (when.isoformat(), workflow_id),
+        )
+
+
+def test_pending_approval_before_expiry_is_not_swept(
+    settings,
+    retriever: KnowledgeRetriever,
+    repository: SqliteSyntheticRepository,
+) -> None:
+    """A read before the deadline leaves a pending workflow untouched."""
+
+    workflow = build_governed_workflow(
+        settings=settings,
+        retriever=retriever,
+        repository=repository,
+        model=_refund_model(75_000),
+    )
+    pending = workflow.invoke(
+        GovernedRequest(
+            requester_id="support-user",
+            query="Issue a GBP 750 refund on ticket TKT-1003 with all details",
+        )
+    )
+    assert pending.status == WorkflowStatus.PENDING_APPROVAL
+
+    read_back = workflow.get_response(pending.workflow_id)
+
+    assert read_back.status == WorkflowStatus.PENDING_APPROVAL
+    assert [item.status for item in read_back.approvals] == [ApprovalStatus.PENDING]
+    events = workflow.audit_trace(pending.workflow_id).events
+    assert not any(event.event_type == AuditEventType.APPROVAL_EXPIRED for event in events)
+
+
+def test_expiry_immediately_after_deadline_denies_on_read(
+    settings,
+    retriever: KnowledgeRetriever,
+    repository: SqliteSyntheticRepository,
+) -> None:
+    """A read just past the deadline sweeps the workflow to denied."""
+
+    workflow = build_governed_workflow(
+        settings=settings,
+        retriever=retriever,
+        repository=repository,
+        model=_refund_model(75_000),
+    )
+    pending = workflow.invoke(
+        GovernedRequest(
+            requester_id="support-user",
+            query="Issue a GBP 750 refund on ticket TKT-1003 with all details",
+        )
+    )
+    _expire_approval_route(
+        settings,
+        pending.workflow_id,
+        when=datetime.now(UTC) - timedelta(microseconds=1),
+    )
+
+    response = workflow.get_response(pending.workflow_id)
+
+    assert response.status == WorkflowStatus.DENIED
+    assert response.error_code == "approval_expired"
+    assert [item.status for item in response.approvals] == [ApprovalStatus.EXPIRED]
+    events = workflow.audit_trace(pending.workflow_id).events
+    expiry_events = [
+        event for event in events if event.event_type == AuditEventType.APPROVAL_EXPIRED
+    ]
+    assert len(expiry_events) == 1
+
+
+def test_repeated_reads_after_expiry_emit_one_audit_event(
+    settings,
+    retriever: KnowledgeRetriever,
+    repository: SqliteSyntheticRepository,
+) -> None:
+    """Repeated reads after expiry are idempotent and never duplicate the event."""
+
+    workflow = build_governed_workflow(
+        settings=settings,
+        retriever=retriever,
+        repository=repository,
+        model=_refund_model(75_000),
+    )
+    pending = workflow.invoke(
+        GovernedRequest(
+            requester_id="support-user",
+            query="Issue a GBP 750 refund on ticket TKT-1003 with all details",
+        )
+    )
+    _expire_approval_route(
+        settings,
+        pending.workflow_id,
+        when=datetime.now(UTC) - timedelta(seconds=1),
+    )
+
+    first = workflow.get_response(pending.workflow_id)
+    second = workflow.get_response(pending.workflow_id)
+    summary = workflow.get_summary(pending.workflow_id)
+
+    assert first.status == WorkflowStatus.DENIED
+    assert first.state_version == second.state_version
+    assert second.status == WorkflowStatus.DENIED
+    assert summary.status == WorkflowStatus.DENIED
+    events = workflow.audit_trace(pending.workflow_id).events
+    expiry_events = [
+        event for event in events if event.event_type == AuditEventType.APPROVAL_EXPIRED
+    ]
+    assert len(expiry_events) == 1
+
+
+def test_decision_after_expiry_is_rejected_deterministically(
+    settings,
+    retriever: KnowledgeRetriever,
+    repository: SqliteSyntheticRepository,
+) -> None:
+    """A decision attempt against an elapsed route is rejected, not silently applied."""
+
+    workflow = build_governed_workflow(
+        settings=settings,
+        retriever=retriever,
+        repository=repository,
+        model=_refund_model(75_000),
+    )
+    pending = workflow.invoke(
+        GovernedRequest(
+            requester_id="support-user",
+            query="Issue a GBP 750 refund on ticket TKT-1003 with all details",
+        )
+    )
+    assert pending.approval_route is not None
+    _expire_approval_route(
+        settings,
+        pending.workflow_id,
+        when=datetime.now(UTC) - timedelta(seconds=1),
+    )
+
+    with pytest.raises(WorkflowConflictError):
+        workflow.approve(
+            pending.workflow_id,
+            ApprovalCommand(
+                role="finance_manager",
+                approved=True,
+                proposal_digest=pending.approval_route.proposal_digest,
+                expected_state_version=pending.state_version,
+                comment="Late approval attempt after the window elapsed.",
+            ),
+            TEST_APPROVAL_PRINCIPAL,
+        )
+
+    # The decision attempt already swept the workflow; a later read must not
+    # finalize it twice or emit a second expiry event.
+    denied = workflow.get_response(pending.workflow_id)
+    assert denied.status == WorkflowStatus.DENIED
+    assert denied.error_code == "approval_expired"
+    events = workflow.audit_trace(pending.workflow_id).events
+    expiry_events = [
+        event for event in events if event.event_type == AuditEventType.APPROVAL_EXPIRED
+    ]
+    assert len(expiry_events) == 1
+
+
+def test_workflow_reaches_finalized_terminal_state_after_expiry(
+    settings,
+    retriever: KnowledgeRetriever,
+    repository: SqliteSyntheticRepository,
+) -> None:
+    """A swept workflow is fully finalized, not merely marked denied."""
+
+    workflow = build_governed_workflow(
+        settings=settings,
+        retriever=retriever,
+        repository=repository,
+        model=_refund_model(75_000),
+    )
+    pending = workflow.invoke(
+        GovernedRequest(
+            requester_id="support-user",
+            query="Issue a GBP 750 refund on ticket TKT-1003 with all details",
+        )
+    )
+    _expire_approval_route(
+        settings,
+        pending.workflow_id,
+        when=datetime.now(UTC) - timedelta(seconds=1),
+    )
+
+    response = workflow.get_response(pending.workflow_id)
+
+    assert response.status == WorkflowStatus.DENIED
+    assert response.current_stage == WorkflowStage.FINAL_RESPONSE_AUDIT
+    assert response.answer is not None
+    assert response.tool_calls == []
+    trace = workflow.audit_trace(pending.workflow_id)
+    assert trace.chain_valid is True
+    assert any(event.event_type == AuditEventType.WORKFLOW_COMPLETED for event in trace.events)
+
+
+def test_expired_denial_persists_and_reloads_from_a_fresh_repository(
+    settings,
+    retriever: KnowledgeRetriever,
+    repository: SqliteSyntheticRepository,
+) -> None:
+    """A swept, finalized denial survives reconstruction from the durable store."""
+
+    workflow = build_governed_workflow(
+        settings=settings,
+        retriever=retriever,
+        repository=repository,
+        model=_refund_model(75_000),
+    )
+    pending = workflow.invoke(
+        GovernedRequest(
+            requester_id="support-user",
+            query="Issue a GBP 750 refund on ticket TKT-1003 with all details",
+        )
+    )
+    _expire_approval_route(
+        settings,
+        pending.workflow_id,
+        when=datetime.now(UTC) - timedelta(seconds=1),
+    )
+    workflow.get_response(pending.workflow_id)
+
+    reloaded_repository = SqliteGovernanceRepository(settings.synthetic_database_path)
+    reloaded = reloaded_repository.get(pending.workflow_id)
+
+    assert reloaded is not None
+    assert reloaded.status == WorkflowStatus.DENIED
+    assert reloaded.error_code == "approval_expired"
+    assert reloaded.current_stage == WorkflowStage.FINAL_RESPONSE_AUDIT
+    assert reloaded.final is not None
+    assert [item.status for item in reloaded.approvals] == [ApprovalStatus.EXPIRED]
 
 
 def test_rejected_approval_denies_without_executing_the_tool(

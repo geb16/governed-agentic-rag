@@ -30,7 +30,7 @@ from app.governance.version import (
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-4-freeze-manifest.json"
 PHASE3_MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-3-freeze-manifest.json"
-PHASE4_FREEZE_ID = "phase4-governance-v1"
+PHASE4_FREEZE_ID = "phase4-governance-v3"
 MANIFEST_SCHEMA_VERSION = 1
 
 # Phase 5 evaluation assets must remain outside this treatment identity.

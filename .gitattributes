@@ -1,5 +1,26 @@
-# Phase 5 hashes exact bytes; keep its release surface stable across platforms.
+# Normalize detected text files across Windows, WSL, and Linux.
+* text=auto eol=lf
+# Keep this repo configuration stable across platforms.
 /.gitattributes text eol=lf
+
+# Phase-3 hashes exact knowledge-base bytes.
+/data/knowledge_base/*.md text eol=lf
+/data/knowledge_base/manifest.json text eol=lf
+
+# Phase 4 hashes exact governance, audit, test, script, and documentation bytes.
+/.env.example text eol=lf
+/docs/phase-4-governance.md text eol=lf
+/docs/phase-4-freeze-manifest.json text eol=lf
+/docs/architecture/phase4_governance_architecture.md text eol=lf
+/docs/architecture/phase4_dependency_composition_diagram.svg text eol=lf
+/scripts/run_phase4_smoke_tests.py text eol=lf
+/scripts/verify_phase4_freeze.py text eol=lf
+/src/app/audit/** text eol=lf
+/src/app/governance/** text eol=lf
+/src/app/governed_main.py text eol=lf
+/tests/governance/** text eol=lf
+
+# Phase-5 hashes exact bytes; keep its release surface stable across platforms.
 /data/evaluation/phase5/v1/*.json text eol=lf
 /data/evaluation/phase5/v1/*.jsonl text eol=lf
 /docs/phase-5-evaluation/*.md text eol=lf

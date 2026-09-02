@@ -50,3 +50,12 @@ class WorkflowRepository(Protocol):
     ) -> WorkflowState:
         """Atomically persist one authenticated, proposal-bound decision."""
         ...
+
+    def expire_pending_approvals(
+        self,
+        *,
+        workflow_id: str,
+        expected_version: int,
+    ) -> WorkflowState:
+        """Atomically deny a workflow and expire its still-pending approvals."""
+        ...
