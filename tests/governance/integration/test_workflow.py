@@ -10,17 +10,21 @@ from app.audit.schemas import AuditEventType
 from app.domain.support import FailureMode, FaultPlan
 from app.governance.contracts import (
     ApprovalCommand,
+    ApprovalStatus,
     ApprovalValidationError,
     ClassificationDraft,
     GovernedFinalDraft,
     GovernedRequest,
     ProposedActionDraft,
+    ProposedActionKind,
     Sensitivity,
     TaskIntent,
     TaskType,
     WorkflowConflictError,
+    WorkflowStage,
     WorkflowStatus,
 )
+from app.governance.persistence import SqliteGovernanceRepository
 from app.infrastructure.persistence.sqlite import SqliteSyntheticRepository
 from app.rag.retriever import KnowledgeRetriever
 from tests.governance.support import (
@@ -47,7 +51,7 @@ def _refund_model(
         ],
         proposals=[
             ProposedActionDraft(
-                kind="tool",  # type: ignore
+                kind=ProposedActionKind.TOOL,
                 tool_name="issue_refund",
                 arguments_json=json.dumps(
                     {
@@ -126,7 +130,7 @@ def test_incomplete_request_requires_clarification_without_tool_execution(
         ],
         proposals=[
             ProposedActionDraft(
-                kind="respond",  # type: ignore[arg-type]
+                kind=ProposedActionKind.RESPOND,
                 response_text="Please provide the ticket identifier.",
                 confidence=0.95,
                 missing_information=["ticket_id"],
@@ -288,6 +292,37 @@ def test_expired_approval_cannot_resume_execution(
             ),
             TEST_APPROVAL_PRINCIPAL,
         )
+
+
+
+
+def test_pending_approval_before_expiry_is_not_swept(
+    settings,
+    retriever: KnowledgeRetriever,
+    repository: SqliteSyntheticRepository,
+) -> None:
+    """A read before the deadline leaves a pending workflow untouched."""
+
+    workflow = build_governed_workflow(
+        settings=settings,
+        retriever=retriever,
+        repository=repository,
+        model=_refund_model(75_000),
+    )
+    pending = workflow.invoke(
+        GovernedRequest(
+            requester_id="support-user",
+            query="Issue a GBP 750 refund on ticket TKT-1003 with all details",
+        )
+    )
+    assert pending.status == WorkflowStatus.PENDING_APPROVAL
+
+    read_back = workflow.get_response(pending.workflow_id)
+
+    assert read_back.status == WorkflowStatus.PENDING_APPROVAL
+    assert [item.status for item in read_back.approvals] == [ApprovalStatus.PENDING]
+    events = workflow.audit_trace(pending.workflow_id).events
+    assert not any(event.event_type == AuditEventType.APPROVAL_EXPIRED for event in events)
 
 
 def test_rejected_approval_denies_without_executing_the_tool(
