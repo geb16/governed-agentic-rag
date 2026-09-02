@@ -1,5 +1,5 @@
 {
-  "aggregate_sha256": "339d10a39ca506363d35e08a51b528b9d0dc06e0eca1564390c4e18546a9bc2b",
+  "aggregate_sha256": "3e3f6d9bb1fecf7299bd52dfa6b0d4c01f35edb3c0e28c140b4152a0436d9eac",
   "baseline_aggregate_sha256": "e3d16bb50cf815fda5939a53223356ce96c6dbafec1c4e00e01cf9e6d51fb12e",
   "baseline_freeze_id": "phase3-baseline-v3",
   "baseline_manifest_sha256": "90702715be7671ec3717098260285434ab57106a8d183c9dff99a4703b70727f",
@@ -8,7 +8,7 @@
   "dataset_manifest_sha256": "fe10e8e8816cafb63582df418fc310f93109f6e1aefef53ec45323c8bcce2cd0",
   "dataset_version": "1.0.0",
   "freeze_id": "phase5-evaluation-v2",
-  "frozen_at": "2026-09-02T16:54:34.699953+00:00",
+  "frozen_at": "2026-09-02T17:05:36.769276+00:00",
   "governance_aggregate_sha256": "14b43aa48bc3bab896fca4ba0d518c002afbfa32d5a3e452345e61b419406a3e",
   "governance_freeze_id": "phase4-governance-v3",
   "governance_manifest_sha256": "bde04cf2db7e9f577d677f9961df4c7b72f4418a7f7974ce28c533f5e15f31f8",
@@ -52,7 +52,7 @@
     "tests/evaluation/dataset/conftest.py": "22e6ca7b2cb189b0009ef90c5d02c894bba761a7306de743b65d6355685f2a97",
     "tests/evaluation/dataset/test_contracts.py": "63f0bcc49f2294b56417b63365d0c21743c216798dcf15cbd09d10077a8d5186",
     "tests/evaluation/dataset/test_integrity.py": "f72d41c0a13f3c169092efc8f29d36142859fe63763fdfbe0e29d9b8eb913c3f",
-    "tests/evaluation/dataset/test_phase5_freeze_verifier.py": "acabf33466cba6565de9c3d2cc3ae397c4bbc89b63e9f89ed621d70f68f76dba",
+    "tests/evaluation/dataset/test_phase5_freeze_verifier.py": "34a9ae75b14b91e580200ae18264c5dd3c6870dff68aac6c32ffbdcb87ab4e5b",
     "tests/evaluation/dataset/test_rubric.py": "616462ca4400395885c348c93b4511bc2cd89eb2c6687a21312bbe1df100050c",
     "tests/evaluation/dataset/test_source_and_privacy.py": "bdb5bde4d7a4686c5c16d099912425529894dc10a99aee69ab020f384b4a5f99"
   }
