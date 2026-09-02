@@ -1,5 +1,13 @@
-# Phase 5 hashes exact bytes; keep its release surface stable across platforms.
+# Normalize detected text files across Windows, WSL, and Linux.
+* text=auto eol=lf
+# Keep this repo configuration stable across platforms.
 /.gitattributes text eol=lf
+
+# Phase-3 hashes exact knowledge-base bytes.
+/data/knowledge_base/*.md text eol=lf
+/data/knowledge_base/manifest.json text eol=lf
+
+# Phase-5 hashes exact bytes; keep its release surface stable across platforms.
 /data/evaluation/phase5/v1/*.json text eol=lf
 /data/evaluation/phase5/v1/*.jsonl text eol=lf
 /docs/phase-5-evaluation/*.md text eol=lf
