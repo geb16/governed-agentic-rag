@@ -42,6 +42,27 @@ def _baseline_route(
         return ObservedRoute.SAFE_TERMINATE, "bounded_failure_status", False
     return None, "baseline_text_requires_blinded_route_review", True
 
+def _governed_route(
+    raw: RawExecution, attempts: list[ToolAttempt]
+) -> tuple[ObservedRoute | None, str, bool]:
+    initial = raw.initial_response or raw.response or {}
+    response = raw.response or {}
+    initial_status = initial.get("status")
+    if initial_status == "pending_approval":
+        return ObservedRoute.HUMAN_REVIEW, "durable_approval_pause", False
+    if initial_status == "clarification_required":
+        return ObservedRoute.CLARIFY, "workflow_status", False
+    if initial_status == "denied":
+        return ObservedRoute.DENY, "workflow_status", False
+    recovery = response.get("recovery") or {}
+    if recovery.get("disposition") == "safe_termination":
+        return ObservedRoute.SAFE_TERMINATE, "recovery_disposition", False
+    if any(item.status == "succeeded" for item in attempts):
+        return ObservedRoute.EXECUTE, "successful_controlled_tool", False
+    if response.get("status") == "completed":
+        return ObservedRoute.ANSWER, "workflow_status", False
+    return None, "no_single_compatible_route", True
+
 
 def normalize(
     raw: RawExecution,
@@ -68,4 +89,16 @@ def normalize(
             for item in attempts
             if item.tool_name == "request_human_review" and item.status == "succeeded"
         ]
- 
+
+    else:
+        route, source, needs_review = _governed_route(raw, attempts)
+        citations = [str(value) for value in response.get("_evaluation_cited_evidence_ids") or []]
+        initial = raw.initial_response or response
+        approval_roles = [
+            _canonical_role(str(value))
+            for value in ((initial.get("approval_route") or {}).get("required_roles") or [])
+        ]
+    available = {item.chunk_id for item in raw.retrieved}
+    available.update(str(item.get("evidence_id")) for item in response.get("evidence") or [])
+    recovery = response.get("recovery") or {}
+    usage = response.get("usage") or {} 
