@@ -16,6 +16,7 @@ from app.governance.contracts import (
     GovernedFinalDraft,
     GovernedRequest,
     ProposedActionDraft,
+    ProposedActionKind,
     RetrievalResult,
     Sensitivity,
     TaskIntent,
@@ -106,7 +107,7 @@ def test_adapter_propose_sends_classification_retrieval_and_allowlisted_tools(se
     """Keep the proposal boundary typed and limited to approved context and tools."""
 
     output = ProposedActionDraft(
-        kind="respond",  # type: ignore[arg-type]
+        kind=ProposedActionKind.RESPOND,
         response_text="A response can be drafted without a side effect.",
         confidence=0.95,
         rationale="No tool execution is required.",

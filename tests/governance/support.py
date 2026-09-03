@@ -23,6 +23,7 @@ from app.governance.contracts import (
     GovernedFinalDraft,
     GovernedRequest,
     ProposedActionDraft,
+    ProposedActionKind,
     RetrievalResult,
     Sensitivity,
     TaskIntent,
@@ -116,7 +117,7 @@ def material_refund_model() -> ScriptedGovernanceModel:
         ],
         proposals=[
             ProposedActionDraft(
-                kind="tool",  # type: ignore[arg-type]
+                kind=ProposedActionKind.TOOL,
                 tool_name="issue_refund",
                 arguments_json=json.dumps(
                     {
@@ -160,7 +161,7 @@ class ScriptedGovernanceModel(GovernanceModel):
             proposals
             or [
                 ProposedActionDraft(
-                    kind="respond",  # type: ignore
+                    kind=ProposedActionKind.RESPOND,
                     response_text="A grounded response is available.",
                     confidence=0.95,
                     rationale="No tool action is needed.",

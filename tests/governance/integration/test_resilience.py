@@ -16,6 +16,7 @@ from app.governance.contracts import (
     GovernedFinalDraft,
     GovernedRequest,
     ProposedActionDraft,
+    ProposedActionKind,
     Sensitivity,
     TaskIntent,
     TaskType,
@@ -48,7 +49,7 @@ def _refund_model() -> ScriptedGovernanceModel:
         ],
         proposals=[
             ProposedActionDraft(
-                kind="tool",  # type: ignore[arg-type]
+                kind=ProposedActionKind.TOOL,
                 tool_name="issue_refund",
                 arguments_json=json.dumps(
                     {

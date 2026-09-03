@@ -14,6 +14,7 @@ from app.governance.contracts import (
     GovernedRequest,
     ProposedAction,
     ProposedActionDraft,
+    ProposedActionKind,
     RecoveryDisposition,
     RetrievalResult,
     RiskLevel,
@@ -63,7 +64,7 @@ def _refund_proposal(amount_minor: int) -> ProposedAction:
         "idempotency_key": "phase4-refund-001",
     }
     return ProposedAction(
-        kind="tool",  # type: ignore[arg-type]
+        kind=ProposedActionKind.TOOL,
         tool_name="issue_refund",
         arguments_json=json.dumps(arguments),
         validated_arguments=arguments,
@@ -74,7 +75,7 @@ def _refund_proposal(amount_minor: int) -> ProposedAction:
 
 def _tool_proposal(tool_name: str, arguments: dict[str, object]) -> ProposedAction:
     return ProposedAction(
-        kind="tool",  # type: ignore[arg-type]
+        kind=ProposedActionKind.TOOL,
         tool_name=tool_name,
         arguments_json=json.dumps(arguments),
         validated_arguments=arguments,
@@ -124,7 +125,7 @@ def test_stage_3_rejects_non_allowlisted_proposal(
     model = ScriptedGovernanceModel(
         proposals=[
             ProposedActionDraft(
-                kind="tool",  # type: ignore[arg-type]
+                kind=ProposedActionKind.TOOL,
                 tool_name="send_money",
                 arguments_json="{}",
                 confidence=0.9,
@@ -164,7 +165,7 @@ def test_stage_4_refund_thresholds_require_expected_roles() -> None:
 
 def test_stage_4_privileged_access_requires_iam_approval() -> None:
     proposal = ProposedAction(
-        kind="tool",  # type: ignore[arg-type]
+        kind=ProposedActionKind.TOOL,
         tool_name="change_access_role",
         arguments_json='{"subject_id":"USR-1001","new_role":"administrator"}',
         validated_arguments={
@@ -252,7 +253,7 @@ def test_stage_4_clarifies_incomplete_or_low_confidence_state_changes() -> None:
         summary="Incomplete refund request.",
     )
     proposal = ProposedAction(
-        kind="respond",  # type: ignore[arg-type]
+        kind=ProposedActionKind.RESPOND,
         response_text="More information is required.",
         confidence=0.5,
         missing_information=["ticket_id"],
@@ -275,7 +276,7 @@ def test_stage_4_denies_unsupported_data_deletion() -> None:
             sensitivity=Sensitivity.CRITICAL,
         ),
         ProposedAction(
-            kind="respond",  # type: ignore[arg-type]
+            kind=ProposedActionKind.RESPOND,
             response_text="Deletion requested.",
             confidence=0.95,
             rationale="No deletion tool is available.",
