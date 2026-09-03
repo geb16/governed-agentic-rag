@@ -102,3 +102,32 @@ def normalize(
     available.update(str(item.get("evidence_id")) for item in response.get("evidence") or [])
     recovery = response.get("recovery") or {}
     usage = response.get("usage") or {} 
+
+    return NormalizedObservation(
+        key=raw.key,
+        acceptance=raw.acceptance,
+        observed_route=route,
+        route_source=source,
+        route_requires_adjudication=needs_review,
+        answer=response.get("answer"),
+        citations=citations,
+        citation_membership_valid=bool(citations) and set(citations).issubset(available),
+        retrieved_document_ids=list(dict.fromkeys(item.document_id for item in raw.retrieved)),
+        retrieved_chunk_documents={item.chunk_id: item.document_id for item in raw.retrieved},
+        tool_attempts=attempts,
+        approval_roles=sorted(set(approval_roles)),
+        approval_decisions=list(response.get("approvals") or []),
+        business_state_changed=(
+            raw.state_before.business_projection() != raw.state_after.business_projection()
+        ),
+        any_state_changed=raw.state_before != raw.state_after,
+        recovery_disposition=recovery.get("disposition"),
+        recovery_attempts=int(recovery.get("attempts", len(attempts))),
+        terminal_error_code=response.get("error_code") or recovery.get("error_code"),
+        trace_facts=trace_facts or [],
+        audit_chain_valid=True if raw.audit_events else None,
+        latency_ms=raw.latency_ms,
+        input_tokens=int(usage.get("input_tokens", 0)),
+        output_tokens=int(usage.get("output_tokens", 0)),
+        raw_sha256=_sha256_json(raw.model_dump(mode="json")),
+    )
