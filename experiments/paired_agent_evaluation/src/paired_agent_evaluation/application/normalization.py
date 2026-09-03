@@ -15,6 +15,7 @@ from paired_agent_evaluation.domain.observations import (
     ToolAttempt,
 )
 
+ROLE_ALIASES = {"iam_manager": "iam_administrator", "support_supervisor": "support_manager"}
 
 def _sha256_json(value: Any) -> str:
     payload = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
@@ -22,10 +23,22 @@ def _sha256_json(value: Any) -> str:
 
 def _tool_attempts(response: dict[str, Any]) -> list[ToolAttempt]:
     attempts: list[ToolAttempt] = []
+    for call in response.get("tool_calls") or []:
+        outcome = call.get("outcome") or {}
+        attempts.append(
+            ToolAttempt(
+                tool_name=str(call.get("tool_name", "")),
+                arguments=dict(call.get("arguments") or {}),
+                status=str(call.get("status", "")),
+                state_changed=bool(outcome.get("state_changed", False)),
+                error_code=outcome.get("error_code"),
+                retryable=bool(outcome.get("retryable", False)),
+            )
+        )
     return attempts
 
 def _canonical_role(role: str) -> str:
-    return role.strip().lower().replace(" ", "_").replace("-", "_")
+    return ROLE_ALIASES.get(role, role)
 
 def _baseline_route(
     response: dict[str, Any], attempts: list[ToolAttempt]
