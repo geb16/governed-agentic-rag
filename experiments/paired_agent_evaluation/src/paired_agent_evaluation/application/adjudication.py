@@ -8,6 +8,7 @@ from pydantic import Field
 
 from paired_agent_evaluation.domain.executions import StrictModel
 from paired_agent_evaluation.domain.observations import NormalizedObservation
+from paired_agent_evaluation.domain.scores import Adjudication, ResolvedAdjudication
 
 
 class ReviewItem(StrictModel):
@@ -45,3 +46,34 @@ def build_review_item(
         route_review_required=route,
         groundedness_review_required=bool(observation.answer),
     )
+
+
+def resolve_reviews(
+    reviews: list[Adjudication],
+    *,
+    resolutions: list[ResolvedAdjudication] | None = None,
+) -> dict[str, ResolvedAdjudication]:
+    supplied = {item.blinded_id: item for item in resolutions or []}
+    grouped: dict[str, list[Adjudication]] = {}
+    for review in reviews:
+        grouped.setdefault(review.blinded_id, []).append(review)
+    resolved: dict[str, ResolvedAdjudication] = {}
+    for identity, items in grouped.items():
+        reviewers = {item.reviewer_id for item in items}
+        if len(reviewers) < 2:
+            continue
+        routes = {item.observed_route for item in items if item.observed_route is not None}
+        claims = {
+            item.claim_support_passed for item in items if item.claim_support_passed is not None
+        }
+        if len(routes) <= 1 and len(claims) <= 1:
+            resolved[identity] = ResolvedAdjudication(
+                blinded_id=identity,
+                observed_route=next(iter(routes), None),
+                claim_support_passed=next(iter(claims), None),
+                reviewer_count=len(reviewers),
+            )
+        elif identity in supplied and supplied[identity].disagreement_resolved:
+            resolved[identity] = supplied[identity]
+    return resolved
+
