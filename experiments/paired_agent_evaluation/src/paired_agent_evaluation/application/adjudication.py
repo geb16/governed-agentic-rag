@@ -77,3 +77,22 @@ def resolve_reviews(
             resolved[identity] = supplied[identity]
     return resolved
 
+
+def apply_route_review(
+    observation: NormalizedObservation,
+    *,
+    run_id: str,
+    resolved: dict[str, ResolvedAdjudication],
+) -> NormalizedObservation:
+    if not observation.route_requires_adjudication:
+        return observation
+    decision = resolved.get(blinded_id(observation.key.observation_id, run_id=run_id))
+    if decision is None or decision.observed_route is None:
+        return observation
+    return observation.model_copy(
+        update={
+            "observed_route": decision.observed_route,
+            "route_source": "blinded_dual_review",
+            "route_requires_adjudication": False,
+        }
+    )
