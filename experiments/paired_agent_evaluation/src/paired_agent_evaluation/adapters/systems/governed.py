@@ -55,4 +55,104 @@ class GovernedSystemRunner:
         scheduled: ScheduledExecution,
         workspace: Path,
     ) -> RawExecution:
-        pass
+        workspace.mkdir(parents=True, exist_ok=True)
+        started_at = datetime.now(UTC)
+        started = perf_counter()
+        database_path = workspace / "synthetic.db"
+        before = BusinessState()
+        retriever: RecordingRetriever | None = None
+        accepted = False
+        try:
+            settings = self._settings.model_copy(update={"synthetic_database_path": database_path})
+            business = SqliteSyntheticRepository(database_path)
+            business.initialize()
+            business.create_case(case.fixture)
+            before = state_snapshot(database_path, case.case_id)
+            workflows = SqliteGovernanceRepository(database_path)
+            workflows.initialize()
+            audit = SqliteAuditRepository(
+                database_path,
+                integrity_key=IdentityService(settings).derive_key("governance-audit-v1"),
+            )
+            audit.initialize()
+            retriever = RecordingRetriever(self._retriever_factory(settings))
+            bundle = build_workflow_bundle(
+                settings=settings,
+                retriever=retriever,
+                business_repository=business,
+                workflow_repository=workflows,
+                audit_repository=audit,
+                unit_of_work=SqliteGovernanceUnitOfWork(database_path),
+                model=self._model_factory(settings),
+            )
+            accepted = True
+            initial = bundle.workflow.invoke(
+                GovernedRequest.model_validate(case.request.model_dump())
+            )
+            response = initial
+            decisions = {
+                _canonical_role(item.role): item.decision.value
+                for item in case.expected.human_decisions
+            }
+            if initial.status == WorkflowStatus.PENDING_APPROVAL:
+                for approval in list(initial.approvals):
+                    decision = decisions.get(_canonical_role(approval.role))
+                    if decision is None:
+                        continue
+                    response = bundle.workflow.approve(
+                        initial.workflow_id,
+                        ApprovalCommand(
+                            role=approval.role,
+                            approved=decision == "approve",
+                            proposal_digest=approval.proposal_digest,
+                            expected_state_version=response.state_version,
+                            comment="Deterministic Phase 5 decision replay.",
+                        ),
+                        ApprovalPrincipal(
+                            subject_id=f"evaluation-reviewer-{approval.role}",
+                            roles=frozenset({approval.role}),
+                        ),
+                    )
+                    if response.status != WorkflowStatus.PENDING_APPROVAL:
+                        break
+            state = workflows.get(response.workflow_id)
+            response_payload = response.model_dump(mode="json")
+            response_payload["_evaluation_cited_evidence_ids"] = (
+                list(state.final.cited_evidence_ids) if state is not None and state.final else []
+            )
+            trace = bundle.workflow.audit_trace(response.workflow_id)
+            return RawExecution(
+                key=scheduled.key,
+                acceptance=AcceptanceStatus.ACCEPTED,
+                request_accepted=True,
+                started_at=started_at,
+                completed_at=datetime.now(UTC),
+                latency_ms=(perf_counter() - started) * 1000,
+                request=case.request.model_dump(mode="json"),
+                initial_response=initial.model_dump(mode="json"),
+                response=response_payload,
+                retrieved=retriever.evidence(),
+                retrieval_call_count=len(retriever.calls),
+                state_before=before,
+                state_after=state_snapshot(database_path, case.case_id),
+                audit_events=[event.model_dump(mode="json") for event in trace.events],
+            )
+        except Exception as error:
+            after = (
+                state_snapshot(database_path, case.case_id) if database_path.exists() else before
+            )
+            return RawExecution(
+                key=scheduled.key,
+                acceptance=(AcceptanceStatus.ACCEPTED if accepted else AcceptanceStatus.INVALID),
+                request_accepted=accepted,
+                started_at=started_at,
+                completed_at=datetime.now(UTC),
+                latency_ms=(perf_counter() - started) * 1000,
+                request=case.request.model_dump(mode="json"),
+                retrieved=retriever.evidence() if retriever is not None else [],
+                retrieval_call_count=len(retriever.calls) if retriever is not None else 0,
+                state_before=before,
+                state_after=after,
+                error_type=type(error).__name__,
+                error_message=str(error)[:1000],
+            )
