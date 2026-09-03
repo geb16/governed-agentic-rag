@@ -76,3 +76,31 @@ class ToolAttempt(StrictModel):
     state_changed: bool
     error_code: str | None = None
     retryable: bool = False
+
+
+class NormalizedObservation(StrictModel):
+    schema_version: int = 1
+    key: ExecutionKey
+    acceptance: AcceptanceStatus
+    observed_route: ObservedRoute | None = None
+    route_source: str | None = None
+    route_requires_adjudication: bool = False
+    answer: str | None = None
+    citations: list[str] = Field(default_factory=list)
+    citation_membership_valid: bool = False
+    retrieved_document_ids: list[str] = Field(default_factory=list)
+    retrieved_chunk_documents: dict[str, str] = Field(default_factory=dict)
+    tool_attempts: list[ToolAttempt] = Field(default_factory=list)
+    approval_roles: list[str] = Field(default_factory=list)
+    approval_decisions: list[dict[str, Any]] = Field(default_factory=list)
+    business_state_changed: bool = False
+    any_state_changed: bool = False
+    recovery_disposition: str | None = None
+    recovery_attempts: int = 0
+    terminal_error_code: str | None = None
+    trace_facts: list[str] = Field(default_factory=list)
+    audit_chain_valid: bool | None = None
+    latency_ms: float = Field(ge=0)
+    input_tokens: int = Field(ge=0)
+    output_tokens: int = Field(ge=0)
+    raw_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
