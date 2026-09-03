@@ -33,3 +33,45 @@ class ResolvedAdjudication(StrictModel):
     reviewer_count: int = Field(ge=2)
     disagreement_resolved: bool = False
     resolution_notes: str = ""
+
+
+class MetricContribution(StrictModel):
+    key: ExecutionKey
+    metric_id: str
+    eligible: bool
+    numerator: float = Field(default=0, ge=0)
+    denominator: float = Field(default=0, ge=0)
+    pending_reason: str | None = None
+    detail: str = ""
+
+
+class Estimate(StrictModel):
+    metric_id: str
+    condition: str
+    stratum: str
+    estimate: float | None
+    ci_lower: float | None = None
+    ci_upper: float | None = None
+    eligible_case_clusters: int = Field(ge=0)
+    accepted_observations: int = Field(ge=0)
+    valid_bootstrap_replicates: int = Field(ge=0)
+
+
+class PairedDifference(StrictModel):
+    metric_id: str
+    stratum: str
+    governed_minus_baseline: float | None
+    ci_lower: float | None = None
+    ci_upper: float | None = None
+    complete_pairs: int = Field(ge=0)
+    eligible_case_clusters: int = Field(ge=0)
+    valid_bootstrap_replicates: int = Field(ge=0)
+
+
+class SecondaryGrade(StrictModel):
+    observation_id: str
+    grader: str
+    grader_version: str
+    model_identifier: str
+    value: float = Field(ge=0, le=1)
+    reason: str = ""
