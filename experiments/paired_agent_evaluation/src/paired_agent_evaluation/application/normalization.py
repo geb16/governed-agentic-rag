@@ -17,9 +17,15 @@ from paired_agent_evaluation.domain.observations import (
 
 ROLE_ALIASES = {"iam_manager": "iam_administrator", "support_supervisor": "support_manager"}
 
+
 def _sha256_json(value: Any) -> str:
     payload = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def _canonical_role(role: str) -> str:
+    return ROLE_ALIASES.get(role, role)
+
 
 def _tool_attempts(response: dict[str, Any]) -> list[ToolAttempt]:
     attempts: list[ToolAttempt] = []
@@ -37,8 +43,6 @@ def _tool_attempts(response: dict[str, Any]) -> list[ToolAttempt]:
         )
     return attempts
 
-def _canonical_role(role: str) -> str:
-    return ROLE_ALIASES.get(role, role)
 
 def _baseline_route(
     response: dict[str, Any], attempts: list[ToolAttempt]
@@ -54,6 +58,7 @@ def _baseline_route(
     if status == "failed":
         return ObservedRoute.SAFE_TERMINATE, "bounded_failure_status", False
     return None, "baseline_text_requires_blinded_route_review", True
+
 
 def _governed_route(
     raw: RawExecution, attempts: list[ToolAttempt]
@@ -81,7 +86,7 @@ def normalize(
     raw: RawExecution,
     *,
     trace_facts: list[str] | None = None,
-):
+) -> NormalizedObservation:
     response = raw.response or {}
     attempts = _tool_attempts(response)
     if raw.acceptance == AcceptanceStatus.INVALID:
@@ -93,7 +98,6 @@ def normalize(
             output_tokens=0,
             raw_sha256=_sha256_json(raw.model_dump(mode="json")),
         )
-
     if raw.key.condition == Condition.BASELINE:
         route, source, needs_review = _baseline_route(response, attempts)
         citations = [str(item.get("chunk_id")) for item in response.get("citations") or []]
@@ -102,7 +106,6 @@ def normalize(
             for item in attempts
             if item.tool_name == "request_human_review" and item.status == "succeeded"
         ]
-
     else:
         route, source, needs_review = _governed_route(raw, attempts)
         citations = [str(value) for value in response.get("_evaluation_cited_evidence_ids") or []]
@@ -114,8 +117,7 @@ def normalize(
     available = {item.chunk_id for item in raw.retrieved}
     available.update(str(item.get("evidence_id")) for item in response.get("evidence") or [])
     recovery = response.get("recovery") or {}
-    usage = response.get("usage") or {} 
-
+    usage = response.get("usage") or {}
     return NormalizedObservation(
         key=raw.key,
         acceptance=raw.acceptance,
