@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "confidence_level": 0.95,
+  "bootstrap_method": "nonparametric_percentile_case_cluster",
+  "bootstrap_replicates": 10000,
+  "bootstrap_seed": 20260830,
+  "strata": ["category", "route", "intent", "risk_level"],
+  "paired_difference": "governed_minus_baseline",
+  "composite_score": false,
+  "minimum_valid_bootstrap_replicates": 9500
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "experiment_id": "baseline-governed-paired-v1",
+  "dataset_version": "1.0.0",
+  "rubric_version": "1.0.0",
+  "conditions": ["baseline", "governed"],
+  "repetitions_per_case": 3,
+  "condition_order_seed": 20260831,
+  "max_pre_acceptance_attempts": 2,
+  "execution_concurrency": 1,
+  "required_execution_profile": "experiment",
+  "required_retrieval_backend": "qdrant"
+}

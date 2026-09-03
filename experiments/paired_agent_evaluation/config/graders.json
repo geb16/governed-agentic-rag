@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "primary_groundedness": {
+    "method": "blinded_human_claim_support",
+    "reviewers": 2,
+    "disagreement_policy": "resolution_required",
+    "citation_membership_required": true
+  },
+  "baseline_text_route": {
+    "method": "blinded_human_route_classification",
+    "reviewers": 2,
+    "required_when": "completed response has no decisive structured tool or safety signal",
+    "disagreement_policy": "resolution_required"
+  },
+  "secondary_groundedness": {
+    "enabled": true,
+    "provider": "ragas",
+    "package_version": "0.4.3",
+    "metric": "Faithfulness",
+    "report_as_primary": false
+  }
+}
