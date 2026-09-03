@@ -26,9 +26,3 @@ class RawExecutionStore(Protocol):
     def write(self, execution: RawExecution) -> Path: ...
 
     def read_all(self) -> list[RawExecution]: ...
-
-
-class SecondaryGroundednessGrader(Protocol):
-    async def grade(
-        self, *, query: str, response: str, contexts: list[str]
-    ) -> tuple[float, str]: ...
