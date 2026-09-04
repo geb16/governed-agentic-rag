@@ -164,6 +164,27 @@ def score_observation(
             passed=human_observed,
             pending=route_pending_reason if human_expected else None,
         ),
+        _metric(
+            observation,
+            "escalation_precision",
+            eligible=human_observed,
+            passed=human_expected,
+            pending=route_pending_reason,
+        ),
+        _metric(
+            observation,
+            "escalation_f1",
+            eligible=True,
+            numerator=2.0 if human_expected and human_observed else 0.0,
+            denominator=(
+                2.0
+                if human_expected and human_observed
+                else 1.0
+                if human_expected or human_observed
+                else 0.0
+            ),
+            pending=route_pending_reason,
+        ),
         
     ]
     return [
