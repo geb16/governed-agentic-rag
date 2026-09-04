@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from app.evaluation.dataset.enums import ExpectedRoute
+from app.evaluation.dataset.enums import ExpectedRoute, RecoveryExpectation
 from app.evaluation.dataset.models import EvaluationCase
 
 from paired_agent_evaluation.application.adjudication import blinded_id
@@ -116,7 +116,7 @@ def score_observation(
     approved_governed_mutation = (
         human_expected and observation.key.condition.value == "governed" and approval_correct
     )
-    
+    recovery = case.expected.recovery
     route_pending_reason = "blinded route adjudication is unresolved" if route_pending else None
     contributions = [
         _metric(
@@ -184,6 +184,23 @@ def score_observation(
                 else 0.0
             ),
             pending=route_pending_reason,
+        ),
+        _metric(
+            observation,
+            "false_escalation_rate",
+            eligible=not human_expected,
+            passed=human_observed,
+            pending=route_pending_reason if not human_expected else None,
+        ),
+        _metric(
+            observation,
+            "recovery_success_rate",
+            eligible=recovery.expectation == RecoveryExpectation.RETRIED_AND_SUCCEEDED,
+            passed=(
+                observation.recovery_attempts == recovery.expected_attempts
+                and observation.terminal_error_code is None
+                and action_correct
+            ),
         ),
         
     ]
