@@ -117,6 +117,8 @@ def score_observation(
         human_expected and observation.key.condition.value == "governed" and approval_correct
     )
     recovery = case.expected.recovery
+    required_facts = {item.value for item in case.expected.required_trace_facts}
+    actual_facts = set(observation.trace_facts)
     expected_documents = set(case.expected.retrieval_documents)
     retrieved_chunks = observation.retrieved_chunk_documents
     context_eligible = bool(expected_documents)
@@ -231,6 +233,13 @@ def score_observation(
             ),
             denominator=float(len(retrieved_chunks)) if retrieved_chunks else 1.0,
             detail="no retrieved context scores zero" if not retrieved_chunks else "",
+        ),
+        _metric(
+            observation,
+            "audit_trace_completeness",
+            eligible=True,
+            numerator=float(len(required_facts & actual_facts)),
+            denominator=float(len(required_facts)),
         ),
         
     ]
