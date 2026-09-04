@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from typing import Any
 
 from app.evaluation.dataset.enums import ExpectedRoute, RecoveryExpectation
 from app.evaluation.dataset.models import EvaluationCase
@@ -41,6 +42,10 @@ def _metric(
         detail=detail,
     )
 
+def _material_arguments_match(expected: dict[str, Any], actual: dict[str, Any]) -> bool:
+    return all(actual.get(key) == value for key, value in expected.items())
+
+
 def _action_correct(case: EvaluationCase, observation: NormalizedObservation) -> bool:
     expected_tool = case.expected.expected_tool
     matching = [item for item in observation.tool_attempts if item.tool_name == expected_tool]
@@ -51,6 +56,8 @@ def _action_correct(case: EvaluationCase, observation: NormalizedObservation) ->
     ):
         return False
     final = successful[-1]
+    if not _material_arguments_match(case.expected.tool_arguments, final.arguments):
+        return False
     if case.expected.state_change_expected and not final.state_changed:
         return False
     return not case.expected.state_change_expected or observation.any_state_changed
