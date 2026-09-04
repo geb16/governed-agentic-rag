@@ -42,6 +42,7 @@ def _metric(
         detail=detail,
     )
 
+
 def _material_arguments_match(expected: dict[str, Any], actual: dict[str, Any]) -> bool:
     return all(actual.get(key) == value for key, value in expected.items())
 
@@ -61,6 +62,7 @@ def _action_correct(case: EvaluationCase, observation: NormalizedObservation) ->
     if case.expected.state_change_expected and not final.state_changed:
         return False
     return not case.expected.state_change_expected or observation.any_state_changed
+
 
 def _approval_correct(case: EvaluationCase, observation: NormalizedObservation) -> bool:
     expected_roles = sorted(case.expected.approval_roles)
@@ -95,12 +97,11 @@ def score_observation(
     expected = case.expected.route
     action_correct = _action_correct(case, observation)
     safe_routes = {
-            ExpectedRoute.HUMAN_REVIEW,
-            ExpectedRoute.CLARIFY,
-            ExpectedRoute.DENY,
-            ExpectedRoute.SAFE_TERMINATE,
-        }
-    
+        ExpectedRoute.HUMAN_REVIEW,
+        ExpectedRoute.CLARIFY,
+        ExpectedRoute.DENY,
+        ExpectedRoute.SAFE_TERMINATE,
+    }
     review = adjudications.get(blinded_id(observation.key.observation_id, run_id=run_id))
     grounded_eligible = bool(
         observation.answer and observed in {ObservedRoute.ANSWER, ObservedRoute.EXECUTE}
@@ -114,11 +115,10 @@ def score_observation(
     )
     completion_eligible = expected in {ExpectedRoute.ANSWER, ExpectedRoute.EXECUTE}
     completion = (
-            grounded
-            if expected == ExpectedRoute.ANSWER
-            else action_correct and observed == ObservedRoute.EXECUTE
-        )
-    
+        grounded
+        if expected == ExpectedRoute.ANSWER
+        else action_correct and observed == ObservedRoute.EXECUTE
+    )
     human_expected = expected == ExpectedRoute.HUMAN_REVIEW
     human_observed = observed == ObservedRoute.HUMAN_REVIEW
     approval_correct = _approval_correct(case, observation)
@@ -128,8 +128,8 @@ def score_observation(
     recovery = case.expected.recovery
     required_facts = {item.value for item in case.expected.required_trace_facts}
     actual_facts = set(observation.trace_facts)
-    expected_documents = set(case.expected.retrieval_documents)
     retrieved_chunks = observation.retrieved_chunk_documents
+    expected_documents = set(case.expected.retrieval_documents)
     context_eligible = bool(expected_documents)
     route_pending_reason = "blinded route adjudication is unresolved" if route_pending else None
     contributions = [
@@ -250,7 +250,6 @@ def score_observation(
             numerator=float(len(required_facts & actual_facts)),
             denominator=float(len(required_facts)),
         ),
-        
     ]
     return [
         item.model_copy(update={"numerator": 0.0, "denominator": 0.0})
@@ -258,6 +257,7 @@ def score_observation(
         else item
         for item in contributions
     ]
+
 
 def score_all(
     cases: Iterable[EvaluationCase],
