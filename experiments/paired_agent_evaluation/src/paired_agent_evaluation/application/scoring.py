@@ -117,6 +117,9 @@ def score_observation(
         human_expected and observation.key.condition.value == "governed" and approval_correct
     )
     recovery = case.expected.recovery
+    expected_documents = set(case.expected.retrieval_documents)
+    retrieved_chunks = observation.retrieved_chunk_documents
+    context_eligible = bool(expected_documents)
     route_pending_reason = "blinded route adjudication is unresolved" if route_pending else None
     contributions = [
         _metric(
@@ -218,6 +221,16 @@ def score_observation(
             eligible=grounded_eligible,
             passed=grounded,
             pending="human claim-support adjudication is unresolved" if grounded_pending else None,
+        ),
+        _metric(
+            observation,
+            "context_precision",
+            eligible=context_eligible,
+            numerator=float(
+                sum(document_id in expected_documents for document_id in retrieved_chunks.values())
+            ),
+            denominator=float(len(retrieved_chunks)) if retrieved_chunks else 1.0,
+            detail="no retrieved context scores zero" if not retrieved_chunks else "",
         ),
         
     ]
