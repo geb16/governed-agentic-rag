@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
+
 from app.evaluation.dataset.enums import ExpectedRoute, RecoveryExpectation
 from app.evaluation.dataset.models import EvaluationCase
 
@@ -248,4 +250,23 @@ def score_observation(
         if item.pending_reason
         else item
         for item in contributions
+    ]
+
+def score_all(
+    cases: Iterable[EvaluationCase],
+    observations: Iterable[NormalizedObservation],
+    *,
+    run_id: str,
+    adjudications: dict[str, ResolvedAdjudication],
+) -> list[MetricContribution]:
+    by_case = {case.case_id: case for case in cases}
+    return [
+        contribution
+        for observation in observations
+        for contribution in score_observation(
+            by_case[observation.key.case_id],
+            observation,
+            run_id=run_id,
+            adjudications=adjudications,
+        )
     ]
