@@ -143,15 +143,22 @@ def registered_strata(
     def include_all(_: EvaluationCase) -> bool:
         return True
 
-    strata = [("overall", include_all)]
+    strata: list[tuple[str, Callable[[EvaluationCase], bool]]] = [("overall", include_all)]
     dimensions: dict[str, Callable[[EvaluationCase], str]] = {
         "category": lambda case: case.category.value,
-        "route": lambda case: casse.expected.route.value,
+        "route": lambda case: case.expected.route.value,
         "intent": lambda case: case.expected.intent,
         "risk_level": lambda case: case.expected.risk_level.value,
     }
     for dimension, accessor in dimensions.items():
         for value in sorted({accessor(case) for case in cases}):
 
-            strata.append(f"{dimension}={value}")
+            def matches(
+                case: EvaluationCase,
+                selected: str = value,
+                read: Callable[[EvaluationCase], str] = accessor,
+            ) -> bool:
+                return read(case) == selected
+
+            strata.append((f"{dimension}={value}", matches))
     return strata
