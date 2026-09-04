@@ -8,7 +8,7 @@ from collections.abc import Callable, Iterable
 
 from app.evaluation.dataset.models import EvaluationCase
 
-from paired_agent_evaluation.domain.scores import Estimate, MetricContribution
+from paired_agent_evaluation.domain.scores import Estimate, MetricContribution, PairedDifference
 
 
 def _ratio(items: Iterable[MetricContribution]) -> float | None:
@@ -74,5 +74,64 @@ def estimate_condition(
         ci_upper=_percentile(bootstrap, 0.975) if valid_interval else None,
         eligible_case_clusters=len(by_case),
         accepted_observations=len({(item.key.case_id, item.key.repetition) for item in selected}),
+        valid_bootstrap_replicates=len(bootstrap),
+    )
+
+
+def estimate_paired_difference(
+    contributions: list[MetricContribution],
+    cases: dict[str, EvaluationCase],
+    *,
+    metric_id: str,
+    stratum: str,
+    include_case: Callable[[EvaluationCase], bool],
+    replicates: int,
+    seed: int,
+    minimum_valid: int,
+) -> PairedDifference:
+    keyed = {
+        (item.key.case_id, item.key.repetition, item.key.condition.value): item
+        for item in contributions
+        if item.metric_id == metric_id and include_case(cases[item.key.case_id])
+    }
+    pairs: dict[str, list[tuple[MetricContribution, MetricContribution]]] = defaultdict(list)
+    pair_keys = {(case_id, repetition) for case_id, repetition, _ in keyed}
+    for case_id, repetition in pair_keys:
+        baseline = keyed.get((case_id, repetition, "baseline"))
+        governed = keyed.get((case_id, repetition, "governed"))
+        if (
+            baseline is not None
+            and governed is not None
+            and baseline.pending_reason is None
+            and governed.pending_reason is None
+        ):
+            pairs[case_id].append((baseline, governed))
+    categories: dict[str, list[str]] = defaultdict(list)
+    for case_id in sorted(pairs):
+        categories[cases[case_id].category.value].append(case_id)
+
+    def difference(ids: list[str]) -> float | None:
+        baseline = _ratio(pair[0] for case_id in ids for pair in pairs[case_id])
+        governed = _ratio(pair[1] for case_id in ids for pair in pairs[case_id])
+        return governed - baseline if baseline is not None and governed is not None else None
+
+    identities = list(pairs)
+    point = difference(identities)
+    bootstrap: list[float] = []
+    if len(pairs) >= 2:
+        rng = random.Random(seed)
+        for _ in range(replicates):
+            value = difference(_draw_case_ids(categories, rng))
+            if value is not None:
+                bootstrap.append(value)
+    valid_interval = len(bootstrap) >= minimum_valid
+    return PairedDifference(
+        metric_id=metric_id,
+        stratum=stratum,
+        governed_minus_baseline=point,
+        ci_lower=_percentile(bootstrap, 0.025) if valid_interval else None,
+        ci_upper=_percentile(bootstrap, 0.975) if valid_interval else None,
+        complete_pairs=sum(len(value) for value in pairs.values()),
+        eligible_case_clusters=len(pairs),
         valid_bootstrap_replicates=len(bootstrap),
     )
