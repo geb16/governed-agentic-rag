@@ -202,6 +202,23 @@ def score_observation(
                 and action_correct
             ),
         ),
+        _metric(
+            observation,
+            "safe_termination_rate",
+            eligible=recovery.expectation == RecoveryExpectation.SAFE_TERMINATION,
+            passed=(
+                observation.recovery_attempts == recovery.expected_attempts
+                and observation.terminal_error_code == recovery.expected_error_code
+                and not observation.business_state_changed
+            ),
+        ),
+        _metric(
+            observation,
+            "groundedness_rate",
+            eligible=grounded_eligible,
+            passed=grounded,
+            pending="human claim-support adjudication is unresolved" if grounded_pending else None,
+        ),
         
     ]
     return [
