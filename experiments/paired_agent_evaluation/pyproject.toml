@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=80,<82"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "governed-agentic-rag-paired-evaluation"
+version = "0.1.0"
+description = "Reproducible paired evaluation-harness for the frozen baseline(phase-3) and governed(phase-4) systems."
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "governed-agentic-rag",
+  "pydantic>=2.13,<3",
+  "ragas==0.4.3",
+]
+
+[dependency-groups]
+dev = [
+  "mypy>=1.19,<2",
+  "pytest>=9,<10",
+  "pytest-cov>=7,<8",
+  "ruff>=0.15,<1",
+]
+
+[tool.uv.sources]
+governed-agentic-rag = { path = "../..", editable = true }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+paired_agent_evaluation = ["py.typed"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q --strict-config --strict-markers"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "RUF"]
+
+[tool.mypy]
+python_version = "3.12"
+mypy_path = ["$MYPY_CONFIG_FILE_DIR/src", "$MYPY_CONFIG_FILE_DIR/../../src"]
+files = ["$MYPY_CONFIG_FILE_DIR/src"]
+explicit_package_bases = true
+plugins = ["pydantic.mypy"]
