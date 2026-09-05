@@ -8,10 +8,12 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from app.core.config import Settings
 from app.evaluation.dataset.enums import DatasetSplit
 from app.evaluation.dataset.models import EvaluationCase, ScoringRubric
 
 from paired_agent_evaluation.adapters.dataset import Phase5Dataset
+from paired_agent_evaluation.adapters.graders import RagasFaithfulnessGrader
 from paired_agent_evaluation.adapters.storage.filesystem import (
     JsonlStore,
     RawFilesystemStore,
@@ -38,6 +40,7 @@ from paired_agent_evaluation.domain.scores import (
     MetricContribution,
     PairedDifference,
     ResolvedAdjudication,
+    SecondaryGrade,
 )
 
 
@@ -193,3 +196,38 @@ def score_run(*, run_id: str) -> dict[str, Any]:
     manifest["completed_at"] = datetime.now(UTC).isoformat() if pending == 0 else None
     atomic_json(manifest_path, manifest)
     return summary
+
+
+async def _grade_ragas(run_id: str) -> list[SecondaryGrade]:
+    paths = EvaluationPaths.discover()
+    run_root = paths.run_root(run_id)
+    raw = RawFilesystemStore(run_root / "raw" / "observations").read_all()
+    manifest = json.loads((run_root / "run-manifest.json").read_text(encoding="utf-8"))
+    settings = Settings(_env_file=paths.repository / ".env")
+    if settings.openai_api_key is None:
+        raise ValueError("RAG_OPENAI_API_KEY is required for secondary Ragas grading")
+    grader = RagasFaithfulnessGrader(
+        api_key=settings.openai_api_key.get_secret_value(),
+        model=str(manifest["model_identifier"]),
+    )
+    grades = []
+    for execution in raw:
+        answer = str((execution.response or {}).get("answer") or "")
+        contexts = [item.content for item in execution.retrieved]
+        if not answer or not contexts:
+            continue
+        value, reason = await grader.grade(
+            query=str(execution.request["query"]), response=answer, contexts=contexts
+        )
+        grades.append(
+            SecondaryGrade(
+                observation_id=execution.key.observation_id,
+                grader="ragas.Faithfulness",
+                grader_version="0.4.3",
+                model_identifier=str(manifest["model_identifier"]),
+                value=value,
+                reason=reason,
+            )
+        )
+    JsonlStore.write(run_root / "secondary-ragas.jsonl", grades)
+    return grades
