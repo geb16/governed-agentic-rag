@@ -27,6 +27,36 @@ RELEASE_FILES = (
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
+def _sanitize(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {
+            str(key): (
+                "[REDACTED]"
+                if any(part in str(key).lower() for part in (
+                    "api_key", "password", "secret", "access_token", "refresh_token"
+                    )
+                )
+                else _sanitize(item)
+            )
+            for key, item in value.items()
+        }
+    if isinstance(value, list):
+        return [_sanitize(item) for item in value]
+    return value
+
+
+def _write_sanitized(source: Path, destination: Path) -> None:
+    if source.suffix == ".jsonl":
+        records = [json.loads(line) for line in source.read_text(encoding="utf-8").splitlines()]
+        content = "".join(
+            json.dumps(_sanitize(record), separators=(",", ":"), sort_keys=True) + "\n"
+            for record in records
+        )
+        destination.write_text(content, encoding="utf-8", newline="\n")
+        return
+    atomic_json(destination, _sanitize(json.loads(source.read_text(encoding="utf-8"))))
+
+
 def seal_run(*, run_root: Path, release_root: Path) -> ReleaseManifest:
     missing = [name for name in RELEASE_FILES if not (run_root / name).is_file()]
     if missing:
@@ -41,6 +71,11 @@ def seal_run(*, run_root: Path, release_root: Path) -> ReleaseManifest:
         raise ValueError(
             f"Only a test-split run can be sealed; refusing split={run_manifest.get('split')!r}"
         )
+    if release_root.exists() and any(release_root.iterdir()):
+        raise ValueError("Release directory must be empty before sealing")
+    release_root.mkdir(parents=True, exist_ok=True)
+    for name in RELEASE_FILES:
+        _write_sanitized(run_root / name, release_root / name) 
     hashes = {name: _sha256(release_root / name) for name in RELEASE_FILES}
     payload = {
         "release_id": "paired-agent-evaluation-v1",
