@@ -162,7 +162,11 @@ def prepare_run(
         ):
             raise ValueError("Existing run schedule is missing or has changed")
         return paths, schedule, existing, settings
-    
+    if run_root.exists() and any(run_root.iterdir()):
+        raise ValueError("Run directory exists without a managed manifest")
+    run_root.mkdir(parents=True, exist_ok=True)
+    atomic_json(schedule_path, [item.model_dump(mode="json") for item in schedule])
+    atomic_json(manifest_path, manifest.model_dump(mode="json"))
     return paths, schedule, manifest, settings
 
 
