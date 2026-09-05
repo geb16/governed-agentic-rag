@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from app.core.config import Settings
 from app.evaluation.dataset.enums import DatasetSplit
@@ -53,21 +55,28 @@ def validate_run_id(run_id: str) -> None:
     if re.fullmatch(r"run_[A-Za-z0-9_-]+", run_id) is None:
         raise ValueError("run_id must match run_[A-Za-z0-9_-]+")
 
+def _json(path: Path) -> Any:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def load_experiment_config(paths: EvaluationPaths) -> ExperimentConfig:
-    return ExperimentConfig.model_validate(paths.configs / "experiment.json")
+    return ExperimentConfig.model_validate(_json(paths.configs / "experiment.json"))
 
 
 def prepare_run(
     *,
     run_id: str,
     split: DatasetSplit,
-) -> tuple[
-    EvaluationPaths,
-    list[ScheduledExecution],
-    ExperimentManifest,
-    Settings,
-]:
-    raise NotImplementedError("Run preparation has not been implemented")
+) -> tuple[EvaluationPaths, list[ScheduledExecution], ExperimentManifest, Settings]:
+    paths = EvaluationPaths.discover()
+    validate_run_id(run_id)
+    config = load_experiment_config(paths)
+    dataset = Phase5Dataset(paths.repository)
+    rubric = dataset.rubric()
+    if rubric.repetitions_per_case != config.repetitions_per_case:
+        raise ValueError("Experiment repetitions drift from the frozen rubric")
+
+
 
 def acquire(*, run_id: str, split: DatasetSplit) -> ExperimentManifest:
     paths, schedule, manifest, settings = prepare_run(run_id=run_id, split=split)
