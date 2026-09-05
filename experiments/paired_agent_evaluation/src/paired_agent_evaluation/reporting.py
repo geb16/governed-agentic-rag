@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -30,6 +31,7 @@ from paired_agent_evaluation.application.statistics import (
     registered_strata,
 )
 from paired_agent_evaluation.composition import EvaluationPaths
+from paired_agent_evaluation.domain.observations import AcceptanceStatus, NormalizedObservation
 from paired_agent_evaluation.domain.scores import (
     Adjudication,
     Estimate,
@@ -95,6 +97,50 @@ def _build_estimates(
             )
     return estimates, differences
 
+def _summary(
+    run_id: str,
+    split: DatasetSplit,
+    observations: list[NormalizedObservation],
+    resolved: dict[str, ResolvedAdjudication],
+    review_items: list[Any],
+    pending: int,
+) -> dict[str, Any]:
+    return {
+        "run_id": run_id,
+        "split": split.value,
+        "accepted_observations": sum(
+            item.acceptance == AcceptanceStatus.ACCEPTED for item in observations
+        ),
+        "invalid_observations": sum(
+            item.acceptance == AcceptanceStatus.INVALID for item in observations
+        ),
+        "pending_metric_contributions": pending,
+        "resolved_adjudications": len(resolved),
+        "review_items": len(review_items),
+        "primary_results_final": pending == 0,
+        "latency_ms_by_condition": {
+            condition: [
+                item.latency_ms for item in observations if item.key.condition.value == condition
+            ]
+            for condition in ("baseline", "governed")
+        },
+        "token_usage_by_condition": {
+            condition: {
+                "input_tokens": sum(
+                    item.input_tokens
+                    for item in observations
+                    if item.key.condition.value == condition
+                ),
+                "output_tokens": sum(
+                    item.output_tokens
+                    for item in observations
+                    if item.key.condition.value == condition
+                ),
+            }
+            for condition in ("baseline", "governed")
+        },
+    }
+
 
 def score_run(*, run_id: str) -> dict[str, Any]:
     paths = EvaluationPaths.discover()
@@ -140,3 +186,10 @@ def score_run(*, run_id: str) -> dict[str, Any]:
         run_root / "paired-differences.json",
         [item.model_dump(mode="json") for item in differences],
     )
+    pending = sum(item.pending_reason is not None for item in contributions)
+    summary = _summary(run_id, split, normalized, resolved, review_items, pending)
+    atomic_json(run_root / "summary.json", summary)
+    manifest["status"] = "scored" if pending == 0 else "awaiting_adjudication"
+    manifest["completed_at"] = datetime.now(UTC).isoformat() if pending == 0 else None
+    atomic_json(manifest_path, manifest)
+    return summary
