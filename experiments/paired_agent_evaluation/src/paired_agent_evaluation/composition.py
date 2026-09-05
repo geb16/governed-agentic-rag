@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.metadata
 import json
 import re
 from dataclasses import dataclass
@@ -15,6 +16,7 @@ from paired_agent_evaluation.adapters.dataset import Phase5Dataset
 from paired_agent_evaluation.adapters.storage.filesystem import (
     RawFilesystemStore,
     atomic_json,
+    sha256_json,
 )
 from paired_agent_evaluation.adapters.systems import BaselineSystemRunner, GovernedSystemRunner
 from paired_agent_evaluation.application.acquisition import AcquisitionRunner
@@ -69,6 +71,10 @@ def _freeze(path: Path) -> dict[str, Any]:
         raise ValueError(f"Freeze manifest must be an object: {path}")
     return payload
 
+def _schedule_hash(schedule: list[ScheduledExecution]) -> str:
+    return sha256_json([item.model_dump(mode="json") for item in schedule])
+
+
 def prepare_run(
     *,
     run_id: str,
@@ -108,7 +114,27 @@ def prepare_run(
         "phase4": phase4["aggregate_sha256"],
         "phase5": phase5["aggregate_sha256"],
     }
-    manifest = ExperimentManifest())
+    
+    package_names = ["governed-agentic-rag", "governed-agentic-rag-paired-evaluation", "ragas"]
+    versions = {name: importlib.metadata.version(name) for name in package_names}
+    manifest = ExperimentManifest(
+        run_id=run_id,
+        split=split.value,
+        status="prepared",
+        phase3_freeze_id=str(phase3["freeze_id"]),
+        phase3_aggregate_sha256=str(phase3["aggregate_sha256"]),
+        phase4_freeze_id=str(phase4["freeze_id"]),
+        phase4_aggregate_sha256=str(phase4["aggregate_sha256"]),
+        phase5_freeze_id=str(phase5["freeze_id"]),
+        phase5_aggregate_sha256=str(phase5["aggregate_sha256"]),
+        model_identifier=settings.openai_model,
+        retrieval_backend=settings.retrieval_backend,
+        qdrant_collection=settings.qdrant_collection,
+        configuration_sha256=sha256_json(configuration),
+        schedule_sha256=_schedule_hash(schedule),
+        expected_observations=len(schedule),
+        package_versions=versions,
+    )
     return paths, schedule, manifest, settings
 
 
