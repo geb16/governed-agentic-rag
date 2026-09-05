@@ -24,6 +24,9 @@ RELEASE_FILES = (
     "paired-differences.json",
     "summary.json",
 )
+
+SENSITIVE_KEY_PARTS = ("api_key", "password", "secret", "access_token", "refresh_token")
+
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -32,10 +35,7 @@ def _sanitize(value: Any) -> Any:
         return {
             str(key): (
                 "[REDACTED]"
-                if any(part in str(key).lower() for part in (
-                    "api_key", "password", "secret", "access_token", "refresh_token"
-                    )
-                )
+                if any(part in str(key).lower() for part in SENSITIVE_KEY_PARTS)
                 else _sanitize(item)
             )
             for key, item in value.items()
