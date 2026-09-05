@@ -24,11 +24,12 @@ RELEASE_FILES = (
     "paired-differences.json",
     "summary.json",
 )
-
 SENSITIVE_KEY_PARTS = ("api_key", "password", "secret", "access_token", "refresh_token")
+
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
 
 def _sanitize(value: Any) -> Any:
     if isinstance(value, dict):
@@ -75,7 +76,7 @@ def seal_run(*, run_root: Path, release_root: Path) -> ReleaseManifest:
         raise ValueError("Release directory must be empty before sealing")
     release_root.mkdir(parents=True, exist_ok=True)
     for name in RELEASE_FILES:
-        _write_sanitized(run_root / name, release_root / name) 
+        _write_sanitized(run_root / name, release_root / name)
     hashes = {name: _sha256(release_root / name) for name in RELEASE_FILES}
     payload = {
         "release_id": "paired-agent-evaluation-v1",
@@ -91,7 +92,7 @@ def seal_run(*, run_root: Path, release_root: Path) -> ReleaseManifest:
     atomic_json(release_root / "manifest.json", manifest.model_dump(mode="json"))
     return manifest
 
-# Verify that a release is complete and consistent, returning the manifes
+
 def verify_release(release_root: Path) -> ReleaseManifest:
     manifest = ReleaseManifest.model_validate_json(
         (release_root / "manifest.json").read_text(encoding="utf-8")
