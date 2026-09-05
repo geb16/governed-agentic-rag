@@ -1,4 +1,4 @@
-# Execution identities and the immutable paired schedule. 
+# Execution identities and the immutable paired schedule.
 
 from __future__ import annotations
 
