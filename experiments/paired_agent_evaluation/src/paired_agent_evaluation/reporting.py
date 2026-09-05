@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 from datetime import UTC, datetime
 from pathlib import Path
@@ -231,3 +232,6 @@ async def _grade_ragas(run_id: str) -> list[SecondaryGrade]:
         )
     JsonlStore.write(run_root / "secondary-ragas.jsonl", grades)
     return grades
+
+def grade_ragas(*, run_id: str) -> list[SecondaryGrade]:
+    return asyncio.run(_grade_ragas(run_id))
