@@ -6,6 +6,23 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from app.core.config import Settings
+from app.evaluation.dataset.enums import DatasetSplit
+
+from paired_agent_evaluation.adapters.dataset import Phase5Dataset
+from paired_agent_evaluation.adapters.storage.filesystem import (
+    RawFilesystemStore,
+    atomic_json,
+)
+from paired_agent_evaluation.adapters.systems import BaselineSystemRunner, GovernedSystemRunner
+from paired_agent_evaluation.application.acquisition import AcquisitionRunner
+from paired_agent_evaluation.domain.executions import (
+    Condition,
+    ExperimentConfig,
+    ScheduledExecution,
+)
+from paired_agent_evaluation.domain.manifests import ExperimentManifest
+
 
 @dataclass(frozen=True, slots=True)
 class EvaluationPaths:
@@ -35,3 +52,45 @@ class EvaluationPaths:
 def validate_run_id(run_id: str) -> None:
     if re.fullmatch(r"run_[A-Za-z0-9_-]+", run_id) is None:
         raise ValueError("run_id must match run_[A-Za-z0-9_-]+")
+
+def load_experiment_config(paths: EvaluationPaths) -> ExperimentConfig:
+    return ExperimentConfig.model_validate(paths.configs / "experiment.json")
+
+
+def prepare_run(
+    *,
+    run_id: str,
+    split: DatasetSplit,
+) -> tuple[
+    EvaluationPaths,
+    list[ScheduledExecution],
+    ExperimentManifest,
+    Settings,
+]:
+    raise NotImplementedError("Run preparation has not been implemented")
+
+def acquire(*, run_id: str, split: DatasetSplit) -> ExperimentManifest:
+    paths, schedule, manifest, settings = prepare_run(run_id=run_id, split=split)
+    config = load_experiment_config(paths)
+    cases = Phase5Dataset(paths.repository).cases(split)
+    run_root = paths.run_root(run_id)
+    store = RawFilesystemStore(run_root / "raw" / "observations")
+    executions = AcquisitionRunner(
+        runners={
+            Condition.BASELINE: BaselineSystemRunner(settings),
+            Condition.GOVERNED: GovernedSystemRunner(settings),
+        },
+        store=store,
+        workspace=run_root / "work",
+        max_pre_acceptance_attempts=config.max_pre_acceptance_attempts,
+    ).run(schedule, cases)
+    accepted = sum(item.request_accepted for item in executions)
+    completed = manifest.model_copy(
+        update={
+            "status": "acquired",
+            "accepted_observations": accepted,
+            "invalid_observations": len(executions) - accepted,
+        }
+    )
+    atomic_json(run_root / "run-manifest.json", completed.model_dump(mode="json"))
+    return completed
