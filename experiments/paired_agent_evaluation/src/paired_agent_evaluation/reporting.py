@@ -1,6 +1,5 @@
 # Phase-6 reporting orchestration over pure application services.
 
-
 from __future__ import annotations
 
 import asyncio
@@ -62,6 +61,7 @@ def _load_adjudications(run_root: Path) -> dict[str, ResolvedAdjudication]:
     )
     return resolve_reviews(reviews, resolutions=resolutions)
 
+
 def _build_estimates(
     contributions: list[MetricContribution],
     cases: list[EvaluationCase],
@@ -100,6 +100,7 @@ def _build_estimates(
                 )
             )
     return estimates, differences
+
 
 def _summary(
     run_id: str,
@@ -232,6 +233,7 @@ async def _grade_ragas(run_id: str) -> list[SecondaryGrade]:
         )
     JsonlStore.write(run_root / "secondary-ragas.jsonl", grades)
     return grades
+
 
 def grade_ragas(*, run_id: str) -> list[SecondaryGrade]:
     return asyncio.run(_grade_ragas(run_id))
