@@ -18,6 +18,7 @@ from paired_agent_evaluation.adapters.storage.filesystem import (
 )
 from paired_agent_evaluation.adapters.systems import BaselineSystemRunner, GovernedSystemRunner
 from paired_agent_evaluation.application.acquisition import AcquisitionRunner
+from paired_agent_evaluation.application.scheduling import build_schedule
 from paired_agent_evaluation.domain.executions import (
     Condition,
     ExperimentConfig,
@@ -62,6 +63,11 @@ def _json(path: Path) -> Any:
 def load_experiment_config(paths: EvaluationPaths) -> ExperimentConfig:
     return ExperimentConfig.model_validate(_json(paths.configs / "experiment.json"))
 
+def _freeze(path: Path) -> dict[str, Any]:
+    payload = _json(path)
+    if not isinstance(payload, dict):
+        raise ValueError(f"Freeze manifest must be an object: {path}")
+    return payload
 
 def prepare_run(
     *,
@@ -72,10 +78,38 @@ def prepare_run(
     validate_run_id(run_id)
     config = load_experiment_config(paths)
     dataset = Phase5Dataset(paths.repository)
+    cases = dataset.cases(split)
     rubric = dataset.rubric()
     if rubric.repetitions_per_case != config.repetitions_per_case:
         raise ValueError("Experiment repetitions drift from the frozen rubric")
-
+    schedule = build_schedule(
+        cases,
+        repetitions=config.repetitions_per_case,
+        seed=config.condition_order_seed,
+    )
+    run_root = paths.run_root(run_id)
+    settings = Settings(
+        _env_file=paths.repository / ".env",
+        execution_profile="experiment",
+        experiment_run_id=run_id,
+        experiment_manifest_dir=run_root / "system-manifests",
+    )
+    if settings.retrieval_backend != config.required_retrieval_backend:
+        raise ValueError("Configured retrieval backend violates experiment.json")
+    phase3 = _freeze(paths.repository / "docs" / "phase-3-freeze-manifest.json")
+    phase4 = _freeze(paths.repository / "docs" / "phase-4-freeze-manifest.json")
+    phase5 = dataset.freeze_identity()
+    configuration = {
+        name: _json(paths.configs / name)
+        for name in ("experiment.json", "graders.json", "reporting.json")
+    }
+    configuration["freeze_aggregates"] = {
+        "phase3": phase3["aggregate_sha256"],
+        "phase4": phase4["aggregate_sha256"],
+        "phase5": phase5["aggregate_sha256"],
+    }
+    manifest = ExperimentManifest())
+    return paths, schedule, manifest, settings
 
 
 def acquire(*, run_id: str, split: DatasetSplit) -> ExperimentManifest:
