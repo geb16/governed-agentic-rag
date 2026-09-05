@@ -135,6 +135,34 @@ def prepare_run(
         expected_observations=len(schedule),
         package_versions=versions,
     )
+    manifest_path = run_root / "run-manifest.json"
+    schedule_path = run_root / "schedule.json"
+    if manifest_path.is_file():
+        existing = ExperimentManifest.model_validate_json(manifest_path.read_text(encoding="utf-8"))
+        immutable = (
+            "run_id",
+            "split",
+            "phase3_aggregate_sha256",
+            "phase4_aggregate_sha256",
+            "phase5_aggregate_sha256",
+            "model_identifier",
+            "retrieval_backend",
+            "qdrant_collection",
+            "configuration_sha256",
+            "schedule_sha256",
+            "expected_observations",
+            "package_versions",
+        )
+        drift = [name for name in immutable if getattr(existing, name) != getattr(manifest, name)]
+        if drift:
+            raise ValueError(f"Existing run manifest drift: {', '.join(drift)}")
+        if (
+            not schedule_path.is_file()
+            or sha256_json(_json(schedule_path)) != manifest.schedule_sha256
+        ):
+            raise ValueError("Existing run schedule is missing or has changed")
+        return paths, schedule, existing, settings
+    
     return paths, schedule, manifest, settings
 
 
