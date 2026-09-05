@@ -90,3 +90,24 @@ def seal_run(*, run_root: Path, release_root: Path) -> ReleaseManifest:
     )
     atomic_json(release_root / "manifest.json", manifest.model_dump(mode="json"))
     return manifest
+
+# Verify that a release is complete and consistent, returning the manifes
+def verify_release(release_root: Path) -> ReleaseManifest:
+    manifest = ReleaseManifest.model_validate_json(
+        (release_root / "manifest.json").read_text(encoding="utf-8")
+    )
+    actual = {path.name for path in release_root.iterdir() if path.is_file()}
+    if actual != {*manifest.files, "manifest.json"}:
+        raise ValueError("Release file set is not closed")
+    for name, digest in manifest.files.items():
+        if _sha256(release_root / name) != digest:
+            raise ValueError(f"Release hash mismatch: {name}")
+    payload = {
+        "release_id": manifest.release_id,
+        "run_id": manifest.run_id,
+        "source_run_manifest_sha256": manifest.source_run_manifest_sha256,
+        "files": manifest.files,
+    }
+    if hashlib.sha256(canonical_json(payload)).hexdigest() != manifest.aggregate_sha256:
+        raise ValueError("Release aggregate mismatch")
+    return manifest
