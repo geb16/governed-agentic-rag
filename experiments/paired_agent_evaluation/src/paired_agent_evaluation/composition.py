@@ -58,6 +58,7 @@ def validate_run_id(run_id: str) -> None:
     if re.fullmatch(r"run_[A-Za-z0-9_-]+", run_id) is None:
         raise ValueError("run_id must match run_[A-Za-z0-9_-]+")
 
+
 def _json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -65,11 +66,13 @@ def _json(path: Path) -> Any:
 def load_experiment_config(paths: EvaluationPaths) -> ExperimentConfig:
     return ExperimentConfig.model_validate(_json(paths.configs / "experiment.json"))
 
+
 def _freeze(path: Path) -> dict[str, Any]:
     payload = _json(path)
     if not isinstance(payload, dict):
         raise ValueError(f"Freeze manifest must be an object: {path}")
     return payload
+
 
 def _schedule_hash(schedule: list[ScheduledExecution]) -> str:
     return sha256_json([item.model_dump(mode="json") for item in schedule])
@@ -114,7 +117,6 @@ def prepare_run(
         "phase4": phase4["aggregate_sha256"],
         "phase5": phase5["aggregate_sha256"],
     }
-    
     package_names = ["governed-agentic-rag", "governed-agentic-rag-paired-evaluation", "ragas"]
     versions = {name: importlib.metadata.version(name) for name in package_names}
     manifest = ExperimentManifest(
