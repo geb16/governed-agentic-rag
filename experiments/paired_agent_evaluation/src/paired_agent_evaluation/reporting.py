@@ -24,10 +24,17 @@ from paired_agent_evaluation.application.adjudication import (
 )
 from paired_agent_evaluation.application.normalization import normalize
 from paired_agent_evaluation.application.scoring import score_all
+from paired_agent_evaluation.application.statistics import (
+    estimate_condition,
+    estimate_paired_difference,
+    registered_strata,
+)
 from paired_agent_evaluation.composition import EvaluationPaths
 from paired_agent_evaluation.domain.scores import (
     Adjudication,
+    Estimate,
     MetricContribution,
+    PairedDifference,
     ResolvedAdjudication,
 )
 
@@ -54,7 +61,41 @@ def _build_estimates(
     cases: list[EvaluationCase],
     rubric: ScoringRubric,
     reporting: dict[str, Any],
-): pass
+) -> tuple[list[Estimate], list[PairedDifference]]:
+    case_map = {case.case_id: case for case in cases}
+    estimates = []
+    differences = []
+    for stratum, predicate in registered_strata(cases):
+        for definition in rubric.metrics:
+            for condition in ("baseline", "governed"):
+                estimates.append(
+                    estimate_condition(
+                        contributions,
+                        case_map,
+                        metric_id=definition.metric_id,
+                        condition=condition,
+                        stratum=stratum,
+                        include_case=predicate,
+                        replicates=int(reporting["bootstrap_replicates"]),
+                        seed=int(reporting["bootstrap_seed"]),
+                        minimum_valid=int(reporting["minimum_valid_bootstrap_replicates"]),
+                    )
+                )
+            differences.append(
+                estimate_paired_difference(
+                    contributions,
+                    case_map,
+                    metric_id=definition.metric_id,
+                    stratum=stratum,
+                    include_case=predicate,
+                    replicates=int(reporting["bootstrap_replicates"]),
+                    seed=int(reporting["bootstrap_seed"]),
+                    minimum_valid=int(reporting["minimum_valid_bootstrap_replicates"]),
+                )
+            )
+    return estimates, differences
+
+
 def score_run(*, run_id: str) -> dict[str, Any]:
     paths = EvaluationPaths.discover()
     run_root = paths.run_root(run_id)
