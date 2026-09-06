@@ -1,5 +1,9 @@
 from datetime import UTC, datetime
 
+from paired_agent_evaluation.adapters.storage.filesystem import RawFilesystemStore
+from paired_agent_evaluation.application.acquisition import AcquisitionRunner
+from paired_agent_evaluation.application.scheduling import build_schedule
+from paired_agent_evaluation.domain.executions import Condition
 from paired_agent_evaluation.domain.observations import (
     AcceptanceStatus,
     BusinessState,
@@ -27,3 +31,24 @@ class SequencedRunner:
             state_after=BusinessState(),
         )
 
+# Test to assert that the acquisition runner retries pre-acceptance once then resumes normally.
+def test_acquisition_retries_pre_acceptance_once_and_resumes(tmp_path, answer_case) -> None:
+
+    scheduled = next(
+        item
+        for item in build_schedule([answer_case], repetitions=1, seed=1)
+        if item.key.condition == Condition.BASELINE
+    )
+    runner = SequencedRunner()
+    store = RawFilesystemStore(tmp_path / "raw")
+    acquisition = AcquisitionRunner(
+        runners={Condition.BASELINE: runner},
+        store=store,
+        workspace=tmp_path / "work",
+        max_pre_acceptance_attempts=2,
+    )
+    result = acquisition.run([scheduled], [answer_case])
+    assert result[0].acceptance == AcceptanceStatus.ACCEPTED
+    assert runner.calls == 2
+    acquisition.run([scheduled], [answer_case])
+    assert runner.calls == 2
