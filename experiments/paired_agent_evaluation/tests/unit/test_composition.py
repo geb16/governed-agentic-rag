@@ -43,3 +43,15 @@ def test_prepare_run_is_idempotent_for_an_unchanged_repeat(isolated_paths) -> No
 
     assert second == first
 
+
+def test_prepare_run_rejects_drift_in_an_existing_run_manifest(monkeypatch, isolated_paths) -> None:
+    prepare_run(run_id="run_composition_drift", split=DatasetSplit.VALIDATION)
+
+    monkeypatch.setattr(
+        composition_module,
+        "Settings",
+        lambda **kwargs: _StubSettings(openai_model="a-different-model", **kwargs),
+    )
+
+    with pytest.raises(ValueError, match="Existing run manifest drift"):
+        prepare_run(run_id="run_composition_drift", split=DatasetSplit.VALIDATION)
