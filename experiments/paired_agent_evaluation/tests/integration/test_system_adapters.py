@@ -38,7 +38,46 @@ def test_both_frozen_systems_run_against_isolated_shared_fixture(
 
 
 class GovernedDualRoleRefundModel:
-    pass
+    """Deterministically require both finance_manager and fraud_reviewer approval."""
+
+    model_name = "fixed-test-model"
+
+    def classify(self, *_: Any, **__: Any) -> ModelResult[ClassificationDraft]:
+        return ModelResult(
+            ClassificationDraft(
+                intent="refund",
+                task_type="state_changing",
+                sensitivity="moderate",
+                confidence=1.0,
+                summary="A large refund was requested.",
+            ),
+            input_tokens=2,
+            output_tokens=1,
+        )
+
+    def propose(self, *_: Any, **__: Any) -> ModelResult[ProposedActionDraft]:
+        return ModelResult(
+            ProposedActionDraft(
+                kind="tool",
+                tool_name="issue_refund",
+                arguments_json=(
+                    '{"ticket_id": "TKT-1003", "amount_minor": 500000, "currency": "GBP", '
+                    '"idempotency_key": "adapter-test-dual-role-refund"}'
+                ),
+                confidence=1.0,
+                rationale="The evidence supports a large candidate refund.",
+            ),
+            input_tokens=2,
+            output_tokens=1,
+        )
+
+    def finalize(self, *_: Any, **__: Any) -> ModelResult[GovernedFinalDraft]:
+        return ModelResult(
+            GovernedFinalDraft(answer="Completed.", grounded=False),
+            input_tokens=2,
+            output_tokens=1,
+        )
+
 
 def test_governed_approval_replay_applies_every_available_decision(
     tmp_path: Path, settings, answer_case
