@@ -99,3 +99,7 @@ regenerate an inherited manifest from this project to force a pass.
    uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_release.py --seal-run run_test_v1
    uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_release.py
    ```
+
+The test split is not a tuning set. Never rerun accepted observations, manually replace model
+outputs, or alter labels after viewing comparative results. Only a pre-acceptance infrastructure
+failure can use the configured bounded rerun.
