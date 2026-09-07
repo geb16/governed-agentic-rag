@@ -24,3 +24,13 @@ def test_application_layer_does_not_import_adapters_or_composition(paths) -> Non
         text = path.read_text(encoding="utf-8")
         assert "paired_agent_evaluation.adapters" not in text
         assert "paired_agent_evaluation.composition" not in text
+
+
+def test_modules_remain_bounded(paths) -> None:
+    source = paths.project / "src" / "paired_agent_evaluation"
+    oversized = [
+        path.relative_to(source)
+        for path in source.rglob("*.py")
+        if len(path.read_text(encoding="utf-8").splitlines()) > 350
+    ]
+    assert oversized == []
