@@ -1,5 +1,7 @@
 from datetime import UTC, datetime
 
+import pytest
+
 from paired_agent_evaluation.application.normalization import normalize
 from paired_agent_evaluation.domain.executions import Condition, ExecutionKey
 from paired_agent_evaluation.domain.observations import (
@@ -49,3 +51,27 @@ def test_normalization_preserves_chunk_level_context_and_trace_projection() -> N
     assert observation.citation_membership_valid is True
     assert observation.retrieved_chunk_documents == {"chunk-1": "policy-1"}
     assert observation.trace_facts == ["classification_recorded"]
+
+
+@pytest.mark.parametrize(
+    ("response", "route", "needs_review"),
+    [
+        ({"status": "refused", "safety": {"blocked": True}}, ObservedRoute.DENY, False),
+        ({"status": "failed"}, ObservedRoute.SAFE_TERMINATE, False),
+        (
+            {
+                "status": "completed",
+                "tool_calls": [
+                    {"tool_name": "ticket_update", "status": "succeeded", "outcome": {}}
+                ],
+            },
+            ObservedRoute.EXECUTE,
+            False,
+        ),
+        ({"status": "completed", "answer": "Text"}, None, True),
+    ],
+)
+def test_baseline_route_normalization(response, route, needs_review) -> None:
+    observation = normalize(_raw(Condition.BASELINE, response))
+    assert observation.observed_route == route
+    assert observation.route_requires_adjudication is needs_review
