@@ -1,6 +1,7 @@
 from app.evaluation.dataset.enums import DatasetSplit
 
 from paired_agent_evaluation.adapters.dataset import Phase5Dataset
+from paired_agent_evaluation.application.adjudication import blinded_id
 from paired_agent_evaluation.application.scoring import score_observation
 from paired_agent_evaluation.domain.executions import Condition, ExecutionKey
 from paired_agent_evaluation.domain.observations import (
@@ -8,6 +9,7 @@ from paired_agent_evaluation.domain.observations import (
     NormalizedObservation,
     ObservedRoute,
 )
+from paired_agent_evaluation.domain.scores import ResolvedAdjudication
 
 
 def _case(paths, case_id):
@@ -25,6 +27,37 @@ def _metrics(case, observation, reviews=None):
             adjudications=reviews or {},
         )
     }
+
+
+def test_groundedness_requires_membership_and_human_claim_support(paths) -> None:
+    case = _case(paths, "case_eval_0002")
+    observation = NormalizedObservation(
+        key=ExecutionKey(case_id=case.case_id, repetition=1, condition=Condition.BASELINE),
+        acceptance=AcceptanceStatus.ACCEPTED,
+        observed_route=ObservedRoute.ANSWER,
+        answer="Supported answer",
+        citations=["relevant"],
+        citation_membership_valid=True,
+        retrieved_chunk_documents={"relevant": "refund_policy", "noise": "support_sop"},
+        latency_ms=1,
+        input_tokens=1,
+        output_tokens=1,
+        raw_sha256="a" * 64,
+    )
+    pending = _metrics(case, observation)
+    assert pending["groundedness_rate"].pending_reason is not None
+    identity = blinded_id(observation.key.observation_id, run_id="run_test")
+    reviews = {
+        identity: ResolvedAdjudication(
+            blinded_id=identity,
+            claim_support_passed=True,
+            reviewer_count=2,
+        )
+    }
+    scored = _metrics(case, observation, reviews)
+    assert scored["groundedness_rate"].numerator == 1
+    assert scored["context_precision"].numerator == 1
+    assert scored["context_precision"].denominator == 2
 
 
 def test_governed_human_review_scores_approval_and_unsafe_prevention(paths) -> None:
