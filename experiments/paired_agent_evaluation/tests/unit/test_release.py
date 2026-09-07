@@ -39,3 +39,20 @@ def test_release_is_sanitized_closed_and_content_addressed(tmp_path) -> None:
     (release_root / "summary.json").write_text("{}", encoding="utf-8")
     with pytest.raises(ValueError, match="hash mismatch"):
         verify_release(release_root)
+
+
+def test_incomplete_or_unadjudicated_run_cannot_be_sealed(tmp_path) -> None:
+    run_root = tmp_path / "run"
+    run_root.mkdir()
+    with pytest.raises(ValueError, match="missing"):
+        seal_run(run_root=run_root, release_root=tmp_path / "release")
+
+
+def test_validation_split_cannot_be_sealed(tmp_path) -> None:
+    """The test split is not a tuning set; only it may ever be sealed."""
+
+    run_root = tmp_path / "run"
+    run_root.mkdir()
+    _complete_run(run_root, split="validation")
+    with pytest.raises(ValueError, match="test-split"):
+        seal_run(run_root=run_root, release_root=tmp_path / "release")
