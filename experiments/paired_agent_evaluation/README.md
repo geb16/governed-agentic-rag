@@ -48,3 +48,54 @@ uv run --project experiments/paired_agent_evaluation ruff check experiments/pair
 uv run --project experiments/paired_agent_evaluation mypy --config-file experiments/paired_agent_evaluation/pyproject.toml
 ```
 
+`verify_harness.py` must pass all Phase-3, Phase-4, and Phase-5 freeze checks. A failure there
+means the defect is upstream, in one of those frozen phases — fix and re-release it there; never
+regenerate an inherited manifest from this project to force a pass.
+
+## Controlled experiment sequence
+
+1. Verify the harness and infrastructure, including Qdrant availability and the repository root's
+   `.env`.
+2. Preview the deterministic schedule if required:
+
+   ```bash
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/build_schedule.py --split validation
+   ```
+
+3. Acquire the validation split:
+
+   ```bash
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/run_validation.py --run-id run_validation_v1
+   ```
+
+4. Generate normalized results and the blinded review packet:
+
+   ```bash
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_validation_v1
+   ```
+
+5. Two reviewers independently write
+   `adjudication/reviewer-<id>.jsonl`. Resolve disagreements in
+   `adjudication/resolutions.jsonl`, then rerun scoring. Do not inspect the condition mapping while
+   reviewing.
+6. Run secondary Ragas faithfulness only after the primary human labels are fixed:
+
+   ```bash
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_validation_v1 --ragas
+   ```
+
+7. Correct harness defects found by validation without changing the frozen metric definitions.
+   Then acquire the untouched test split under a new run ID and repeat scoring and adjudication:
+
+   ```bash
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/run_test.py --run-id run_test_v1
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_test_v1
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_test_v1 --ragas
+   ```
+
+8. Seal exactly one final test run:
+
+   ```bash
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_release.py --seal-run run_test_v1
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_release.py
+   ```
