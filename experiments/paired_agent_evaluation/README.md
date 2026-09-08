@@ -103,3 +103,15 @@ regenerate an inherited manifest from this project to force a pass.
 The test split is not a tuning set. Never rerun accepted observations, manually replace model
 outputs, or alter labels after viewing comparative results. Only a pre-acceptance infrastructure
 failure can use the configured bounded rerun.
+
+## Troubleshooting
+
+- **`verify_harness.py` fails an inherited freeze gate.** The defect is in Phase 3, 4, or 5, not in
+  this harness — fix and re-release the affected phase, then re-run. Do not edit or regenerate that
+  phase's freeze manifest from within this project.
+- **`verify_release.py --seal-run` raises on the run's split.** Only a `test`-split run can be
+  sealed (`release.py::seal_run`); a `validation` run exists to correct the harness before the real
+  test-split run, not to be released.
+- **`uv` resolves the wrong dependencies or interpreter.** Confirm `--project
+  experiments/paired_agent_evaluation` is present (or that you're `cd`'d into this directory) — the
+  repository root and this project keep separate lockfiles and virtual environments.
