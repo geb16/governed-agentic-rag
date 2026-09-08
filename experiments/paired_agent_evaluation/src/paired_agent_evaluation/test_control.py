@@ -12,6 +12,10 @@ from typing import Any, Protocol
 from app.evaluation.dataset.enums import DatasetSplit
 
 from paired_agent_evaluation.adapters.dataset import Phase5Dataset
+from paired_agent_evaluation.adapters.storage.filesystem import (
+    atomic_json,
+    sha256_json,
+)
 from paired_agent_evaluation.application.scheduling import build_schedule
 from paired_agent_evaluation.domain.executions import ExperimentConfig
 from paired_agent_evaluation.domain.manifests import (
@@ -180,3 +184,11 @@ def write_harness_freeze(
         aggregate_sha256="0" * 64,
         **_inherited_identities(paths),
     )
+    manifest = manifest.model_copy(
+        update={"aggregate_sha256": sha256_json(_manifest_payload(manifest))}
+    )
+    atomic_json(
+        paths.repository / HARNESS_MANIFEST,
+        manifest.model_dump(mode="json"),
+    )
+    return manifest
