@@ -57,3 +57,11 @@ composition.py   The project's own composition root: path discovery, config load
 release.py       Sanitization and content-addressed sealing of a completed run.
 reporting.py     Normalization, scoring, and release-packet generation over a run's raw results.
 ```
+
+`tests/architecture/test_boundaries.py` enforces the two structural rules this implies:
+`domain/` must never import `adapters` or `application`, and `application/` must never import
+`adapters` or `composition` — so the ports in `application/ports.py`
+(`SystemRunner`, `RawExecutionStore`, `SecondaryGroundednessGrader`) are the only contract adapters
+implement, and application code stays testable without constructing any concrete adapter. A third
+rule (`test_modules_remain_bounded`) caps every source file at 350 lines, keeping each module legible
+without an internal decomposition mandate.
