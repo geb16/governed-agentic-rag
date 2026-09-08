@@ -18,11 +18,14 @@ from paired_agent_evaluation.adapters.storage.filesystem import (
     JsonlStore,
     RawFilesystemStore,
     atomic_json,
+    sha256_json,
 )
 from paired_agent_evaluation.adapters.telemetry import project_trace_facts
 from paired_agent_evaluation.application.adjudication import (
+    BlindingPlan,
     apply_route_review,
     build_review_item,
+    order_review_items,
     resolve_reviews,
 )
 from paired_agent_evaluation.application.normalization import normalize
@@ -152,6 +155,11 @@ def score_run(*, run_id: str) -> dict[str, Any]:
     run_root = paths.run_root(run_id)
     manifest_path = run_root / "run-manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    blinding_plan = BlindingPlan.model_validate_json(
+        (run_root / "blinding-plan.json").read_text(encoding="utf-8")
+    )
+    if sha256_json(blinding_plan.model_dump(mode="json")) != manifest.get("blinding_plan_sha256"):
+        raise ValueError("Run blinding plan has changed")
     split = DatasetSplit(str(manifest["split"]))
     dataset = Phase5Dataset(paths.repository)
     cases = dataset.cases(split)
@@ -161,24 +169,28 @@ def score_run(*, run_id: str) -> dict[str, Any]:
         raise ValueError("Raw observation count does not match the run manifest")
     normalized = [normalize(item, trace_facts=project_trace_facts(item)) for item in raw]
     resolved = _load_adjudications(run_root)
-    normalized = [apply_route_review(item, run_id=run_id, resolved=resolved) for item in normalized]
-    by_raw = {item.key.observation_id: item for item in raw}
-    review_items = [
-        review
-        for observation in normalized
-        if (
-            review := build_review_item(
-                observation,
-                run_id=run_id,
-                query=str(by_raw[observation.key.observation_id].request["query"]),
-                contexts=[
-                    item.content for item in by_raw[observation.key.observation_id].retrieved
-                ],
-            )
-        )
-        is not None
+    normalized = [
+        apply_route_review(item, plan=blinding_plan, resolved=resolved) for item in normalized
     ]
-    contributions = score_all(cases, normalized, run_id=run_id, adjudications=resolved)
+    by_raw = {item.key.observation_id: item for item in raw}
+    review_items_by_observation = {}
+    for observation in normalized:
+        observation_id = observation.key.observation_id
+        review = build_review_item(
+            observation,
+            plan=blinding_plan,
+            query=str(by_raw[observation_id].request["query"]),
+            contexts=[item.content for item in by_raw[observation_id].retrieved],
+        )
+        if review is not None:
+            review_items_by_observation[observation_id] = review
+    review_items = order_review_items(review_items_by_observation, plan=blinding_plan)
+    contributions = score_all(
+        cases,
+        normalized,
+        blinding_plan=blinding_plan,
+        adjudications=resolved,
+    )
     reporting = json.loads((paths.configs / "reporting.json").read_text(encoding="utf-8"))
     estimates, differences = _build_estimates(contributions, cases, rubric, reporting)
     JsonlStore.write(run_root / "raw-results.jsonl", raw)
