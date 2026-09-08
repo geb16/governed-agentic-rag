@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -46,6 +47,9 @@ class EvaluationControlPaths(Protocol):
 
     def run_root(self, run_id: str) -> Path: ...
 
+def _json(path: Path) -> Any:
+    return json.loads(path.read_text(encoding="utf-8"))
+
 def _run_inherited_freeze_verifiers(paths: EvaluationControlPaths) -> None:
     failed: list[str] = []
     for script in INHERITED_VERIFIERS:
@@ -82,6 +86,21 @@ def verify_harness_readiness(paths: EvaluationControlPaths) -> None:
     _run_inherited_freeze_verifiers(paths)
     _verify_schedule_contract(paths)
 
+def _source_paths(paths: EvaluationControlPaths) -> list[Path]:
+    fixed = [paths.project / name for name in ("README.md", "pyproject.toml", "uv.lock")]
+    scoped = [
+        *paths.configs.glob("*.json"),
+        *(paths.project / "scripts").glob("*.py"),
+        *(paths.project / "src").rglob("*.py"),
+        *(paths.project / "src").rglob("py.typed"),
+        *(paths.project / "tests").rglob("*.py"),
+        *(paths.project / "tests").rglob("*.md"),
+        paths.repository / "docs" / "architecture" / "phase6_evaluation_architecture.md",
+        *(paths.repository / "docs" / "phase-6-experiments").glob("*.md"),
+    ]
+    files = {path.resolve() for path in [*fixed, *scoped] if path.is_file()}
+    return sorted(files, key=lambda path: path.as_posix())
+
 def _source_hashes(paths: EvaluationControlPaths) -> dict[str, str]:
     return {
         path.relative_to(paths.repository).as_posix(): _sha256(path)
@@ -90,7 +109,18 @@ def _source_hashes(paths: EvaluationControlPaths) -> dict[str, str]:
 
 
 def _inherited_identities(paths: EvaluationControlPaths) -> dict[str, str]:
-    pass 
+    phase3 = _json(paths.repository / "docs" / "phase-3-freeze-manifest.json")
+    phase4 = _json(paths.repository / "docs" / "phase-4-freeze-manifest.json")
+    phase5 = _json(paths.repository / "docs" / "phase-5-freeze-manifest.json")
+    return {
+        "phase3_freeze_id": str(phase3["freeze_id"]),
+        "phase3_aggregate_sha256": str(phase3["aggregate_sha256"]),
+        "phase4_freeze_id": str(phase4["freeze_id"]),
+        "phase4_aggregate_sha256": str(phase4["aggregate_sha256"]),
+        "phase5_freeze_id": str(phase5["freeze_id"]),
+        "phase5_aggregate_sha256": str(phase5["aggregate_sha256"]),
+    }
+
 
 def _completed_validation(paths: EvaluationControlPaths, run_id: str) -> tuple[str, str]:
     pass
