@@ -119,3 +119,21 @@ seal_run(run_root, release_root)
   -> require split == "test"  (a validation run can never be sealed as the release)
   -> sanitize (redact secret-shaped keys) and content-address every file
 ```
+
+## Failure and consistency model
+
+| Condition | Enforced behavior |
+|---|---|
+| Missing or failed Phase 3/4/5 freeze verification | `verify_harness.py` exits non-zero; acquisition must not proceed |
+| Re-running `prepare_run` with a changed configuration, model, backend, or schedule | Raises `Existing run manifest drift`; the original run is never silently altered |
+| A pre-acceptance attempt fails (transient/infrastructure failure before an observation is accepted) | Retried up to `max_pre_acceptance_attempts`, each attempt in its own workspace directory |
+| An observation is already accepted | Never rerun; acquisition resumes past it unconditionally |
+| A governed workflow's live risk assessment requires a role the dataset's expected decisions omit | That one role is skipped, not the whole replay; every available decision is still applied |
+| A run's status is not `"scored"` or primary results are not final | `seal_run` refuses to seal |
+| A fully scored run's split is `"validation"` | `seal_run` refuses to seal; only a `"test"`-split run may become the release |
+| `verify_release` against a sealed directory | Recomputes and compares every file digest and the aggregate digest; any mismatch fails closed |
+| Secondary Ragas grading run before adjudication is locked | Not code-enforced today; the protocol in `experiments/paired_agent_evaluation/README.md` requires human labels be fixed first — see known compromises |
+
+Each `BaselineSystemRunner`/`GovernedSystemRunner` attempt constructs a fresh, isolated SQLite
+database under its own attempt workspace before invoking the frozen agent or workflow, so conditions
+never share or leak mutable state across observations, repetitions, or each other.
