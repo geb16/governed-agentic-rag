@@ -1,10 +1,12 @@
-# Create blinded review packets and resolve independent reviewer decisions.
+"""Create opaque review identities and resolve independent reviewer decisions."""
 
 from __future__ import annotations
 
-import hashlib
+import re
+import secrets
+from collections.abc import Iterable, Mapping
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from paired_agent_evaluation.domain.executions import StrictModel
 from paired_agent_evaluation.domain.observations import NormalizedObservation
@@ -21,15 +23,65 @@ class ReviewItem(StrictModel):
     groundedness_review_required: bool
 
 
-def blinded_id(observation_id: str, *, run_id: str) -> str:
-    digest = hashlib.sha256(f"{run_id}:{observation_id}".encode()).hexdigest()
-    return f"blind_{digest[:24]}"
+class BlindingPlan(StrictModel):
+    """Persist opaque identities and reviewer order without exposing conditions."""
+
+    schema_version: int = 1
+    assignments: dict[str, str]
+    review_order: list[str]
+
+    @model_validator(mode="after")
+    def validate_closed_mapping(self) -> BlindingPlan:
+        """Require one unique opaque identity and one order entry per observation."""
+        observation_ids = set(self.assignments)
+        if not observation_ids or observation_ids != set(self.review_order):
+            raise ValueError("blinding assignments and review order must contain the same IDs")
+        if len(self.review_order) != len(observation_ids):
+            raise ValueError("review order must contain every observation exactly once")
+        blinded_ids = list(self.assignments.values())
+        if len(blinded_ids) != len(set(blinded_ids)):
+            raise ValueError("blinded identities must be unique")
+        if any(re.fullmatch(r"blind_[a-f0-9]{32}", value) is None for value in blinded_ids):
+            raise ValueError("blinded identities must be opaque 128-bit hexadecimal tokens")
+        return self
+
+    def identity_for(self, observation_id: str) -> str:
+        """Return the persisted opaque identity for an observation."""
+        try:
+            return self.assignments[observation_id]
+        except KeyError as error:
+            raise ValueError(
+                f"Observation is absent from the blinding plan: {observation_id}"
+            ) from error
+
+
+def create_blinding_plan(observation_ids: Iterable[str]) -> BlindingPlan:
+    """Create a cryptographically random mapping and independent review order."""
+    identities = list(observation_ids)
+    if len(identities) != len(set(identities)):
+        raise ValueError("observation identities must be unique")
+    assignments: dict[str, str] = {}
+    issued: set[str] = set()
+    for observation_id in identities:
+        blinded = f"blind_{secrets.token_hex(16)}"
+        while blinded in issued:
+            blinded = f"blind_{secrets.token_hex(16)}"
+        assignments[observation_id] = blinded
+        issued.add(blinded)
+    review_order = identities.copy()
+    secrets.SystemRandom().shuffle(review_order)
+    return BlindingPlan(assignments=assignments, review_order=review_order)
+
+
+def blinded_id(observation_id: str, *, plan: BlindingPlan) -> str:
+    """Resolve an observation through the private, persisted blinding plan."""
+    return plan.identity_for(observation_id)
 
 
 def build_review_item(
     observation: NormalizedObservation,
     *,
-    run_id: str,
+    plan: BlindingPlan,
     query: str,
     contexts: list[str],
 ) -> ReviewItem | None:
@@ -38,7 +90,7 @@ def build_review_item(
     if not grounded and not route:
         return None
     return ReviewItem(
-        blinded_id=blinded_id(observation.key.observation_id, run_id=run_id),
+        blinded_id=blinded_id(observation.key.observation_id, plan=plan),
         query=query,
         response=observation.answer or "",
         contexts=contexts,
@@ -46,6 +98,16 @@ def build_review_item(
         route_review_required=route,
         groundedness_review_required=bool(observation.answer),
     )
+
+
+def order_review_items(items: Mapping[str, ReviewItem], *, plan: BlindingPlan) -> list[ReviewItem]:
+    """Order reviewer-visible items by the plan's random, condition-independent order."""
+    unexpected = set(items) - set(plan.assignments)
+    if unexpected:
+        raise ValueError(f"Review items are absent from the blinding plan: {sorted(unexpected)}")
+    return [
+        items[observation_id] for observation_id in plan.review_order if observation_id in items
+    ]
 
 
 def resolve_reviews(
@@ -81,12 +143,12 @@ def resolve_reviews(
 def apply_route_review(
     observation: NormalizedObservation,
     *,
-    run_id: str,
+    plan: BlindingPlan,
     resolved: dict[str, ResolvedAdjudication],
 ) -> NormalizedObservation:
     if not observation.route_requires_adjudication:
         return observation
-    decision = resolved.get(blinded_id(observation.key.observation_id, run_id=run_id))
+    decision = resolved.get(blinded_id(observation.key.observation_id, plan=plan))
     if decision is None or decision.observed_route is None:
         return observation
     return observation.model_copy(
