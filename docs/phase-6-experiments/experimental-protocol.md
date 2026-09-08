@@ -27,3 +27,10 @@ at most twice in total.
 Raw observations, normalized observations, metric contributions, estimates, paired differences,
 usage, latency, review packets, resolved decisions, and a content-addressed manifest are retained.
 Secrets are excluded from manifests and sensitive-key fields are redacted during sealing.
+
+NIST calls for documented test sets, metrics, tools, uncertainty, and testing under deployment-like
+conditions. Modern agent evaluation also distinguishes final-output quality from process and tool
+behavior. This protocol is grounded in the following requirements:
+[NIST AI RMF Measure 2.1 and 2.3](https://airc.nist.gov/airmf-resources/airmf/5-sec-core/),
+[Microsoft Foundry agent evaluators](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/agent-evaluators),
+and [OpenAI agent evals](https://developers.openai.com/api/docs/guides/agent-evals).
