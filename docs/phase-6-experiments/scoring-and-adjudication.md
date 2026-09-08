@@ -9,3 +9,14 @@ Objective signals are derived from tool attempts, exact material arguments, befo
 state, approvals, terminal errors, retrieved chunk identities, and audit facts. Context precision is
 calculated per retrieved chunk, not per unique document, so repeated irrelevant chunks are not
 silently discounted.
+
+Groundedness is primary only when exact citation membership passes and two blinded reviewers agree
+that every material claim is supported by the supplied context. Baseline text-only routes also need
+blinded classification when no decisive structured tool or safety signal exists. One reviewer is
+insufficient. Disagreement requires an explicit resolution record.
+
+Ragas `Faithfulness` 0.4.3 is a secondary sensitivity analysis, never a replacement for the frozen
+human claim-support label. Its own guidance notes that LLM-based metrics can be nondeterministic and
+should be validated against human judgement:
+[Ragas metrics overview](https://docs.ragas.io/en/stable/concepts/metrics/overview/) and
+[available metrics](https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/).
