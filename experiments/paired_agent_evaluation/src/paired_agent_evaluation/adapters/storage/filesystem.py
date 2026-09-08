@@ -30,6 +30,15 @@ def atomic_json(path: Path, value: Any) -> None:
     temporary.replace(path)
 
 
+def exclusive_json(path: Path, value: Any) -> None:
+    """Create a JSON control record once, failing if any prior claim exists."""
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    content = json.dumps(value, indent=2, sort_keys=True) + "\n"
+    with path.open("x", encoding="utf-8", newline="\n") as stream:
+        stream.write(content)
+
+
 class RawFilesystemStore:
     def __init__(self, root: Path) -> None:
         self.root = root
