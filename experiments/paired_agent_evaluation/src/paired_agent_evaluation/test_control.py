@@ -2,10 +2,19 @@
 
 from __future__ import annotations
 
+import subprocess
+import sys
 from pathlib import Path
 from typing import Protocol
 
-from paired_agent_evaluation.domain.manifests import HarnessFreezeManifest
+from app.evaluation.dataset.enums import DatasetSplit
+
+from paired_agent_evaluation.adapters.dataset import Phase5Dataset
+from paired_agent_evaluation.application.scheduling import build_schedule
+from paired_agent_evaluation.domain.executions import ExperimentConfig
+from paired_agent_evaluation.domain.manifests import (
+    HarnessFreezeManifest,
+)
 
 HARNESS_FREEZE_ID = "paired-agent-evaluation-harness-v1"
 HARNESS_MANIFEST = Path("docs/phase-6-experiments/harness-freeze-manifest.json")
@@ -37,7 +46,54 @@ class EvaluationControlPaths(Protocol):
 
     def run_root(self, run_id: str) -> Path: ...
 
+def _run_inherited_freeze_verifiers(paths: EvaluationControlPaths) -> None:
+    failed: list[str] = []
+    for script in INHERITED_VERIFIERS:
+        result = subprocess.run(
+            [sys.executable, script],
+            cwd=paths.repository,
+            check=False,
+            text=True,
+        )
+        if result.returncode:
+            failed.append(script)
+    if failed:
+        raise ValueError(f"Inherited freeze verification failed: {', '.join(failed)}")
 
+def _verify_schedule_contract(paths: EvaluationControlPaths) -> None:
+    dataset = Phase5Dataset(paths.repository)
+    config = ExperimentConfig.model_validate(_json(paths.configs / "experiment.json"))
+    expected = {DatasetSplit.VALIDATION: 120, DatasetSplit.TEST: 480}
+    for split, count in expected.items():
+        schedule = build_schedule(
+            dataset.cases(split),
+            repetitions=config.repetitions_per_case,
+            seed=config.condition_order_seed,
+        )
+        if len(schedule) != count:
+            raise ValueError(
+                f"{split.value} schedule has {len(schedule)} entries; expected {count}"
+            )
+
+
+def verify_harness_readiness(paths: EvaluationControlPaths) -> None:
+    """Verify inherited releases and the registered schedule before any acquisition."""
+
+    _run_inherited_freeze_verifiers(paths)
+    _verify_schedule_contract(paths)
+
+def _source_hashes(paths: EvaluationControlPaths) -> dict[str, str]:
+    return {
+        path.relative_to(paths.repository).as_posix(): _sha256(path)
+        for path in _source_paths(paths)
+    }
+
+
+def _inherited_identities(paths: EvaluationControlPaths) -> dict[str, str]:
+    pass 
+
+def _completed_validation(paths: EvaluationControlPaths, run_id: str) -> tuple[str, str]:
+    pass
 
 def write_harness_freeze(
     paths: EvaluationControlPaths,
@@ -55,3 +111,17 @@ def write_harness_freeze(
         raise ValueError("Preregistered test run directory already exists")
     if paths.release.exists() and any(paths.release.iterdir()):
         raise ValueError("A sealed test release already exists")
+    verify_harness_readiness(paths)
+    validation_manifest_hash, validation_summary_hash = _completed_validation(
+        paths, validation_run_id
+    )
+    manifest = HarnessFreezeManifest(
+        freeze_id=HARNESS_FREEZE_ID,
+        preregistered_test_run_id=test_run_id,
+        validation_run_id=validation_run_id,
+        validation_run_manifest_sha256=validation_manifest_hash,
+        validation_summary_sha256=validation_summary_hash,
+        source_files=_source_hashes(paths),
+        aggregate_sha256="0" * 64,
+        **_inherited_identities(paths),
+    )
