@@ -1,7 +1,7 @@
 from app.evaluation.dataset.enums import DatasetSplit
 
 from paired_agent_evaluation.adapters.dataset import Phase5Dataset
-from paired_agent_evaluation.application.adjudication import blinded_id
+from paired_agent_evaluation.application.adjudication import BlindingPlan, blinded_id
 from paired_agent_evaluation.application.scoring import score_observation
 from paired_agent_evaluation.domain.executions import Condition, ExecutionKey
 from paired_agent_evaluation.domain.observations import (
@@ -17,13 +17,21 @@ def _case(paths, case_id):
     return next(case for case in cases if case.case_id == case_id)
 
 
-def _metrics(case, observation, reviews=None):
+def _blinding_plan(observation) -> BlindingPlan:
+    observation_id = observation.key.observation_id
+    return BlindingPlan(
+        assignments={observation_id: f"blind_{'a' * 32}"},
+        review_order=[observation_id],
+    )
+
+
+def _metrics(case, observation, reviews=None, *, plan=None):
     return {
         item.metric_id: item
         for item in score_observation(
             case,
             observation,
-            run_id="run_test",
+            blinding_plan=plan or _blinding_plan(observation),
             adjudications=reviews or {},
         )
     }
@@ -44,9 +52,10 @@ def test_groundedness_requires_membership_and_human_claim_support(paths) -> None
         output_tokens=1,
         raw_sha256="a" * 64,
     )
-    pending = _metrics(case, observation)
+    plan = _blinding_plan(observation)
+    pending = _metrics(case, observation, plan=plan)
     assert pending["groundedness_rate"].pending_reason is not None
-    identity = blinded_id(observation.key.observation_id, run_id="run_test")
+    identity = blinded_id(observation.key.observation_id, plan=plan)
     reviews = {
         identity: ResolvedAdjudication(
             blinded_id=identity,
@@ -54,7 +63,7 @@ def test_groundedness_requires_membership_and_human_claim_support(paths) -> None
             reviewer_count=2,
         )
     }
-    scored = _metrics(case, observation, reviews)
+    scored = _metrics(case, observation, reviews, plan=plan)
     assert scored["groundedness_rate"].numerator == 1
     assert scored["context_precision"].numerator == 1
     assert scored["context_precision"].denominator == 2
