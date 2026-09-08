@@ -115,3 +115,8 @@ failure can use the configured bounded rerun.
 - **`uv` resolves the wrong dependencies or interpreter.** Confirm `--project
   experiments/paired_agent_evaluation` is present (or that you're `cd`'d into this directory) — the
   repository root and this project keep separate lockfiles and virtual environments.
+
+See [architecture](../../docs/architecture/phase6_evaluation_architecture.md),
+[protocol](../../docs/phase-6-experiments/experimental-protocol.md),
+[scoring](../../docs/phase-6-experiments/scoring-and-adjudication.md), and
+[limitations](../../docs/phase-6-experiments/limitations.md).
