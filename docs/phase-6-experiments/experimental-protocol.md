@@ -34,3 +34,6 @@ behavior. This protocol is grounded in the following requirements:
 [NIST AI RMF Measure 2.1 and 2.3](https://airc.nist.gov/airmf-resources/airmf/5-sec-core/),
 [Microsoft Foundry agent evaluators](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/agent-evaluators),
 and [OpenAI agent evals](https://developers.openai.com/api/docs/guides/agent-evals).
+
+> Note: The harness is local and provider-neutral. It does not depend on the legacy hosted OpenAI Evals API,
+which the official guidance marks for shutdown in November 2026.
