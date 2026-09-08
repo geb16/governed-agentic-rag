@@ -34,3 +34,26 @@ actively-developed harness independently verifiable and independently freezable.
 The implementation uses the domain name `paired_agent_evaluation` throughout code, directories, and
 identifiers; "Phase 6" appears only in documentation, docstrings, and comments, matching how Phase 3
 uses `baseline` and Phase 4 uses `governance` rather than phase numbers in code.
+
+## Dependency and composition model
+
+The project follows the same feature-owned clean architecture as the frozen phases, scaled down to
+four layers under `src/paired_agent_evaluation/`:
+
+```text
+domain/          Pydantic contracts: execution identities, the schedule, raw and normalized
+                 observations, scores, and content-addressed run/release manifests.
+application/     Pure orchestration over ports: acquisition, normalization, adjudication,
+                 scoring, statistics, scheduling. No adapter or provider imports.
+adapters/        Concrete implementations of application ports:
+                   dataset/   — Phase5Dataset, reading the frozen Phase 5 release
+                   systems/   — BaselineSystemRunner, GovernedSystemRunner (invoke the frozen
+                                agent/workflow directly, in isolated per-attempt SQLite state)
+                   storage/   — atomic, deterministic JSON/JSONL persistence
+                   graders/   — RagasFaithfulnessGrader (secondary sensitivity analysis)
+                   telemetry/ — trace-fact projection for audit-completeness scoring
+composition.py   The project's own composition root: path discovery, config loading, and
+                 prepare_run/acquire wiring. Independent of app.baseline_main/app.governed_main.
+release.py       Sanitization and content-addressed sealing of a completed run.
+reporting.py     Normalization, scoring, and release-packet generation over a run's raw results.
+```
