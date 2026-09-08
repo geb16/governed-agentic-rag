@@ -87,3 +87,35 @@ without an internal decomposition mandate.
 | `composition.py` | `EvaluationPaths`, config loading, `prepare_run`/`acquire` wiring | Reporting or sealing |
 | `release.py` | Sanitization, content-addressed sealing and verification | Score computation |
 | `scripts/*.py` | CLI entry points over `composition`/`reporting`/`release` | Business logic |
+
+## Acquisition, scoring, and sealing sequence
+
+```text
+verify_harness.py
+  -> re-verify Phase 3, Phase 4, and Phase 5 freeze manifests (hard blocker on any failure)
+  -> re-verify the deterministic schedule length for both splits
+
+prepare_run(run_id, split)
+  -> load experiment.json, the frozen Phase 5 dataset and rubric, build the seeded schedule
+  -> build content-addressed configuration and schedule digests
+  -> first call: write run-manifest.json + schedule.json
+  -> repeat call: compare every immutable field and the schedule hash; raise on any drift
+
+acquire(run_id, split)
+  -> for each scheduled execution not yet accepted:
+       run the condition's SystemRunner in an isolated workspace, up to
+       max_pre_acceptance_attempts times, until AcceptanceStatus.ACCEPTED
+       (an accepted observation is written once and never rerun)
+  -> write the updated run manifest (accepted/invalid counts)
+
+reporting: normalize -> score -> adjudicate (blinded) -> [ragas, after adjudication] -> summarize
+  -> normalize every raw observation into one route/evidence/tool vocabulary
+  -> compute the 14 frozen Phase 5 metric contributions
+  -> build and, after human resolution, apply the blinded review packet
+  -> bootstrap estimates, paired differences, and the run summary
+
+seal_run(run_root, release_root)
+  -> require every RELEASE_FILES entry, status == "scored", primary_results_final
+  -> require split == "test"  (a validation run can never be sealed as the release)
+  -> sanitize (redact secret-shaped keys) and content-address every file
+```
