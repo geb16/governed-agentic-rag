@@ -149,3 +149,31 @@ never share or leak mutable state across observations, repetitions, or each othe
 | Run and release manifests | Content-addressed, internal | Hash every input file; sensitive-key fields redacted before sealing |
 | Raw run artifacts (`artifacts/paired_agent_evaluation/`) | Mutable, local, gitignored | Never committed; only a sealed release under `data/evaluation/paired_agent_evaluation/v1/` is |
 | Sealed release directory | Immutable once verified | `seal_run` refuses a non-empty destination; `verify_release` re-derives every hash rather than trusting stored values |
+
+## Known architectural compromises
+
+1. `adapters/systems/baseline.py` and `governed.py` are structurally symmetric (construct isolated
+   state, invoke the frozen system, project a `RawExecution`) but not shared code, because the two
+   frozen systems have different construction signatures and response shapes. A small amount of
+   logic — role-alias canonicalization (`ROLE_ALIASES`) in particular — is duplicated between
+   `adapters/systems/governed.py` and `application/normalization.py` rather than factored into one
+   shared module; the two must be kept in sync by hand.
+2. Several configuration fields in `config/reporting.json` and `config/graders.json` (bootstrap
+   method, confidence level, per-grader policy text) are hashed into `configuration_sha256` for
+   provenance but not read by any code path; the executable statistical policy lives in
+   `application/statistics.py`. Editing those fields changes the recorded configuration digest, not
+   behavior.
+3. The Ragas-after-adjudication ordering ("run secondary faithfulness only after primary human
+   labels are fixed") is a documented protocol step, not a code-enforced precondition; nothing stops
+   `score_results.py --ragas` from running before adjudication is complete.
+4. This harness inherits every architectural compromise of the systems it evaluates (see
+   [Phase 4 governance architecture — known architectural compromises](./phase4_governance_architecture.md#known-architectural-compromises)):
+   single-process SQLite durability, synchronous model/tool calls, and an unanchored (though
+   tamper-evident) audit hash chain all bound what "governed" and "baseline" can mean in this pilot's
+   results.
+5. There is no Phase 6 cryptographic freeze yet. Unlike Phase 3/4/5, the harness itself is still
+   under active development and is not hashed into a `docs/phase-6-freeze-manifest.json`. Freezing it
+   before the validation split has exercised and corrected harness defects (per the controlled
+   sequence in `experiments/paired_agent_evaluation/README.md`, step 7) would freeze code before it
+   is known to work; the freeze manifest is deferred until after validation-driven correction is done
+   and before the test split is acquired.
