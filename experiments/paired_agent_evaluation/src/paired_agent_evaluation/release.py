@@ -14,6 +14,7 @@ from paired_agent_evaluation.domain.manifests import ReleaseManifest
 RELEASE_FILES = (
     "run-manifest.json",
     "schedule.json",
+    "blinding-plan.json",
     "raw-results.jsonl",
     "normalized.jsonl",
     "review-packet.jsonl",
