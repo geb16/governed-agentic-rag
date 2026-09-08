@@ -137,3 +137,15 @@ seal_run(run_root, release_root)
 Each `BaselineSystemRunner`/`GovernedSystemRunner` attempt constructs a fresh, isolated SQLite
 database under its own attempt workspace before invoking the frozen agent or workflow, so conditions
 never share or leak mutable state across observations, repetitions, or each other.
+
+## Blinding and data trust boundaries
+
+| Data or artifact | Trust classification | Enforcement boundary |
+|---|---|---|
+| Raw and normalized observations | Internal, condition-labeled | Never part of the reviewer-facing packet |
+| The review packet (`review-packet.jsonl`) | Reviewer-facing | Carries only a `blinded_id`; no `case_id`, `condition`, or raw observation identity |
+| Adjudication resolutions | Reviewer-authored, trusted after dual review | Consumed by scoring only after being written back under the real observation identity |
+| Secondary Ragas grades | Diagnostic only | Never merged into primary metric contributions |
+| Run and release manifests | Content-addressed, internal | Hash every input file; sensitive-key fields redacted before sealing |
+| Raw run artifacts (`artifacts/paired_agent_evaluation/`) | Mutable, local, gitignored | Never committed; only a sealed release under `data/evaluation/paired_agent_evaluation/v1/` is |
+| Sealed release directory | Immutable once verified | `seal_run` refuses a non-empty destination; `verify_release` re-derives every hash rather than trusting stored values |
