@@ -27,7 +27,7 @@ from paired_agent_evaluation.domain.executions import (
     ExperimentConfig,
     ScheduledExecution,
 )
-from paired_agent_evaluation.domain.manifests import ExperimentManifest
+from paired_agent_evaluation.domain.manifests import ExperimentManifest, TestExecutionClaim
 
 
 @dataclass(frozen=True, slots=True)
@@ -186,11 +186,23 @@ def prepare_run(
     return paths, schedule, manifest, settings
 
 
-def _acquire(*, run_id: str, split: DatasetSplit) -> ExperimentManifest:
+def _acquire(
+    *,
+    run_id: str,
+    split: DatasetSplit,
+    test_claim: TestExecutionClaim | None = None,
+) -> ExperimentManifest:
     paths, schedule, manifest, settings = prepare_run(run_id=run_id, split=split)
     config = load_experiment_config(paths)
     cases = Phase5Dataset(paths.repository).cases(split)
     run_root = paths.run_root(run_id)
+    if split == DatasetSplit.TEST:
+        if test_claim is None or test_claim.test_run_id != run_id:
+            raise ValueError("Test acquisition requires its consumed execution claim")
+        atomic_json(
+            run_root / "test-execution-claim.json",
+            test_claim.model_dump(mode="json"),
+        )
     store = RawFilesystemStore(run_root / "raw" / "observations")
     executions = AcquisitionRunner(
         runners={
@@ -227,5 +239,5 @@ def acquire_preregistered_test(*, run_id: str) -> ExperimentManifest:
     from paired_agent_evaluation.test_control import claim_test_execution
 
     paths = EvaluationPaths.discover()
-    claim_test_execution(paths, run_id=run_id)
-    return _acquire(run_id=run_id, split=DatasetSplit.TEST)
+    claim = claim_test_execution(paths, run_id=run_id)
+    return _acquire(run_id=run_id, split=DatasetSplit.TEST, test_claim=claim)
