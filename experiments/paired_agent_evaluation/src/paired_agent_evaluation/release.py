@@ -9,10 +9,11 @@ from pathlib import Path
 from typing import Any
 
 from paired_agent_evaluation.adapters.storage.filesystem import atomic_json, canonical_json
-from paired_agent_evaluation.domain.manifests import ReleaseManifest
+from paired_agent_evaluation.domain.manifests import ReleaseManifest, TestExecutionClaim
 
 RELEASE_FILES = (
     "run-manifest.json",
+    "test-execution-claim.json",
     "schedule.json",
     "blinding-plan.json",
     "raw-results.jsonl",
@@ -73,6 +74,11 @@ def seal_run(*, run_root: Path, release_root: Path) -> ReleaseManifest:
         raise ValueError(
             f"Only a test-split run can be sealed; refusing split={run_manifest.get('split')!r}"
         )
+    claim = TestExecutionClaim.model_validate_json(
+        (run_root / "test-execution-claim.json").read_text(encoding="utf-8")
+    )
+    if claim.test_run_id != run_manifest.get("run_id"):
+        raise ValueError("Test execution claim does not match the sealed run")
     if release_root.exists() and any(release_root.iterdir()):
         raise ValueError("Release directory must be empty before sealing")
     release_root.mkdir(parents=True, exist_ok=True)
