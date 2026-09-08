@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol
 
 from app.evaluation.dataset.enums import DatasetSplit
 
@@ -14,6 +15,7 @@ from paired_agent_evaluation.adapters.dataset import Phase5Dataset
 from paired_agent_evaluation.application.scheduling import build_schedule
 from paired_agent_evaluation.domain.executions import ExperimentConfig
 from paired_agent_evaluation.domain.manifests import (
+    ExperimentManifest,
     HarnessFreezeManifest,
 )
 
@@ -49,6 +51,10 @@ class EvaluationControlPaths(Protocol):
 
 def _json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
+
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
 
 def _run_inherited_freeze_verifiers(paths: EvaluationControlPaths) -> None:
     failed: list[str] = []
@@ -123,7 +129,26 @@ def _inherited_identities(paths: EvaluationControlPaths) -> dict[str, str]:
 
 
 def _completed_validation(paths: EvaluationControlPaths, run_id: str) -> tuple[str, str]:
-    pass
+    run_root = paths.run_root(run_id)
+    manifest_path = run_root / "run-manifest.json"
+    summary_path = run_root / "summary.json"
+    if not manifest_path.is_file() or not summary_path.is_file():
+        raise ValueError("Validation must have a run manifest and final summary")
+    manifest = ExperimentManifest.model_validate_json(manifest_path.read_text(encoding="utf-8"))
+    summary = _json(summary_path)
+    if manifest.run_id != run_id or manifest.split != DatasetSplit.VALIDATION.value:
+        raise ValueError("Validation evidence does not identify the requested validation run")
+    if manifest.status != "scored" or not isinstance(summary, dict):
+        raise ValueError("Validation run is not fully scored")
+    if summary.get("run_id") != run_id or summary.get("split") != DatasetSplit.VALIDATION.value:
+        raise ValueError("Validation summary identity does not match its run manifest")
+    if summary.get("primary_results_final") is not True:
+        raise ValueError("Validation adjudication is not final")
+    observed = manifest.accepted_observations + manifest.invalid_observations
+    if observed != manifest.expected_observations:
+        raise ValueError("Validation observation count is incomplete")
+    return _sha256(manifest_path), _sha256(summary_path)
+
 
 def write_harness_freeze(
     paths: EvaluationControlPaths,
