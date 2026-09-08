@@ -31,6 +31,7 @@ class SequencedRunner:
             state_after=BusinessState(),
         )
 
+
 # Test to assert that the acquisition runner retries pre-acceptance once then resumes normally.
 def test_acquisition_retries_pre_acceptance_once_and_resumes(tmp_path, answer_case) -> None:
 
