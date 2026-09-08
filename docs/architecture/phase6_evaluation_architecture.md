@@ -177,3 +177,25 @@ never share or leak mutable state across observations, repetitions, or each othe
    sequence in `experiments/paired_agent_evaluation/README.md`, step 7) would freeze code before it
    is known to work; the freeze manifest is deferred until after validation-driven correction is done
    and before the test split is acquired.
+
+## Readiness gates
+
+`experiments/paired_agent_evaluation/scripts/verify_harness.py` is the harness's own composite gate:
+it re-verifies all three inherited freeze manifests and the deterministic schedule length for both
+splits, and fails closed if any of them is wrong. It is necessary but not sufficient — the full local
+gate (`ruff check`, `mypy`, `pytest`) documented in `experiments/paired_agent_evaluation/README.md`
+must also pass before acquisition begins, since `verify_harness.py` does not itself run the test
+suite or static analysis.
+
+## Architecture verification expectations
+
+`experiments/paired_agent_evaluation/tests/architecture/test_boundaries.py` must fail when:
+
+- the project root resolves inside `src/app/baseline`, `src/app/governance`, or `src/app/evaluation`;
+- `domain/` imports `adapters` or `application`;
+- `application/` imports `adapters` or `composition`;
+- any source file under `src/paired_agent_evaluation/` exceeds 350 lines.
+
+These static checks protect dependency direction and module size. They do not replace the frozen
+freeze-manifest checks, the local test/lint/type gate, or human review of the experimental protocol
+itself.
