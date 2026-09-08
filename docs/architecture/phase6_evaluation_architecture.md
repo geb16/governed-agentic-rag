@@ -65,3 +65,25 @@ reporting.py     Normalization, scoring, and release-packet generation over a ru
 implement, and application code stays testable without constructing any concrete adapter. A third
 rule (`test_modules_remain_bounded`) caps every source file at 350 lines, keeping each module legible
 without an internal decomposition mandate.
+
+## Component ownership
+
+| Component | Owns | Does not own |
+|---|---|---|
+| `domain/executions.py` | `Condition`, `ExecutionKey`, the immutable `ScheduledExecution`, `ExperimentConfig` | Persistence, scoring math |
+| `domain/observations.py` | `RawExecution`, `NormalizedObservation`, `ToolAttempt`, `BusinessState` | Adapter I/O |
+| `domain/manifests.py` | `ExperimentManifest`, `ReleaseManifest` | Sealing or hashing logic |
+| `domain/scores.py` | Per-observation metric contribution contracts | Aggregation or bootstrap |
+| `application/acquisition.py` | Resumable, bounded pre-acceptance retry over a `SystemRunner` port | Concrete runner construction |
+| `application/normalization.py` | Mapping heterogeneous raw responses to one observed-route vocabulary | Statistical estimation |
+| `application/adjudication.py` | Blinded review-item construction, resolved-label application | Route inference |
+| `application/scoring.py` | The 14 frozen Phase 5 metric contributions per observation | Bootstrap estimation |
+| `application/statistics.py` | Bootstrap point estimates, paired differences, category strata | Per-observation scoring |
+| `application/scheduling.py` | The deterministic seeded paired schedule | Acquisition execution |
+| `adapters/dataset` | Loading and freeze-identity verification of the Phase 5 release | Case scheduling or scoring |
+| `adapters/systems` | Constructing and invoking one frozen system per attempt, isolated per-attempt SQLite state and recording retrieval | Response interpretation |
+| `adapters/storage` | Atomic JSON and JSONL persistence, canonical hashing | Business logic |
+| `adapters/graders` | The pinned Ragas 0.4 secondary faithfulness call | Primary scoring |
+| `composition.py` | `EvaluationPaths`, config loading, `prepare_run`/`acquire` wiring | Reporting or sealing |
+| `release.py` | Sanitization, content-addressed sealing and verification | Score computation |
+| `scripts/*.py` | CLI entry points over `composition`/`reporting`/`release` | Business logic |
