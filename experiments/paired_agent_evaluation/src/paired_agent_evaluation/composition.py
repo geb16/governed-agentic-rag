@@ -20,6 +20,7 @@ from paired_agent_evaluation.adapters.storage.filesystem import (
 )
 from paired_agent_evaluation.adapters.systems import BaselineSystemRunner, GovernedSystemRunner
 from paired_agent_evaluation.application.acquisition import AcquisitionRunner
+from paired_agent_evaluation.application.adjudication import BlindingPlan, create_blinding_plan
 from paired_agent_evaluation.application.scheduling import build_schedule
 from paired_agent_evaluation.domain.executions import (
     Condition,
@@ -117,6 +118,22 @@ def prepare_run(
         "phase4": phase4["aggregate_sha256"],
         "phase5": phase5["aggregate_sha256"],
     }
+    manifest_path = run_root / "run-manifest.json"
+    schedule_path = run_root / "schedule.json"
+    blinding_path = run_root / "blinding-plan.json"
+    expected_ids = [item.key.observation_id for item in schedule]
+    if manifest_path.is_file():
+        if not blinding_path.is_file():
+            raise ValueError("Existing run is missing its private blinding plan")
+        blinding_plan = BlindingPlan.model_validate_json(blinding_path.read_text(encoding="utf-8"))
+        if set(blinding_plan.assignments) != set(expected_ids):
+            raise ValueError("Existing run blinding plan does not match the schedule")
+    else:
+        if run_root.exists() and any(run_root.iterdir()):
+            raise ValueError("Run directory exists without a managed manifest")
+        run_root.mkdir(parents=True, exist_ok=True)
+        blinding_plan = create_blinding_plan(expected_ids)
+        atomic_json(blinding_path, blinding_plan.model_dump(mode="json"))
     package_names = ["governed-agentic-rag", "governed-agentic-rag-paired-evaluation", "ragas"]
     versions = {name: importlib.metadata.version(name) for name in package_names}
     manifest = ExperimentManifest(
@@ -134,11 +151,10 @@ def prepare_run(
         qdrant_collection=settings.qdrant_collection,
         configuration_sha256=sha256_json(configuration),
         schedule_sha256=_schedule_hash(schedule),
+        blinding_plan_sha256=sha256_json(blinding_plan.model_dump(mode="json")),
         expected_observations=len(schedule),
         package_versions=versions,
     )
-    manifest_path = run_root / "run-manifest.json"
-    schedule_path = run_root / "schedule.json"
     if manifest_path.is_file():
         existing = ExperimentManifest.model_validate_json(manifest_path.read_text(encoding="utf-8"))
         immutable = (
@@ -152,6 +168,7 @@ def prepare_run(
             "qdrant_collection",
             "configuration_sha256",
             "schedule_sha256",
+            "blinding_plan_sha256",
             "expected_observations",
             "package_versions",
         )
@@ -164,15 +181,12 @@ def prepare_run(
         ):
             raise ValueError("Existing run schedule is missing or has changed")
         return paths, schedule, existing, settings
-    if run_root.exists() and any(run_root.iterdir()):
-        raise ValueError("Run directory exists without a managed manifest")
-    run_root.mkdir(parents=True, exist_ok=True)
     atomic_json(schedule_path, [item.model_dump(mode="json") for item in schedule])
     atomic_json(manifest_path, manifest.model_dump(mode="json"))
     return paths, schedule, manifest, settings
 
 
-def acquire(*, run_id: str, split: DatasetSplit) -> ExperimentManifest:
+def _acquire(*, run_id: str, split: DatasetSplit) -> ExperimentManifest:
     paths, schedule, manifest, settings = prepare_run(run_id=run_id, split=split)
     config = load_experiment_config(paths)
     cases = Phase5Dataset(paths.repository).cases(split)
@@ -197,3 +211,21 @@ def acquire(*, run_id: str, split: DatasetSplit) -> ExperimentManifest:
     )
     atomic_json(run_root / "run-manifest.json", completed.model_dump(mode="json"))
     return completed
+
+
+def acquire(*, run_id: str, split: DatasetSplit) -> ExperimentManifest:
+    """Acquire validation observations while reserving test access for the locked path."""
+
+    if split == DatasetSplit.TEST:
+        raise ValueError("Test acquisition requires the preregistered one-time execution gate")
+    return _acquire(run_id=run_id, split=split)
+
+
+def acquire_preregistered_test(*, run_id: str) -> ExperimentManifest:
+    """Claim the single preregistered test execution before invoking either system."""
+
+    from paired_agent_evaluation.test_control import claim_test_execution
+
+    paths = EvaluationPaths.discover()
+    claim_test_execution(paths, run_id=run_id)
+    return _acquire(run_id=run_id, split=DatasetSplit.TEST)
