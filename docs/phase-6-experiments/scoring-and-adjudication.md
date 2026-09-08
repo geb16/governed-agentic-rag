@@ -20,3 +20,8 @@ human claim-support label. Its own guidance notes that LLM-based metrics can be 
 should be validated against human judgement:
 [Ragas metrics overview](https://docs.ragas.io/en/stable/concepts/metrics/overview/) and
 [available metrics](https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/).
+
+Point estimates are frozen-rubric ratios. Uncertainty uses a 95% nonparametric percentile bootstrap
+with 10,000 case-cluster resamples, seed `20260830`, and category-preserving resampling. Differences
+are governed minus baseline and require complete pairs. Results are reported overall and by category,
+expected route, intent, and risk level. No null-hypothesis test is added after observing results.
