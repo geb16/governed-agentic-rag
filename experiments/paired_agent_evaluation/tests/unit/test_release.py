@@ -2,6 +2,7 @@ import json
 
 import pytest
 
+import paired_agent_evaluation.release as release
 from paired_agent_evaluation.release import RELEASE_FILES, seal_run, verify_release
 
 
@@ -13,7 +14,22 @@ def _complete_run(root, *, split: str = "test") -> None:
                 "run_id": "run_test",
                 "split": split,
                 "status": "scored",
-                "api_key": "secret",
+                "completed_at": "2026-09-08T12:00:00Z",
+                "phase3_freeze_id": "phase3-baseline-v3",
+                "phase3_aggregate_sha256": "a" * 64,
+                "phase4_freeze_id": "phase4-governance-v3",
+                "phase4_aggregate_sha256": "b" * 64,
+                "phase5_freeze_id": "phase5-evaluation-v2",
+                "phase5_aggregate_sha256": "c" * 64,
+                "model_identifier": "test-model",
+                "retrieval_backend": "qdrant",
+                "qdrant_collection": "test",
+                "configuration_sha256": "d" * 64,
+                "schedule_sha256": "e" * 64,
+                "blinding_plan_sha256": "f" * 64,
+                "expected_observations": 1,
+                "accepted_observations": 1,
+                "package_versions": {"harness": "1.0.0"},
             }
         elif name == "test-execution-claim.json":
             payload = {
@@ -26,6 +42,8 @@ def _complete_run(root, *, split: str = "test") -> None:
             }
         elif name == "summary.json":
             payload = {"primary_results_final": True}
+        elif name == "secondary-ragas.jsonl":
+            payload = {"api_key": "secret"}
         else:
             payload = []
         if name.endswith(".jsonl"):
@@ -34,15 +52,16 @@ def _complete_run(root, *, split: str = "test") -> None:
             path.write_text(json.dumps(payload), encoding="utf-8")
 
 
-def test_release_is_sanitized_closed_and_content_addressed(tmp_path) -> None:
+def test_release_is_sanitized_closed_and_content_addressed(tmp_path, monkeypatch) -> None:
     run_root = tmp_path / "run"
     release_root = tmp_path / "release"
     run_root.mkdir()
     _complete_run(run_root)
+    monkeypatch.setattr(release, "verify_primary_artifacts", lambda *_: None)
     manifest = seal_run(run_root=run_root, release_root=release_root)
     assert manifest == verify_release(release_root)
-    released = json.loads((release_root / "run-manifest.json").read_text())
-    assert released["api_key"] == "[REDACTED]"
+    released = json.loads((release_root / "secondary-ragas.jsonl").read_text())
+    assert released["value"]["api_key"] == "[REDACTED]"
     with pytest.raises(ValueError, match="empty"):
         seal_run(run_root=run_root, release_root=release_root)
     (release_root / "summary.json").write_text("{}", encoding="utf-8")
@@ -64,4 +83,20 @@ def test_validation_split_cannot_be_sealed(tmp_path) -> None:
     run_root.mkdir()
     _complete_run(run_root, split="validation")
     with pytest.raises(ValueError, match="test-split"):
+        seal_run(run_root=run_root, release_root=tmp_path / "release")
+
+
+def test_derived_artifact_drift_cannot_be_sealed(tmp_path, monkeypatch) -> None:
+    """Reject a scored run when recomputation disagrees with a primary artifact."""
+
+    run_root = tmp_path / "run"
+    run_root.mkdir()
+    _complete_run(run_root)
+    monkeypatch.setattr(
+        release,
+        "derive_primary_artifacts",
+        lambda **_: {"summary.json": {"primary_results_final": True, "trusted": True}},
+    )
+
+    with pytest.raises(ValueError, match=r"Primary derived artifacts.*summary\.json"):
         seal_run(run_root=run_root, release_root=tmp_path / "release")
