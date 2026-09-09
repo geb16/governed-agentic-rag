@@ -253,4 +253,15 @@ def claim_test_execution(
         raise ValueError("Preregistered test run directory already exists")
     if paths.release.exists() and any(paths.release.iterdir()):
         raise ValueError("A sealed test release already exists")
-
+    claim = TestExecutionClaim(
+        test_run_id=run_id,
+        harness_freeze_id=manifest.freeze_id,
+        harness_aggregate_sha256=manifest.aggregate_sha256,
+        validation_run_id=manifest.validation_run_id,
+    )
+    claim_path = paths.repository / TEST_EXECUTION_CLAIM
+    try:
+        exclusive_json(claim_path, claim.model_dump(mode="json"))
+    except FileExistsError as error:
+        raise ValueError("Test execution authorization has already been consumed") from error
+    return claim
