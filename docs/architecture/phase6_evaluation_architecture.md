@@ -94,12 +94,20 @@ without an internal decomposition mandate.
 verify_harness.py
   -> re-verify Phase 3, Phase 4, and Phase 5 freeze manifests (hard blocker on any failure)
   -> re-verify the deterministic schedule length for both splits
+  -> after completed validation: hash the harness and validation evidence; preregister one test ID
+
+run_test.py
+  -> re-verify inherited freezes, the harness hash, and pinned completed-validation evidence
+  -> require the exact preregistered test run ID
+  -> atomically create the durable one-time execution claim before any provider call
+  -> refuse every later attempt, including attempts under a different run ID
 
 prepare_run(run_id, split)
   -> load experiment.json, the frozen Phase 5 dataset and rubric, build the seeded schedule
+  -> generate one cryptographically random blinding map and reviewer order before acquisition
   -> build content-addressed configuration and schedule digests
-  -> first call: write run-manifest.json + schedule.json
-  -> repeat call: compare every immutable field and the schedule hash; raise on any drift
+  -> first call: write run-manifest.json + schedule.json + private blinding-plan.json
+  -> repeat call: compare every immutable field, schedule hash, and blinding-plan hash; raise on drift
 
 acquire(run_id, split)
   -> for each scheduled execution not yet accepted:
@@ -125,6 +133,9 @@ seal_run(run_root, release_root)
 | Condition | Enforced behavior |
 |---|---|
 | Missing or failed Phase 3/4/5 freeze verification | `verify_harness.py` exits non-zero; acquisition must not proceed |
+| Missing/drifted Phase 6 harness freeze or incomplete/drifted validation evidence | Test acquisition fails before provider access |
+| Test run ID differs from the preregistration | Test acquisition fails before creating a run |
+| Any prior execution claim, test run manifest, or sealed test release exists | Every later test acquisition is rejected; a new run ID cannot bypass the gate |
 | Re-running `prepare_run` with a changed configuration, model, backend, or schedule | Raises `Existing run manifest drift`; the original run is never silently altered |
 | A pre-acceptance attempt fails (transient/infrastructure failure before an observation is accepted) | Retried up to `max_pre_acceptance_attempts`, each attempt in its own workspace directory |
 | An observation is already accepted | Never rerun; acquisition resumes past it unconditionally |
@@ -143,9 +154,11 @@ never share or leak mutable state across observations, repetitions, or each othe
 | Data or artifact | Trust classification | Enforcement boundary |
 |---|---|---|
 | Raw and normalized observations | Internal, condition-labeled | Never part of the reviewer-facing packet |
-| The review packet (`review-packet.jsonl`) | Reviewer-facing | Carries only a `blinded_id`; no `case_id`, `condition`, or raw observation identity |
+| The private blinding plan (`blinding-plan.json`) | Confidential until adjudication is final | Maps observations to cryptographically random opaque IDs and records a random reviewer order; its digest is pinned by the run manifest |
+| The review packet (`review-packet.jsonl`) | Reviewer-facing | Carries only opaque IDs in the private plan's random order; no `case_id`, `condition`, raw observation identity, or public derivation input |
 | Adjudication resolutions | Reviewer-authored, trusted after dual review | Consumed by scoring only after being written back under the real observation identity |
 | Secondary Ragas grades | Diagnostic only | Never merged into primary metric contributions |
+| Harness freeze and test-execution claim | Preregistered control evidence | Bind reviewed source bytes and completed validation to one test ID; claim is created exclusively before provider access and copied into the sealed run |
 | Run and release manifests | Content-addressed, internal | Hash every input file; sensitive-key fields redacted before sealing |
 | Raw run artifacts (`artifacts/paired_agent_evaluation/`) | Mutable, local, gitignored | Never committed; only a sealed release under `data/evaluation/paired_agent_evaluation/v1/` is |
 | Sealed release directory | Immutable once verified | `seal_run` refuses a non-empty destination; `verify_release` re-derives every hash rather than trusting stored values |
@@ -171,18 +184,18 @@ never share or leak mutable state across observations, repetitions, or each othe
    single-process SQLite durability, synchronous model/tool calls, and an unanchored (though
    tamper-evident) audit hash chain all bound what "governed" and "baseline" can mean in this pilot's
    results.
-5. There is no Phase 6 cryptographic freeze yet. Unlike Phase 3/4/5, the harness itself is still
-   under active development and is not hashed into a `docs/phase-6-freeze-manifest.json`. Freezing it
-   before the validation split has exercised and corrected harness defects (per the controlled
-   sequence in `experiments/paired_agent_evaluation/README.md`, step 7) would freeze code before it
-   is known to work; the freeze manifest is deferred until after validation-driven correction is done
-   and before the test split is acquired.
+5. The one-time execution claim is durable repository evidence rather than an external append-only
+   registry. Deleting both the claim and all test/release artifacts could bypass the local guard;
+   repository permissions and review must therefore prevent removal. The harness still fails closed
+   for normal operation, interruption, repeated commands, and alternative run IDs.
 
 ## Readiness gates
 
 `experiments/paired_agent_evaluation/scripts/verify_harness.py` is the harness's own composite gate:
 it re-verifies all three inherited freeze manifests and the deterministic schedule length for both
-splits, and fails closed if any of them is wrong. It is necessary but not sufficient — the full local
+splits. Its `--write` mode accepts only completed validation evidence and preregisters one test run;
+its `--frozen` mode recomputes every harness, inherited-release, and validation hash. It is necessary
+but not sufficient — the full local
 gate (`ruff check`, `mypy`, `pytest`) documented in `experiments/paired_agent_evaluation/README.md`
 must also pass before acquisition begins, since `verify_harness.py` does not itself run the test
 suite or static analysis.
