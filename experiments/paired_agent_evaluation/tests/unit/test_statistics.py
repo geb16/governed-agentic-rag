@@ -1,9 +1,11 @@
 from app.evaluation.dataset.enums import DatasetSplit
 
 from paired_agent_evaluation.adapters.dataset import Phase5Dataset
-from paired_agent_evaluation.application.statistics import estimate_condition
+from paired_agent_evaluation.application.statistics import (
+    estimate_condition,
+)
 from paired_agent_evaluation.domain.executions import Condition, ExecutionKey
-from paired_agent_evaluation.domain.scores import MetricContribution
+from paired_agent_evaluation.domain.scores import Estimate, MetricContribution
 
 
 def test_case_cluster_bootstrap_is_reproducible(paths) -> None:
@@ -18,15 +20,20 @@ def test_case_cluster_bootstrap_is_reproducible(paths) -> None:
         )
         for index, case in enumerate(cases)
     ]
-    kwargs = dict(
-        contributions=contributions,
-        cases={case.case_id: case for case in cases},
-        metric_id="metric",
-        condition="baseline",
-        stratum="overall",
-        include_case=lambda _: True,
-        replicates=100,
-        seed=7,
-        minimum_valid=90,
-    )
-    assert estimate_condition(**kwargs) == estimate_condition(**kwargs)
+
+    def run_estimate() -> Estimate:
+        return estimate_condition(
+            contributions,
+            {case.case_id: case for case in cases},
+            metric_id="metric",
+            condition="baseline",
+            stratum="overall",
+            include_case=lambda _: True,
+            replicates=100,
+            seed=7,
+            minimum_valid=90,
+            stratify_by_category=True,
+        )
+
+    assert run_estimate() == run_estimate()
+
