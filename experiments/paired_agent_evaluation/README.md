@@ -5,15 +5,22 @@ under identical Phase 5 cases, model, Qdrant collection, synthetic database fixt
 tools, and deterministic failure plan.
 
 The implementation uses the domain name `paired_agent_evaluation`; phase numbers appear only in
-documentation and docstrings. It is versioned independently of `src/app` and is **not** frozen —
-no identity manifest pins its own code, so defects found here may be fixed directly, without a
-phase release. It does, however, verify the Phase 3, 4, and 5 freeze identities it depends on; see
+documentation and docstrings. It is versioned independently of `src/app`. Validation may identify
+harness defects, but the corrected harness must be frozen and bound to one completed validation
+run and one preregistered test run before the test split can execute. It also verifies the Phase 3,
+4, and 5 freeze identities it depends on; see
 [architecture](../../docs/architecture/phase6_evaluation_architecture.md) for the full design and
 [limitations](../../docs/phase-6-experiments/limitations.md) for known compromises.
 
 Mutable run output is written to the gitignored `artifacts/paired_agent_evaluation/`. Only a
 completed, adjudicated, sanitized **test**-split run can be sealed under
 `data/evaluation/paired_agent_evaluation/v1/`.
+
+`prepare_run` creates a cryptographically random `blinding-plan.json` before acquisition and pins
+its digest in the run manifest. Reviewers receive only `review-packet.jsonl`, whose opaque IDs and
+order come from that private plan; never give reviewers the run directory or blinding plan. The
+plan is disclosed only in the sealed release after adjudication is final, preserving a verifiable
+mapping from reviews to observations without exposing conditions during review.
 
 ## Prerequisites
 
@@ -85,7 +92,17 @@ regenerate an inherited manifest from this project to force a pass.
    ```
 
 7. Correct harness defects found by validation without changing the frozen metric definitions.
-   Then acquire the untouched test split under a new run ID and repeat scoring and adjudication:
+   After the validation run is fully scored and adjudicated, freeze the exact harness revision and
+   preregister its only permitted test run ID:
+
+   ```bash
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_harness.py --write --validation-run-id run_validation_v1 --test-run-id run_test_v1
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_harness.py --frozen
+   ```
+
+   Commit and independently review
+   `docs/phase-6-experiments/harness-freeze-manifest.json` before test execution. Then acquire the
+   untouched test split and repeat scoring and adjudication:
 
    ```bash
    uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/run_test.py --run-id run_test_v1
@@ -102,13 +119,19 @@ regenerate an inherited manifest from this project to force a pass.
 
 The test split is not a tuning set. Never rerun accepted observations, manually replace model
 outputs, or alter labels after viewing comparative results. Only a pre-acceptance infrastructure
-failure can use the configured bounded rerun.
+failure can use the configured bounded rerun inside the single acquisition process. Immediately
+before provider access, `run_test.py` atomically creates
+`data/evaluation/paired_agent_evaluation/test-execution-claim.json`; its existence permanently
+blocks another local test acquisition. Preserve and commit that claim with the eventual release.
 
 ## Troubleshooting
 
 - **`verify_harness.py` fails an inherited freeze gate.** The defect is in Phase 3, 4, or 5, not in
   this harness — fix and re-release the affected phase, then re-run. Do not edit or regenerate that
   phase's freeze manifest from within this project.
+- **`run_test.py` rejects the run ID or an existing claim.** Use only the test run ID recorded by
+  the reviewed harness freeze. Never delete or replace the execution claim to obtain another run;
+  a consumed claim means the test split has already started, even if acquisition was interrupted.
 - **`verify_release.py --seal-run` raises on the run's split.** Only a `test`-split run can be
   sealed (`release.py::seal_run`); a `validation` run exists to correct the harness before the real
   test-split run, not to be released.
