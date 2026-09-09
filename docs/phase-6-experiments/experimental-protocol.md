@@ -18,8 +18,10 @@ at most twice in total.
 1. Verify all inherited freezes and the locked environment.
 2. Run validation, generate blinded reviews, resolve defects in the harness only, and record any
    protocol deviation.
-3. Freeze the harness configuration and adjudication instructions.
-4. Run the untouched test split once.
+3. Content-address the complete harness, pin the final validation manifest and summary, and
+   preregister exactly one test run ID.
+4. Atomically consume that authorization before any provider call, then run the untouched test
+   split once. An interrupted test acquisition is not restarted under another run ID.
 5. Complete dual independent, condition-blinded human review before opening comparative results.
 6. Run Ragas as a secondary sensitivity measure, compute the registered estimates, and seal the
    sanitized artifact set.
