@@ -49,3 +49,42 @@ def test_only_aggregate_strata_resample_by_category(paths) -> None:
         if name not in {"overall", "category_macro"}
     )
 
+
+def test_category_macro_is_unweighted_across_categories(paths) -> None:
+    """Give each category equal weight regardless of its metric denominator."""
+    cases = Phase5Dataset(paths.repository).cases(DatasetSplit.VALIDATION)
+    first = cases[0]
+    second = next(case for case in cases if case.category != first.category)
+    selected = {case.case_id: case for case in (first, second)}
+    contributions = [
+        MetricContribution(
+            key=ExecutionKey(case_id=first.case_id, repetition=1, condition=Condition.BASELINE),
+            metric_id="metric",
+            eligible=True,
+            numerator=9,
+            denominator=9,
+        ),
+        MetricContribution(
+            key=ExecutionKey(case_id=second.case_id, repetition=1, condition=Condition.BASELINE),
+            metric_id="metric",
+            eligible=True,
+            numerator=0,
+            denominator=1,
+        ),
+    ]
+
+    estimate = estimate_condition(
+        contributions,
+        selected,
+        metric_id="metric",
+        condition="baseline",
+        stratum="category_macro",
+        include_case=lambda _: True,
+        replicates=0,
+        seed=7,
+        minimum_valid=1,
+        stratify_by_category=True,
+        category_macro=True,
+    )
+
+    assert estimate.estimate == 0.5
