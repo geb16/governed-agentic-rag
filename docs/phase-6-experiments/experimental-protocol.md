@@ -10,8 +10,10 @@ case and repetition to reduce order effects.
 The independent variable is the presence of the governance-aware workflow layer. Controlled
 substrates are the model identifier, synthetic knowledge base, Qdrant collection, per-case SQLite
 fixture, simulated tools, fault plan, request, and labels. Acquisition concurrency is one. An
-accepted model invocation is never rerun; only a failure before request acceptance can be retried,
-at most twice in total.
+accepted model invocation is never rerun. An atomic per-attempt journal is created before system
+execution, acceptance is recorded after the first successful provider response, and only an
+explicitly completed pre-acceptance failure can be retried, at most twice in total. A process
+interruption leaving an attempt started or accepted but without a raw observation fails closed.
 
 ## Sequence and leakage controls
 
