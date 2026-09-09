@@ -82,3 +82,16 @@ def test_harness_freeze_requires_completed_validation(control_paths) -> None:
             test_run_id="run_test_registered",
         )
 
+# Testing that the harness freeze verification fails if the source code has 
+# changed since the freeze was written.
+def test_harness_verification_rejects_source_drift(control_paths, monkeypatch) -> None:
+    _complete_validation(control_paths, "run_validation_drift")
+    control.write_harness_freeze(
+        control_paths,
+        validation_run_id="run_validation_drift",
+        test_run_id="run_test_drift",
+    )
+    monkeypatch.setattr(control, "_source_hashes", lambda paths: {"changed.py": "0" * 64})
+
+    with pytest.raises(ValueError, match="source files changed"):
+        control.verify_harness_freeze(control_paths)
