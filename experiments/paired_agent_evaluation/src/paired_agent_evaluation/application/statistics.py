@@ -1,4 +1,4 @@
-# Frozen ratio estimators and stratified case-cluster percentile bootstrap.
+# Frozen ratio estimators and case-cluster percentile bootstrap.
 
 from __future__ import annotations
 
@@ -26,8 +26,37 @@ def _percentile(values: list[float], probability: float) -> float:
     return ordered[lower] * (1 - fraction) + ordered[upper] * fraction
 
 
-def _draw_case_ids(case_ids_by_category: dict[str, list[str]], rng: random.Random) -> list[str]:
-    return [rng.choice(ids) for ids in case_ids_by_category.values() for _ in range(len(ids))]
+def _case_groups(
+    case_ids: Iterable[str],
+    cases: dict[str, EvaluationCase],
+    *,
+    stratify_by_category: bool,
+) -> list[list[str]]:
+    ordered = sorted(case_ids)
+    if not stratify_by_category:
+        return [ordered]
+    by_category: dict[str, list[str]] = defaultdict(list)
+    for case_id in ordered:
+        by_category[cases[case_id].category.value].append(case_id)
+    return [by_category[category] for category in sorted(by_category)]
+
+
+def _draw_case_ids(groups: list[list[str]], rng: random.Random) -> list[str]:
+    return [rng.choice(group) for group in groups for _ in range(len(group))]
+
+
+def _category_macro(
+    items: Iterable[MetricContribution], cases: dict[str, EvaluationCase]
+) -> float | None:
+    by_category: dict[str, list[MetricContribution]] = defaultdict(list)
+    materialized = list(items)
+    for item in materialized:
+        by_category[cases[item.key.case_id].category.value].append(item)
+    categories = sorted({case.category.value for case in cases.values()})
+    category_values = [_ratio(by_category[category]) for category in categories]
+    if not category_values or any(value is None for value in category_values):
+        return None
+    return sum(value for value in category_values if value is not None) / len(category_values)
 
 
 def estimate_condition(
@@ -41,6 +70,8 @@ def estimate_condition(
     replicates: int,
     seed: int,
     minimum_valid: int,
+    stratify_by_category: bool,
+    category_macro: bool = False,
 ) -> Estimate:
     selected = [
         item
@@ -50,18 +81,17 @@ def estimate_condition(
         and include_case(cases[item.key.case_id])
     ]
     by_case: dict[str, list[MetricContribution]] = defaultdict(list)
-    categories: dict[str, list[str]] = defaultdict(list)
     for item in selected:
         by_case[item.key.case_id].append(item)
-    for case_id in sorted(by_case):
-        categories[cases[case_id].category.value].append(case_id)
-    point = _ratio(selected)
+    groups = _case_groups(by_case, cases, stratify_by_category=stratify_by_category)
+    aggregate = (lambda items: _category_macro(items, cases)) if category_macro else _ratio
+    point = aggregate(selected)
     bootstrap: list[float] = []
     if len(by_case) >= 2:
         rng = random.Random(seed)
         for _ in range(replicates):
-            draw = _draw_case_ids(categories, rng)
-            value = _ratio(item for case_id in draw for item in by_case[case_id])
+            draw = _draw_case_ids(groups, rng)
+            value = aggregate(item for case_id in draw for item in by_case[case_id])
             if value is not None:
                 bootstrap.append(value)
     valid_interval = len(bootstrap) >= minimum_valid
@@ -88,6 +118,8 @@ def estimate_paired_difference(
     replicates: int,
     seed: int,
     minimum_valid: int,
+    stratify_by_category: bool,
+    category_macro: bool = False,
 ) -> PairedDifference:
     keyed = {
         (item.key.case_id, item.key.repetition, item.key.condition.value): item
@@ -106,13 +138,12 @@ def estimate_paired_difference(
             and governed.pending_reason is None
         ):
             pairs[case_id].append((baseline, governed))
-    categories: dict[str, list[str]] = defaultdict(list)
-    for case_id in sorted(pairs):
-        categories[cases[case_id].category.value].append(case_id)
+    groups = _case_groups(pairs, cases, stratify_by_category=stratify_by_category)
+    aggregate = (lambda items: _category_macro(items, cases)) if category_macro else _ratio
 
     def difference(ids: list[str]) -> float | None:
-        baseline = _ratio(pair[0] for case_id in ids for pair in pairs[case_id])
-        governed = _ratio(pair[1] for case_id in ids for pair in pairs[case_id])
+        baseline = aggregate(pair[0] for case_id in ids for pair in pairs[case_id])
+        governed = aggregate(pair[1] for case_id in ids for pair in pairs[case_id])
         return governed - baseline if baseline is not None and governed is not None else None
 
     identities = list(pairs)
@@ -121,7 +152,7 @@ def estimate_paired_difference(
     if len(pairs) >= 2:
         rng = random.Random(seed)
         for _ in range(replicates):
-            value = difference(_draw_case_ids(categories, rng))
+            value = difference(_draw_case_ids(groups, rng))
             if value is not None:
                 bootstrap.append(value)
     valid_interval = len(bootstrap) >= minimum_valid
@@ -139,11 +170,14 @@ def estimate_paired_difference(
 
 def registered_strata(
     cases: list[EvaluationCase],
-) -> list[tuple[str, Callable[[EvaluationCase], bool]]]:
+) -> list[tuple[str, Callable[[EvaluationCase], bool], bool, bool]]:
     def include_all(_: EvaluationCase) -> bool:
         return True
 
-    strata: list[tuple[str, Callable[[EvaluationCase], bool]]] = [("overall", include_all)]
+    strata: list[tuple[str, Callable[[EvaluationCase], bool], bool, bool]] = [
+        ("overall", include_all, True, False),
+        ("category_macro", include_all, True, True),
+    ]
     dimensions: dict[str, Callable[[EvaluationCase], str]] = {
         "category": lambda case: case.category.value,
         "route": lambda case: case.expected.route.value,
@@ -160,5 +194,5 @@ def registered_strata(
             ) -> bool:
                 return read(case) == selected
 
-            strata.append((f"{dimension}={value}", matches))
+            strata.append((f"{dimension}={value}", matches, False, False))
     return strata
