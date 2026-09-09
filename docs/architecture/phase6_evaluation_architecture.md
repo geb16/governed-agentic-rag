@@ -85,7 +85,7 @@ without an internal decomposition mandate.
 | `adapters/storage` | Atomic JSON/JSONL persistence, canonical hashing, and the monotonic attempt journal | Retry policy or system execution |
 | `adapters/graders` | The pinned Ragas 0.4 secondary faithfulness call | Primary scoring |
 | `composition.py` | `EvaluationPaths`, config loading, `prepare_run`/`acquire` wiring | Reporting or sealing |
-| `release.py` | Sanitization, content-addressed sealing and verification | Score computation |
+| `release.py` | Independent rederivation checks, sanitization, content-addressed sealing and verification | Metric definitions or acquisition |
 | `scripts/*.py` | CLI entry points over `composition`/`reporting`/`release` | Business logic |
 
 ## Acquisition, scoring, and sealing sequence
@@ -117,15 +117,21 @@ acquire(run_id, split)
        persist the raw observation atomically, then close the journal
   -> write the updated run manifest (accepted/invalid counts)
 
-reporting: normalize -> score -> adjudicate (blinded) -> [ragas, after adjudication] -> summarize
+reporting: normalize -> review packet -> adjudicate (blinded) -> score -> summarize
   -> normalize every raw observation into one route/evidence/tool vocabulary
-  -> compute the 14 frozen Phase 5 metric contributions
-  -> build and, after human resolution, apply the blinded review packet
-  -> bootstrap estimates, paired differences, and the run summary
+  -> build the randomly ordered, condition-blinded review packet
+  -> require two independent decisions for each applicable review field; resolve disagreements
+  -> apply resolved labels and compute the 14 frozen Phase 5 metric contributions
+  -> bootstrap condition estimates, category-macro estimates, paired differences, and the summary
+  -> optionally run Ragas only after primary adjudication is final
 
 seal_run(run_root, release_root)
   -> require every RELEASE_FILES entry, status == "scored", primary_results_final
   -> require split == "test"  (a validation run can never be sealed as the release)
+  -> validate the exact scheduled observation identity set
+  -> independently rederive normalized observations, review artifacts, scores, estimates,
+     paired differences, and summary from raw observations and authoritative inputs
+  -> reject sealing if any stored primary artifact differs from its rederived value
   -> sanitize (redact secret-shaped keys) and content-address every file
 ```
 
@@ -141,9 +147,11 @@ seal_run(run_root, release_root)
 | A proven pre-acceptance attempt fails | Journaled as `PRE_ACCEPTANCE_FAILED` and retried up to `max_pre_acceptance_attempts`, with every attempt in an isolated workspace |
 | A prior attempt remains `STARTED` or `ACCEPTED` without a raw observation | Acquisition fails closed because provider acceptance cannot be safely excluded; no automatic rerun occurs |
 | A raw observation is already persisted | Acquisition resumes past it without invoking either system |
+| Raw observations are duplicated, missing, or substituted while preserving the expected count | Scoring rejects the run because observation identities must exactly match the frozen schedule |
 | A governed workflow's live risk assessment requires a role the dataset's expected decisions omit | That one role is skipped, not the whole replay; every available decision is still applied |
 | A run's status is not `"scored"` or primary results are not final | `seal_run` refuses to seal |
 | A fully scored run's split is `"validation"` | `seal_run` refuses to seal; only a `"test"`-split run may become the release |
+| A stored normalized result, review artifact, score, estimate, paired difference, or summary drifts from deterministic rederivation | `seal_run` refuses to seal, regardless of manifest status |
 | `verify_release` against a sealed directory | Recomputes and compares every file digest and the aggregate digest; any mismatch fails closed |
 | Secondary Ragas grading run before adjudication is locked | Not code-enforced today; the protocol in `experiments/paired_agent_evaluation/README.md` requires human labels be fixed first — see known compromises |
 
@@ -154,6 +162,9 @@ The runner's model decorator records acceptance only after a provider call retur
 Authentication, connection, and provider-availability failures before that point remain invalid
 attempts; failures after recorded acceptance remain system outcomes. The attempt journal is the
 durable authority used to prevent an accepted invocation from being silently repeated after a crash.
+For governed observations, audit facts are trusted only when the source chain is valid and its
+workflow, trace, and request identities correlate with the response and request. Events from an
+invalid or mismatched envelope contribute no audit-completeness facts.
 
 ## Blinding and data trust boundaries
 
@@ -164,6 +175,7 @@ durable authority used to prevent an accepted invocation from being silently rep
 | The review packet (`review-packet.jsonl`) | Reviewer-facing | Carries only opaque IDs in the private plan's random order; no `case_id`, `condition`, raw observation identity, or public derivation input |
 | Adjudication resolutions | Reviewer-authored, trusted after dual review | Consumed by scoring only after being written back under the real observation identity |
 | Secondary Ragas grades | Diagnostic only | Never merged into primary metric contributions |
+| Stored primary result artifacts | Derived, not authoritative | `seal_run` rederives and compares them from raw observations, the schedule, dataset, rubric, blinding plan, and adjudication inputs |
 | Harness freeze and test-execution claim | Preregistered control evidence | Bind reviewed source bytes and completed validation to one test ID; claim is created exclusively before provider access and copied into the sealed run |
 | Run and release manifests | Content-addressed, internal | Hash every input file; sensitive-key fields redacted before sealing |
 | Raw run artifacts (`artifacts/paired_agent_evaluation/`) | Mutable, local, gitignored | Never committed; only a sealed release under `data/evaluation/paired_agent_evaluation/v1/` is |
@@ -177,11 +189,11 @@ durable authority used to prevent an accepted invocation from being silently rep
    logic — role-alias canonicalization (`ROLE_ALIASES`) in particular — is duplicated between
    `adapters/systems/governed.py` and `application/normalization.py` rather than factored into one
    shared module; the two must be kept in sync by hand.
-2. Several configuration fields in `config/reporting.json` and `config/graders.json` (bootstrap
-   method, confidence level, per-grader policy text) are hashed into `configuration_sha256` for
-   provenance but not read by any code path; the executable statistical policy lives in
-   `application/statistics.py`. Editing those fields changes the recorded configuration digest, not
-   behavior.
+2. Declarative method labels in `config/reporting.json` and policy text in `config/graders.json`
+   are hashed for provenance but do not dynamically select implementations. The corresponding
+   executable policies live in `application/statistics.py`, `application/adjudication.py`, and
+   `application/scoring.py`; changes therefore require code, configuration, and tests to remain in
+   agreement.
 3. The Ragas-after-adjudication ordering ("run secondary faithfulness only after primary human
    labels are fixed") is a documented protocol step, not a code-enforced precondition; nothing stops
    `score_results.py --ragas` from running before adjudication is complete.
@@ -202,7 +214,8 @@ it re-verifies all three inherited freeze manifests and the deterministic schedu
 splits. Its `--write` mode accepts only completed validation evidence and preregisters one test run;
 its `--frozen` mode recomputes every harness, inherited-release, and validation hash. It is necessary
 but not sufficient — the full local
-gate (`ruff check`, `mypy`, `pytest`) documented in `experiments/paired_agent_evaluation/README.md`
+gate (`pytest`, `ruff check`, `ruff format --check`, and `mypy`) documented in
+`experiments/paired_agent_evaluation/README.md`
 must also pass before acquisition begins, since `verify_harness.py` does not itself run the test
 suite or static analysis.
 
