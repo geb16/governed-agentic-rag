@@ -3,7 +3,6 @@ from app.evaluation.dataset.enums import DatasetSplit
 from paired_agent_evaluation.adapters.dataset import Phase5Dataset
 from paired_agent_evaluation.application.statistics import (
     estimate_condition,
-    estimate_paired_difference,
     registered_strata,
 )
 from paired_agent_evaluation.domain.executions import Condition, ExecutionKey
@@ -40,8 +39,7 @@ def test_case_cluster_bootstrap_is_reproducible(paths) -> None:
     assert run_estimate() == run_estimate()
 
 # Testing if the registered strata are used to control the resampling 
-# policy, rather than the case IDs themselves. This is important because the case IDs are not guaranteed to be stable across runs, but the registered strata should be.
-def test_reported_stratum_resamples_as_one_case_pool(paths, monkeypatch) -> None:
+# policy, rather than the case IDs themselves.
     cases = Phase5Dataset(paths.repository).cases(DatasetSplit.VALIDATION)
     contributions = [
         MetricContribution(
@@ -76,3 +74,17 @@ def test_reported_stratum_resamples_as_one_case_pool(paths, monkeypatch) -> None
     )
 
     assert len(observed_groups[0]) == 1
+
+# Testing if the registered strata are used to control the resampling policy,
+# rather than the case IDs themselves.
+def test_registered_strata_encode_the_frozen_resampling_policy(paths) -> None:
+    """Stratify only overall and category-macro bootstrap draws."""
+    cases = Phase5Dataset(paths.repository).cases(DatasetSplit.VALIDATION)
+    policies = {
+        name: (stratify_by_category, category_macro)
+        for name, _, stratify_by_category, category_macro in registered_strata(cases)
+    }
+
+    assert policies.pop("overall") == (True, False)
+    assert policies.pop("category_macro") == (True, True)
+    assert set(policies.values()) == {(False, False)}
