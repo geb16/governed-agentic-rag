@@ -19,6 +19,8 @@ STAGE_FACT = {
 def project_trace_facts(raw: RawExecution) -> list[str]:
     if raw.response is None:
         return []
+    if raw.key.condition == Condition.GOVERNED and not _audit_is_trustworthy(raw):
+        return []
     facts = {"request_identity", "final_outcome"}
     if raw.retrieval_call_count:
         facts.add("retrieval_evidence")
@@ -40,3 +42,14 @@ def project_trace_facts(raw: RawExecution) -> list[str]:
         if event.get("event_type") == "tool_attempted":
             facts.add("tool_attempt")
     return sorted(facts)
+
+
+def _audit_is_trustworthy(raw: RawExecution) -> bool:
+    response = raw.response or {}
+    request_id = raw.request.get("request_id")
+    return (
+        raw.audit_chain_valid is True
+        and raw.audit_workflow_id == response.get("workflow_id")
+        and raw.audit_trace_id == response.get("trace_id")
+        and raw.audit_request_id == request_id == response.get("request_id")
+    )
