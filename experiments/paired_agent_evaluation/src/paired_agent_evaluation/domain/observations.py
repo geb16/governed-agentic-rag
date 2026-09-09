@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from paired_agent_evaluation.domain.executions import ExecutionKey, StrictModel
 
@@ -67,6 +67,13 @@ class RawExecution(StrictModel):
     operational_events: list[dict[str, Any]] = Field(default_factory=list)
     error_type: str | None = None
     error_message: str | None = None
+
+    @model_validator(mode="after")
+    def validate_acceptance_consistency(self) -> RawExecution:
+        """Keep the explicit acceptance flag aligned with its status enum."""
+        if self.request_accepted != (self.acceptance == AcceptanceStatus.ACCEPTED):
+            raise ValueError("request_accepted must match acceptance status")
+        return self
 
 
 class ToolAttempt(StrictModel):
