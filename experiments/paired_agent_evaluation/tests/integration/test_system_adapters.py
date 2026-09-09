@@ -11,6 +11,17 @@ from paired_agent_evaluation.adapters.systems import BaselineSystemRunner, Gover
 from paired_agent_evaluation.application.normalization import normalize
 from paired_agent_evaluation.application.scheduling import build_schedule
 from paired_agent_evaluation.domain.executions import Condition
+from paired_agent_evaluation.domain.observations import AcceptanceStatus
+
+
+class MemoryAcceptanceRecorder:
+    """Retain acceptance evidence for direct adapter integration tests."""
+
+    def __init__(self) -> None:
+        self.accepted = False
+
+    def mark_accepted(self) -> None:
+        self.accepted = True
 
 
 def test_both_frozen_systems_run_against_isolated_shared_fixture(
@@ -18,16 +29,28 @@ def test_both_frozen_systems_run_against_isolated_shared_fixture(
 ) -> None:
     schedule = build_schedule([answer_case], repetitions=1, seed=20260831)
     by_condition = {item.key.condition: item for item in schedule}
+    baseline_acceptance = MemoryAcceptanceRecorder()
+    governed_acceptance = MemoryAcceptanceRecorder()
     baseline = BaselineSystemRunner(
         settings,
         retriever_factory=lambda _: StaticRetriever(),
         model_factory=lambda _: BaselineAnswerModel(),
-    ).execute(answer_case, by_condition[Condition.BASELINE], tmp_path / "baseline")
+    ).execute(
+        answer_case,
+        by_condition[Condition.BASELINE],
+        tmp_path / "baseline",
+        acceptance=baseline_acceptance,
+    )
     governed = GovernedSystemRunner(
         settings,
         retriever_factory=lambda _: StaticRetriever(),
         model_factory=lambda _: GovernedAnswerModel(),
-    ).execute(answer_case, by_condition[Condition.GOVERNED], tmp_path / "governed")
+    ).execute(
+        answer_case,
+        by_condition[Condition.GOVERNED],
+        tmp_path / "governed",
+        acceptance=governed_acceptance,
+    )
     assert baseline.request_accepted is True
     assert governed.request_accepted is True
     assert baseline.request == governed.request
@@ -100,7 +123,7 @@ def test_governed_approval_replay_applies_every_available_decision(
         settings,
         retriever_factory=lambda _: StaticRetriever(),
         model_factory=lambda _: GovernedDualRoleRefundModel(),
-    ).execute(case, scheduled, tmp_path)
+    ).execute(case, scheduled, tmp_path, acceptance=MemoryAcceptanceRecorder())
 
     assert execution.request_accepted is True
     assert execution.initial_response is not None
