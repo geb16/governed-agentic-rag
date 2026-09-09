@@ -70,6 +70,35 @@ def test_two_independent_matching_reviews_resolve() -> None:
     assert resolve_reviews(reviews)["blind_1"].observed_route.value == "answer"
 
 
+def test_reviewers_must_independently_decide_each_resolved_field() -> None:
+    """Different single-reviewer fields do not constitute dual review."""
+    reviews = [
+        Adjudication(blinded_id="blind_1", reviewer_id="r1", observed_route="answer"),
+        Adjudication(blinded_id="blind_1", reviewer_id="r2", claim_support_passed=True),
+    ]
+
+    assert resolve_reviews(reviews) == {}
+
+
+def test_independently_dual_reviewed_fields_resolve_together() -> None:
+    reviews = [
+        Adjudication(blinded_id="blind_1", reviewer_id="r1", observed_route="answer"),
+        Adjudication(
+            blinded_id="blind_1",
+            reviewer_id="r2",
+            observed_route="answer",
+            claim_support_passed=True,
+        ),
+        Adjudication(blinded_id="blind_1", reviewer_id="r3", claim_support_passed=True),
+    ]
+
+    decision = resolve_reviews(reviews)["blind_1"]
+
+    assert decision.observed_route.value == "answer"
+    assert decision.claim_support_passed is True
+    assert decision.reviewer_count == 3
+
+
 # Testing that two independent reviews with the same blinded_id but different observed_route values
 # do not resolve without an explicit resolution provided.
 def test_disagreement_requires_explicit_resolution() -> None:
