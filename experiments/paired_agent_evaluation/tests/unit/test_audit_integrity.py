@@ -1,5 +1,6 @@
 from datetime import UTC, datetime
 
+import pytest
 from paired_agent_evaluation.domain.audit import has_trustworthy_audit
 
 from paired_agent_evaluation.adapters.telemetry import project_trace_facts
@@ -51,3 +52,21 @@ def test_valid_audit_envelope_supports_trace_evidence() -> None:
     assert normalize(raw).audit_correlation_valid is True
     assert "classification" in project_trace_facts(raw)
 
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("audit_chain_valid", False),
+        ("audit_workflow_id", "wf-other"),
+        ("audit_trace_id", "trace-other"),
+        ("audit_request_id", "req-other"),
+        ("audit_trace_id", None),
+    ],
+)
+def test_untrusted_audit_envelope_cannot_claim_trace_facts(field, value) -> None:
+    """Fail closed for chain, correlation, and missing-identifier tampering."""
+    raw = _raw().model_copy(update={field: value})
+
+    assert has_trustworthy_audit(raw) is False
+    assert normalize(raw).audit_correlation_valid is False
+    assert project_trace_facts(raw) == []
