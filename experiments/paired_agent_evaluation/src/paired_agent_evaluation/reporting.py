@@ -176,11 +176,11 @@ def _summary(
     }
 
 
-def score_run(*, run_id: str) -> dict[str, Any]:
-    paths = EvaluationPaths.discover()
-    run_root = paths.run_root(run_id)
-    manifest_path = run_root / "run-manifest.json"
-    manifest = ExperimentManifest.model_validate_json(manifest_path.read_text(encoding="utf-8"))
+def derive_primary_artifacts(
+    *, paths: EvaluationPaths, run_root: Path, manifest: ExperimentManifest
+) -> dict[str, Any]:
+    """Derive every primary result artifact from authoritative run inputs."""
+
     blinding_plan = BlindingPlan.model_validate_json(
         (run_root / "blinding-plan.json").read_text(encoding="utf-8")
     )
@@ -224,19 +224,35 @@ def score_run(*, run_id: str) -> dict[str, Any]:
     )
     reporting = json.loads((paths.configs / "reporting.json").read_text(encoding="utf-8"))
     estimates, differences = _build_estimates(contributions, cases, rubric, reporting)
-    JsonlStore.write(run_root / "raw-results.jsonl", raw)
-    JsonlStore.write(run_root / "normalized.jsonl", normalized)
-    JsonlStore.write(run_root / "review-packet.jsonl", review_items)
-    JsonlStore.write(run_root / "resolved-adjudications.jsonl", list(resolved.values()))
-    JsonlStore.write(run_root / "scores.jsonl", contributions)
-    atomic_json(run_root / "estimates.json", [item.model_dump(mode="json") for item in estimates])
-    atomic_json(
-        run_root / "paired-differences.json",
-        [item.model_dump(mode="json") for item in differences],
-    )
     pending = sum(item.pending_reason is not None for item in contributions)
-    summary = _summary(run_id, split, normalized, resolved, review_items, pending)
-    atomic_json(run_root / "summary.json", summary)
+    return {
+        "raw-results.jsonl": raw,
+        "normalized.jsonl": normalized,
+        "review-packet.jsonl": review_items,
+        "resolved-adjudications.jsonl": list(resolved.values()),
+        "scores.jsonl": contributions,
+        "estimates.json": [item.model_dump(mode="json") for item in estimates],
+        "paired-differences.json": [item.model_dump(mode="json") for item in differences],
+        "summary.json": _summary(
+            manifest.run_id, split, normalized, resolved, review_items, pending
+        ),
+    }
+
+
+def score_run(*, run_id: str) -> dict[str, Any]:
+    paths = EvaluationPaths.discover()
+    run_root = paths.run_root(run_id)
+    manifest_path = run_root / "run-manifest.json"
+    manifest = ExperimentManifest.model_validate_json(manifest_path.read_text(encoding="utf-8"))
+    artifacts = derive_primary_artifacts(paths=paths, run_root=run_root, manifest=manifest)
+    for name, payload in artifacts.items():
+        path = run_root / name
+        if name.endswith(".jsonl"):
+            JsonlStore.write(path, payload)
+        else:
+            atomic_json(path, payload)
+    summary = artifacts["summary.json"]
+    pending = int(summary["pending_metric_contributions"])
     manifest = manifest.model_copy(
         update={
             "status": "scored" if pending == 0 else "awaiting_adjudication",
