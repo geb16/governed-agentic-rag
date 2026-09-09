@@ -1,7 +1,7 @@
 from app.evaluation.dataset.enums import DatasetSplit
 
 from paired_agent_evaluation.adapters.dataset import Phase5Dataset
-from paired_agent_evaluation.application.statistics import estimate_condition
+from paired_agent_evaluation.application.statistics import estimate_condition, registered_strata
 from paired_agent_evaluation.domain.executions import Condition, ExecutionKey
 from paired_agent_evaluation.domain.scores import MetricContribution
 
@@ -28,5 +28,24 @@ def test_case_cluster_bootstrap_is_reproducible(paths) -> None:
         replicates=100,
         seed=7,
         minimum_valid=90,
+        stratify_by_category=True,
     )
     assert estimate_condition(**kwargs) == estimate_condition(**kwargs)
+
+
+def test_only_aggregate_strata_resample_by_category(paths) -> None:
+    """Apply category-stratified resampling only to aggregate estimates."""
+    cases = Phase5Dataset(paths.repository).cases(DatasetSplit.VALIDATION)
+    policies = {
+        name: (stratified, category_macro)
+        for name, _, stratified, category_macro in registered_strata(cases)
+    }
+
+    assert policies["overall"] == (True, False)
+    assert policies["category_macro"] == (True, True)
+    assert all(
+        policy == (False, False)
+        for name, policy in policies.items()
+        if name not in {"overall", "category_macro"}
+    )
+
