@@ -82,6 +82,18 @@ def _governed_route(
     return None, "no_single_compatible_route", True
 
 
+def _audit_correlation_valid(raw: RawExecution) -> bool:
+    """Require the retained audit envelope to identify this exact invocation."""
+    request_id = raw.request.get("request_id")
+    response = raw.response or {}
+    return (
+        raw.audit_chain_valid is True
+        and raw.audit_workflow_id == response.get("workflow_id")
+        and raw.audit_trace_id == response.get("trace_id")
+        and raw.audit_request_id == request_id == response.get("request_id")
+    )
+
+
 def normalize(
     raw: RawExecution,
     *,
@@ -114,6 +126,9 @@ def normalize(
             _canonical_role(str(value))
             for value in ((initial.get("approval_route") or {}).get("required_roles") or [])
         ]
+    audit_correlation_valid = (
+        _audit_correlation_valid(raw) if raw.key.condition == Condition.GOVERNED else None
+    )
     available = {item.chunk_id for item in raw.retrieved}
     available.update(str(item.get("evidence_id")) for item in response.get("evidence") or [])
     recovery = response.get("recovery") or {}
@@ -140,7 +155,8 @@ def normalize(
         recovery_attempts=int(recovery.get("attempts", len(attempts))),
         terminal_error_code=response.get("error_code") or recovery.get("error_code"),
         trace_facts=trace_facts or [],
-        audit_chain_valid=True if raw.audit_events else None,
+        audit_chain_valid=raw.audit_chain_valid,
+        audit_correlation_valid=audit_correlation_valid,
         latency_ms=raw.latency_ms,
         input_tokens=int(usage.get("input_tokens", 0)),
         output_tokens=int(usage.get("output_tokens", 0)),
