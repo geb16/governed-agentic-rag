@@ -146,6 +146,15 @@ class UnavailableBaselineModel:
     def complete(self, **_: Any):
         raise ConnectionError("provider unavailable")
 
+
+class MalformedBaselineModel:
+    """Simulate response parsing failure after the provider returned data."""
+
+    model_name = "malformed-test-model"
+
+    def complete(self, **_: Any):
+        raise ValueError("provider response violated the structured-output contract")
+
 # Testing if a provider failure before the first response is not accepted by the system runner.
 def test_provider_failure_before_first_response_is_not_accepted(
     tmp_path: Path, settings, answer_case
@@ -164,3 +173,22 @@ def test_provider_failure_before_first_response_is_not_accepted(
     assert execution.request_accepted is False
     assert acceptance.accepted is False
     assert execution.error_type == "ConnectionError"
+
+# Testing if a provider response that fails parsing after being returned 
+# is still accepted by the system runner.
+def test_response_processing_failure_after_provider_return_is_accepted(
+    tmp_path: Path, settings, answer_case
+) -> None:
+    schedule = build_schedule([answer_case], repetitions=1, seed=20260831)
+    scheduled = next(item for item in schedule if item.key.condition == Condition.BASELINE)
+    acceptance = MemoryAcceptanceRecorder()
+
+    execution = BaselineSystemRunner(
+        settings,
+        retriever_factory=lambda _: StaticRetriever(),
+        model_factory=lambda _: MalformedBaselineModel(),
+    ).execute(answer_case, scheduled, tmp_path, acceptance=acceptance)
+
+    assert execution.acceptance == AcceptanceStatus.ACCEPTED
+    assert execution.request_accepted is True
+    assert acceptance.accepted is True
