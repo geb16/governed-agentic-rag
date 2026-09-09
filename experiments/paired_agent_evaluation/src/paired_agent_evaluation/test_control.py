@@ -18,10 +18,7 @@ from paired_agent_evaluation.adapters.storage.filesystem import (
 )
 from paired_agent_evaluation.application.scheduling import build_schedule
 from paired_agent_evaluation.domain.executions import ExperimentConfig
-from paired_agent_evaluation.domain.manifests import (
-    ExperimentManifest,
-    HarnessFreezeManifest,
-)
+from paired_agent_evaluation.domain.manifests import ExperimentManifest, HarnessFreezeManifest
 
 HARNESS_FREEZE_ID = "paired-agent-evaluation-harness-v1"
 HARNESS_MANIFEST = Path("docs/phase-6-experiments/harness-freeze-manifest.json")
@@ -153,6 +150,8 @@ def _completed_validation(paths: EvaluationControlPaths, run_id: str) -> tuple[s
         raise ValueError("Validation observation count is incomplete")
     return _sha256(manifest_path), _sha256(summary_path)
 
+def _manifest_payload(manifest: HarnessFreezeManifest) -> dict[str, Any]:
+    return manifest.model_dump(mode="json", exclude={"aggregate_sha256"})
 
 def write_harness_freeze(
     paths: EvaluationControlPaths,
