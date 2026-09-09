@@ -74,7 +74,7 @@ def _build_estimates(
     case_map = {case.case_id: case for case in cases}
     estimates = []
     differences = []
-    for stratum, predicate in registered_strata(cases):
+    for stratum, predicate, stratify_by_category, category_macro in registered_strata(cases):
         for definition in rubric.metrics:
             for condition in ("baseline", "governed"):
                 estimates.append(
@@ -88,6 +88,8 @@ def _build_estimates(
                         replicates=int(reporting["bootstrap_replicates"]),
                         seed=int(reporting["bootstrap_seed"]),
                         minimum_valid=int(reporting["minimum_valid_bootstrap_replicates"]),
+                        stratify_by_category=stratify_by_category,
+                        category_macro=category_macro,
                     )
                 )
             differences.append(
@@ -100,6 +102,8 @@ def _build_estimates(
                     replicates=int(reporting["bootstrap_replicates"]),
                     seed=int(reporting["bootstrap_seed"]),
                     minimum_valid=int(reporting["minimum_valid_bootstrap_replicates"]),
+                    stratify_by_category=stratify_by_category,
+                    category_macro=category_macro,
                 )
             )
     return estimates, differences
