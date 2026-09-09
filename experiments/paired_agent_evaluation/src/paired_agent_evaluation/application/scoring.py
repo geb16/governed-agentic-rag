@@ -8,7 +8,7 @@ from typing import Any
 from app.evaluation.dataset.enums import ExpectedRoute, RecoveryExpectation
 from app.evaluation.dataset.models import EvaluationCase
 
-from paired_agent_evaluation.application.adjudication import blinded_id
+from paired_agent_evaluation.application.adjudication import BlindingPlan, blinded_id
 from paired_agent_evaluation.domain.observations import (
     AcceptanceStatus,
     NormalizedObservation,
@@ -87,7 +87,7 @@ def score_observation(
     case: EvaluationCase,
     observation: NormalizedObservation,
     *,
-    run_id: str,
+    blinding_plan: BlindingPlan,
     adjudications: dict[str, ResolvedAdjudication],
 ) -> list[MetricContribution]:
     if observation.acceptance == AcceptanceStatus.INVALID:
@@ -102,7 +102,7 @@ def score_observation(
         ExpectedRoute.DENY,
         ExpectedRoute.SAFE_TERMINATE,
     }
-    review = adjudications.get(blinded_id(observation.key.observation_id, run_id=run_id))
+    review = adjudications.get(blinded_id(observation.key.observation_id, plan=blinding_plan))
     grounded_eligible = bool(
         observation.answer and observed in {ObservedRoute.ANSWER, ObservedRoute.EXECUTE}
     )
@@ -263,7 +263,7 @@ def score_all(
     cases: Iterable[EvaluationCase],
     observations: Iterable[NormalizedObservation],
     *,
-    run_id: str,
+    blinding_plan: BlindingPlan,
     adjudications: dict[str, ResolvedAdjudication],
 ) -> list[MetricContribution]:
     by_case = {case.case_id: case for case in cases}
@@ -273,7 +273,7 @@ def score_all(
         for contribution in score_observation(
             by_case[observation.key.case_id],
             observation,
-            run_id=run_id,
+            blinding_plan=blinding_plan,
             adjudications=adjudications,
         )
     ]

@@ -1,48 +1,50 @@
 from __future__ import annotations
 
-import subprocess
+import argparse
 import sys
 
-from app.evaluation.dataset.enums import DatasetSplit
-
-from paired_agent_evaluation.adapters.dataset import Phase5Dataset
-from paired_agent_evaluation.application.scheduling import build_schedule
-from paired_agent_evaluation.composition import EvaluationPaths, load_experiment_config
+from paired_agent_evaluation.composition import EvaluationPaths
+from paired_agent_evaluation.test_control import (
+    verify_harness_freeze,
+    verify_harness_readiness,
+    write_harness_freeze,
+)
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Verify readiness or freeze the Phase 6 harness before test acquisition."
+    )
+    parser.add_argument("--write", action="store_true", help="Write the preregistered freeze")
+    parser.add_argument("--frozen", action="store_true", help="Require and verify the freeze")
+    parser.add_argument("--validation-run-id")
+    parser.add_argument("--test-run-id")
+    args = parser.parse_args()
+    if args.write and args.frozen:
+        parser.error("--write and --frozen are mutually exclusive")
+    if args.write and (not args.validation_run_id or not args.test_run_id):
+        parser.error("--write requires --validation-run-id and --test-run-id")
+    if not args.write and (args.validation_run_id or args.test_run_id):
+        parser.error("run identifiers are accepted only with --write")
+
     paths = EvaluationPaths.discover()
-    failed_gates: list[str] = []
-    for script in (
-        "scripts/verify_phase3_freeze.py",
-        "scripts/verify_phase4_freeze.py",
-        "scripts/verify_phase5_freeze.py",
-    ):
-        result = subprocess.run(
-            [sys.executable, script],
-            cwd=paths.repository,
-            check=False,
-            text=True,
-        )
-        if result.returncode:
-            failed_gates.append(script)
-    dataset = Phase5Dataset(paths.repository)
-    config = load_experiment_config(paths)
-    expected = {DatasetSplit.VALIDATION: 120, DatasetSplit.TEST: 480}
-    for split, count in expected.items():
-        schedule = build_schedule(
-            dataset.cases(split),
-            repetitions=config.repetitions_per_case,
-            seed=config.condition_order_seed,
-        )
-        if len(schedule) != count:
-            raise ValueError(
-                f"{split.value} schedule has {len(schedule)} entries; expected {count}"
+    try:
+        if args.write:
+            manifest = write_harness_freeze(
+                paths,
+                validation_run_id=str(args.validation_run_id),
+                test_run_id=str(args.test_run_id),
             )
-    if failed_gates:
-        print(f"Evaluation harness blocked by {len(failed_gates)} inherited freeze gate(s).")
+            print(f"Wrote {manifest.freeze_id}: {manifest.aggregate_sha256}")
+        elif args.frozen:
+            manifest = verify_harness_freeze(paths)
+            print(f"Verified {manifest.freeze_id}: {manifest.aggregate_sha256}")
+        else:
+            verify_harness_readiness(paths)
+            print("Evaluation harness readiness and inherited freeze identities verified.")
+    except (OSError, ValueError) as error:
+        print(f"Evaluation harness blocked: {error}", file=sys.stderr)
         return 1
-    print("Evaluation harness and inherited freeze identities verified.")
     return 0
 
 

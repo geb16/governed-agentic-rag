@@ -1,0 +1,122 @@
+# Paired Agent Evaluation — Phase 6 Experimental Harness
+
+This isolated project compares the frozen conventional baseline and governance-aware workflow
+under identical Phase 5 cases, model, Qdrant collection, synthetic database fixture, simulated
+tools, and deterministic failure plan.
+
+The implementation uses the domain name `paired_agent_evaluation`; phase numbers appear only in
+documentation and docstrings. It is versioned independently of `src/app` and is **not** frozen —
+no identity manifest pins its own code, so defects found here may be fixed directly, without a
+phase release. It does, however, verify the Phase 3, 4, and 5 freeze identities it depends on; see
+[architecture](../../docs/architecture/phase6_evaluation_architecture.md) for the full design and
+[limitations](../../docs/phase-6-experiments/limitations.md) for known compromises.
+
+Mutable run output is written to the gitignored `artifacts/paired_agent_evaluation/`. Only a
+completed, adjudicated, sanitized **test**-split run can be sealed under
+`data/evaluation/paired_agent_evaluation/v1/`.
+
+## Prerequisites
+
+- Python 3.11–3.13 and [uv](https://docs.astral.sh/uv/).
+- A running Qdrant instance with the frozen `phase3_enterprise_kb` collection populated (see the
+  repository root's own setup instructions).
+- A **repository-root** `.env` (this directory has no `.env` of its own) defining at minimum:
+
+  ```
+  RAG_RETRIEVAL_BACKEND=qdrant
+  RAG_QDRANT_URL=http://localhost:6333
+  RAG_OPENAI_API_KEY=...
+  RAG_SAFETY_IDENTIFIER_SECRET=...
+  ```
+
+  `RAG_EXECUTION_PROFILE=experiment` and `RAG_EXPERIMENT_RUN_ID` are set automatically per run by
+  `composition.prepare_run` — do not set them yourself.
+
+This project has its own `pyproject.toml`, `uv.lock`, and `.venv`, independent of the repository
+root's. Always pass `--project experiments/paired_agent_evaluation` (or run from inside this
+directory) so `uv` resolves the correct environment.
+
+## Readiness gates
+
+From the repository root:
+
+```bash
+uv sync --project experiments/paired_agent_evaluation --group dev --frozen
+uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_harness.py
+uv run --project experiments/paired_agent_evaluation pytest -c experiments/paired_agent_evaluation/pyproject.toml experiments/paired_agent_evaluation/tests
+uv run --project experiments/paired_agent_evaluation ruff check experiments/paired_agent_evaluation
+uv run --project experiments/paired_agent_evaluation mypy --config-file experiments/paired_agent_evaluation/pyproject.toml
+```
+
+`verify_harness.py` must pass all Phase-3, Phase-4, and Phase-5 freeze checks. A failure there
+means the defect is upstream, in one of those frozen phases — fix and re-release it there; never
+regenerate an inherited manifest from this project to force a pass.
+
+## Controlled experiment sequence
+
+1. Verify the harness and infrastructure, including Qdrant availability and the repository root's
+   `.env`.
+2. Preview the deterministic schedule if required:
+
+   ```bash
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/build_schedule.py --split validation
+   ```
+
+3. Acquire the validation split:
+
+   ```bash
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/run_validation.py --run-id run_validation_v1
+   ```
+
+4. Generate normalized results and the blinded review packet:
+
+   ```bash
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_validation_v1
+   ```
+
+5. Two reviewers independently write
+   `adjudication/reviewer-<id>.jsonl`. Resolve disagreements in
+   `adjudication/resolutions.jsonl`, then rerun scoring. Do not inspect the condition mapping while
+   reviewing.
+6. Run secondary Ragas faithfulness only after the primary human labels are fixed:
+
+   ```bash
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_validation_v1 --ragas
+   ```
+
+7. Correct harness defects found by validation without changing the frozen metric definitions.
+   Then acquire the untouched test split under a new run ID and repeat scoring and adjudication:
+
+   ```bash
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/run_test.py --run-id run_test_v1
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_test_v1
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_test_v1 --ragas
+   ```
+
+8. Seal exactly one final test run:
+
+   ```bash
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_release.py --seal-run run_test_v1
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_release.py
+   ```
+
+The test split is not a tuning set. Never rerun accepted observations, manually replace model
+outputs, or alter labels after viewing comparative results. Only a pre-acceptance infrastructure
+failure can use the configured bounded rerun.
+
+## Troubleshooting
+
+- **`verify_harness.py` fails an inherited freeze gate.** The defect is in Phase 3, 4, or 5, not in
+  this harness — fix and re-release the affected phase, then re-run. Do not edit or regenerate that
+  phase's freeze manifest from within this project.
+- **`verify_release.py --seal-run` raises on the run's split.** Only a `test`-split run can be
+  sealed (`release.py::seal_run`); a `validation` run exists to correct the harness before the real
+  test-split run, not to be released.
+- **`uv` resolves the wrong dependencies or interpreter.** Confirm `--project
+  experiments/paired_agent_evaluation` is present (or that you're `cd`'d into this directory) — the
+  repository root and this project keep separate lockfiles and virtual environments.
+
+See [architecture](../../docs/architecture/phase6_evaluation_architecture.md),
+[protocol](../../docs/phase-6-experiments/experimental-protocol.md),
+[scoring](../../docs/phase-6-experiments/scoring-and-adjudication.md), and
+[limitations](../../docs/phase-6-experiments/limitations.md).
