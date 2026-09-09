@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -16,6 +17,16 @@ class StrictModel(BaseModel):
 class Condition(StrEnum):
     BASELINE = "baseline"
     GOVERNED = "governed"
+
+
+class AttemptState(StrEnum):
+    """Describe the durable lifecycle of one acquisition attempt."""
+
+    STARTED = "started"
+    ACCEPTED = "accepted"
+    PRE_ACCEPTANCE_FAILED = "pre_acceptance_failed"
+    ACCEPTED_OBSERVATION_PERSISTED = "accepted_observation_persisted"
+    INVALID_OBSERVATION_PERSISTED = "invalid_observation_persisted"
 
 
 class ExecutionKey(StrictModel):
@@ -33,6 +44,18 @@ class ScheduledExecution(StrictModel):
     key: ExecutionKey
     split: str
     pair_order: int = Field(ge=1, le=2)
+
+
+class AttemptRecord(StrictModel):
+    """Persist acceptance evidence before an observation can be retried."""
+
+    schema_version: int = 1
+    observation_id: str
+    attempt: int = Field(ge=1)
+    state: AttemptState
+    started_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    error_type: str | None = None
 
 
 class ExperimentConfig(StrictModel):
