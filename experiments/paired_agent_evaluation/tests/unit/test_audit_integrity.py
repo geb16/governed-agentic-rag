@@ -1,10 +1,10 @@
 from datetime import UTC, datetime
 
 import pytest
-from paired_agent_evaluation.domain.audit import has_trustworthy_audit
 
 from paired_agent_evaluation.adapters.telemetry import project_trace_facts
 from paired_agent_evaluation.application.normalization import normalize
+from paired_agent_evaluation.domain.audit import has_trustworthy_audit
 from paired_agent_evaluation.domain.executions import Condition, ExecutionKey
 from paired_agent_evaluation.domain.observations import (
     AcceptanceStatus,
