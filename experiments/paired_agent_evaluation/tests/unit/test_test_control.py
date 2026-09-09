@@ -11,6 +11,7 @@ import paired_agent_evaluation.composition as composition_module
 import paired_agent_evaluation.test_control as control
 from paired_agent_evaluation.adapters.storage.filesystem import atomic_json
 from paired_agent_evaluation.composition import EvaluationPaths, prepare_run
+from paired_agent_evaluation.domain.manifests import ExperimentManifest
 
 
 class _StubSettings:
@@ -119,3 +120,26 @@ def test_test_authorization_is_exact_and_consumed_once(control_paths) -> None:
 
     with pytest.raises(ValueError, match="already been consumed"):
         control.claim_test_execution(control_paths, run_id="run_test_once")
+
+# Checking that if a test run has already been executed and recorded in the manifest,
+def test_prior_test_manifest_blocks_the_preregistered_test_run(control_paths) -> None:
+    validation_id = "run_validation_prior"
+    _complete_validation(control_paths, validation_id)
+    control.write_harness_freeze(
+        control_paths,
+        validation_run_id=validation_id,
+        test_run_id="run_test_registered_after_prior",
+    )
+    validation_manifest_path = control_paths.run_root(validation_id) / "run-manifest.json"
+    prior = ExperimentManifest.model_validate_json(
+        validation_manifest_path.read_text(encoding="utf-8")
+    ).model_copy(update={"run_id": "run_test_prior", "split": "test"})
+    prior_root = control_paths.run_root(prior.run_id)
+    prior_root.mkdir(parents=True)
+    atomic_json(prior_root / "run-manifest.json", prior.model_dump(mode="json"))
+
+    with pytest.raises(ValueError, match="already executed: run_test_prior"):
+        control.claim_test_execution(
+            control_paths,
+            run_id="run_test_registered_after_prior",
+        )
