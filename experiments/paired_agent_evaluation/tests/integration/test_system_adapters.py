@@ -7,6 +7,9 @@ from app.governance.contracts import ClassificationDraft, GovernedFinalDraft, Pr
 from app.governance.llm import ModelResult
 from conftest import BaselineAnswerModel, GovernedAnswerModel, StaticRetriever
 
+from paired_agent_evaluation.adapters.storage.attempt_journal import (
+    FilesystemAttemptJournalStore,
+)
 from paired_agent_evaluation.adapters.systems import BaselineSystemRunner, GovernedSystemRunner
 from paired_agent_evaluation.application.normalization import normalize
 from paired_agent_evaluation.application.scheduling import build_schedule
@@ -18,16 +21,29 @@ def test_both_frozen_systems_run_against_isolated_shared_fixture(
 ) -> None:
     schedule = build_schedule([answer_case], repetitions=1, seed=20260831)
     by_condition = {item.key.condition: item for item in schedule}
+    attempts = FilesystemAttemptJournalStore(tmp_path / "attempts")
+    baseline_attempt = attempts.begin(by_condition[Condition.BASELINE].key.observation_id, 1)
     baseline = BaselineSystemRunner(
         settings,
         retriever_factory=lambda _: StaticRetriever(),
         model_factory=lambda _: BaselineAnswerModel(),
-    ).execute(answer_case, by_condition[Condition.BASELINE], tmp_path / "baseline")
+    ).execute(
+        answer_case,
+        by_condition[Condition.BASELINE],
+        baseline_attempt.workspace,
+        acceptance=baseline_attempt,
+    )
+    governed_attempt = attempts.begin(by_condition[Condition.GOVERNED].key.observation_id, 1)
     governed = GovernedSystemRunner(
         settings,
         retriever_factory=lambda _: StaticRetriever(),
         model_factory=lambda _: GovernedAnswerModel(),
-    ).execute(answer_case, by_condition[Condition.GOVERNED], tmp_path / "governed")
+    ).execute(
+        answer_case,
+        by_condition[Condition.GOVERNED],
+        governed_attempt.workspace,
+        acceptance=governed_attempt,
+    )
     assert baseline.request_accepted is True
     assert governed.request_accepted is True
     assert baseline.request == governed.request
@@ -95,12 +111,15 @@ def test_governed_approval_replay_applies_every_available_decision(
     )
     schedule = build_schedule([case], repetitions=1, seed=20260831)
     scheduled = next(item for item in schedule if item.key.condition == Condition.GOVERNED)
+    attempt = FilesystemAttemptJournalStore(tmp_path / "attempts").begin(
+        scheduled.key.observation_id, 1
+    )
 
     execution = GovernedSystemRunner(
         settings,
         retriever_factory=lambda _: StaticRetriever(),
         model_factory=lambda _: GovernedDualRoleRefundModel(),
-    ).execute(case, scheduled, tmp_path)
+    ).execute(case, scheduled, attempt.workspace, acceptance=attempt)
 
     assert execution.request_accepted is True
     assert execution.initial_response is not None
