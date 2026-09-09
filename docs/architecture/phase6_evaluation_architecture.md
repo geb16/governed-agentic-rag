@@ -70,7 +70,7 @@ without an internal decomposition mandate.
 
 | Component | Owns | Does not own |
 |---|---|---|
-| `domain/executions.py` | `Condition`, `ExecutionKey`, the immutable `ScheduledExecution`, `ExperimentConfig` | Persistence, scoring math |
+| `domain/executions.py` | Execution, schedule, configuration, and attempt-lifecycle contracts | Persistence, scoring math |
 | `domain/observations.py` | `RawExecution`, `NormalizedObservation`, `ToolAttempt`, `BusinessState` | Adapter I/O |
 | `domain/manifests.py` | `ExperimentManifest`, `ReleaseManifest` | Sealing or hashing logic |
 | `domain/scores.py` | Per-observation metric contribution contracts | Aggregation or bootstrap |
@@ -82,7 +82,7 @@ without an internal decomposition mandate.
 | `application/scheduling.py` | The deterministic seeded paired schedule | Acquisition execution |
 | `adapters/dataset` | Loading and freeze-identity verification of the Phase 5 release | Case scheduling or scoring |
 | `adapters/systems` | Constructing and invoking one frozen system per attempt, isolated per-attempt SQLite state and recording retrieval | Response interpretation |
-| `adapters/storage` | Atomic JSON and JSONL persistence, canonical hashing | Business logic |
+| `adapters/storage` | Atomic JSON/JSONL persistence, canonical hashing, and the monotonic attempt journal | Retry policy or system execution |
 | `adapters/graders` | The pinned Ragas 0.4 secondary faithfulness call | Primary scoring |
 | `composition.py` | `EvaluationPaths`, config loading, `prepare_run`/`acquire` wiring | Reporting or sealing |
 | `release.py` | Sanitization, content-addressed sealing and verification | Score computation |
@@ -110,10 +110,11 @@ prepare_run(run_id, split)
   -> repeat call: compare every immutable field, schedule hash, and blinding-plan hash; raise on drift
 
 acquire(run_id, split)
-  -> for each scheduled execution not yet accepted:
-       run the condition's SystemRunner in an isolated workspace, up to
-       max_pre_acceptance_attempts times, until AcceptanceStatus.ACCEPTED
-       (an accepted observation is written once and never rerun)
+  -> for each scheduled execution without a persisted observation:
+       atomically journal STARTED before invoking the condition's SystemRunner
+       mark ACCEPTED after the first successful provider response or deterministic local outcome
+       retry only a journaled PRE_ACCEPTANCE_FAILED result, up to the configured bound
+       persist the raw observation atomically, then close the journal
   -> write the updated run manifest (accepted/invalid counts)
 
 reporting: normalize -> score -> adjudicate (blinded) -> [ragas, after adjudication] -> summarize
@@ -137,8 +138,9 @@ seal_run(run_root, release_root)
 | Test run ID differs from the preregistration | Test acquisition fails before creating a run |
 | Any prior execution claim, test run manifest, or sealed test release exists | Every later test acquisition is rejected; a new run ID cannot bypass the gate |
 | Re-running `prepare_run` with a changed configuration, model, backend, or schedule | Raises `Existing run manifest drift`; the original run is never silently altered |
-| A pre-acceptance attempt fails (transient/infrastructure failure before an observation is accepted) | Retried up to `max_pre_acceptance_attempts`, each attempt in its own workspace directory |
-| An observation is already accepted | Never rerun; acquisition resumes past it unconditionally |
+| A proven pre-acceptance attempt fails | Journaled as `PRE_ACCEPTANCE_FAILED` and retried up to `max_pre_acceptance_attempts`, with every attempt in an isolated workspace |
+| A prior attempt remains `STARTED` or `ACCEPTED` without a raw observation | Acquisition fails closed because provider acceptance cannot be safely excluded; no automatic rerun occurs |
+| A raw observation is already persisted | Acquisition resumes past it without invoking either system |
 | A governed workflow's live risk assessment requires a role the dataset's expected decisions omit | That one role is skipped, not the whole replay; every available decision is still applied |
 | A run's status is not `"scored"` or primary results are not final | `seal_run` refuses to seal |
 | A fully scored run's split is `"validation"` | `seal_run` refuses to seal; only a `"test"`-split run may become the release |
@@ -148,6 +150,10 @@ seal_run(run_root, release_root)
 Each `BaselineSystemRunner`/`GovernedSystemRunner` attempt constructs a fresh, isolated SQLite
 database under its own attempt workspace before invoking the frozen agent or workflow, so conditions
 never share or leak mutable state across observations, repetitions, or each other.
+The runner's model decorator records acceptance only after a provider call returns successfully.
+Authentication, connection, and provider-availability failures before that point remain invalid
+attempts; failures after recorded acceptance remain system outcomes. The attempt journal is the
+durable authority used to prevent an accepted invocation from being silently repeated after a crash.
 
 ## Blinding and data trust boundaries
 

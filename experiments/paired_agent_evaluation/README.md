@@ -118,9 +118,10 @@ regenerate an inherited manifest from this project to force a pass.
    ```
 
 The test split is not a tuning set. Never rerun accepted observations, manually replace model
-outputs, or alter labels after viewing comparative results. Only a pre-acceptance infrastructure
-failure can use the configured bounded rerun inside the single acquisition process. Immediately
-before provider access, `run_test.py` atomically creates
+outputs, or alter labels after viewing comparative results. Each attempt is journaled before system
+execution; only an explicitly completed pre-acceptance failure can use the configured bounded retry.
+An abandoned started or accepted attempt fails closed and requires investigation instead of an
+automatic rerun. Immediately before provider access, `run_test.py` atomically creates
 `data/evaluation/paired_agent_evaluation/test-execution-claim.json`; its existence permanently
 blocks another local test acquisition. Preserve and commit that claim with the eventual release.
 

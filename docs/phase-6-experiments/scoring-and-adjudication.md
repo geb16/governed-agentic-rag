@@ -12,8 +12,9 @@ silently discounted.
 
 Groundedness is primary only when exact citation membership passes and two blinded reviewers agree
 that every material claim is supported by the supplied context. Baseline text-only routes also need
-blinded classification when no decisive structured tool or safety signal exists. One reviewer is
-insufficient. Disagreement requires an explicit resolution record.
+blinded classification when no decisive structured tool or safety signal exists. Dual review is
+enforced independently for each decision field: two route decisions cannot satisfy claim-support
+review, or vice versa. Disagreement in a field requires an explicit resolution for that field.
 
 Ragas `Faithfulness` 0.4.3 is a secondary sensitivity analysis, never a replacement for the frozen
 human claim-support label. Its own guidance notes that LLM-based metrics can be nondeterministic and
@@ -22,6 +23,8 @@ should be validated against human judgement:
 [available metrics](https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/).
 
 Point estimates are frozen-rubric ratios. Uncertainty uses a 95% nonparametric percentile bootstrap
-with 10,000 case-cluster resamples, seed `20260830`, and category-preserving resampling. Differences
-are governed minus baseline and require complete pairs. Results are reported overall and by category,
-expected route, intent, and risk level. No null-hypothesis test is added after observing results.
+with 10,000 case-cluster resamples and seed `20260830`. Overall and category-macro estimates preserve
+primary-category sizes; category, route, intent, and risk estimates resample cases within only the
+reported stratum. Category-macro results are the unweighted mean of all six category estimates and
+are not estimable if any category is not estimable. Differences are governed minus baseline and
+require complete pairs. No null-hypothesis test is added after observing results.
