@@ -52,6 +52,7 @@ uv sync --project experiments/paired_agent_evaluation --group dev --frozen
 uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_harness.py
 uv run --project experiments/paired_agent_evaluation pytest -c experiments/paired_agent_evaluation/pyproject.toml experiments/paired_agent_evaluation/tests
 uv run --project experiments/paired_agent_evaluation ruff check experiments/paired_agent_evaluation
+uv run --project experiments/paired_agent_evaluation ruff format --check experiments/paired_agent_evaluation
 uv run --project experiments/paired_agent_evaluation mypy --config-file experiments/paired_agent_evaluation/pyproject.toml
 ```
 
@@ -91,8 +92,9 @@ regenerate an inherited manifest from this project to force a pass.
    uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_validation_v1 --ragas
    ```
 
-7. Correct harness defects found by validation without changing the frozen metric definitions.
-   After the validation run is fully scored and adjudicated, freeze the exact harness revision and
+7. Correct harness defects found by validation without changing the frozen metric definitions. If
+   the harness changes, reacquire and adjudicate validation with the final candidate code. After
+   that validation run is fully scored and adjudicated, freeze the exact harness revision and
    preregister its only permitted test run ID:
 
    ```bash
@@ -102,10 +104,18 @@ regenerate an inherited manifest from this project to force a pass.
 
    Commit and independently review
    `docs/phase-6-experiments/harness-freeze-manifest.json` before test execution. Then acquire the
-   untouched test split and repeat scoring and adjudication:
+   untouched test split and generate its initial review packet:
 
    ```bash
    uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/run_test.py --run-id run_test_v1
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_test_v1
+   ```
+
+   Complete the same blinded, field-level dual review and explicit disagreement resolution used for
+   validation, then rerun primary scoring. Only after `primary_results_final` is true may you run
+   the secondary Ragas analysis:
+
+   ```bash
    uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_test_v1
    uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_test_v1 --ragas
    ```
@@ -116,6 +126,10 @@ regenerate an inherited manifest from this project to force a pass.
    uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_release.py --seal-run run_test_v1
    uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_release.py
    ```
+
+   Sealing validates the exact scheduled observation identities and independently rederives every
+   primary artifact from authoritative inputs. It fails if normalized results, review artifacts,
+   scores, estimates, paired differences, or the summary were altered or became stale.
 
 The test split is not a tuning set. Never rerun accepted observations, manually replace model
 outputs, or alter labels after viewing comparative results. Each attempt is journaled before system
