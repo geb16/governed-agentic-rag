@@ -64,6 +64,10 @@ class RawExecution(StrictModel):
     state_before: BusinessState
     state_after: BusinessState
     audit_events: list[dict[str, Any]] = Field(default_factory=list)
+    audit_chain_valid: bool | None = None
+    audit_workflow_id: str | None = None
+    audit_trace_id: str | None = None
+    audit_request_id: str | None = None
     operational_events: list[dict[str, Any]] = Field(default_factory=list)
     error_type: str | None = None
     error_message: str | None = None
@@ -107,6 +111,7 @@ class NormalizedObservation(StrictModel):
     terminal_error_code: str | None = None
     trace_facts: list[str] = Field(default_factory=list)
     audit_chain_valid: bool | None = None
+    audit_correlation_valid: bool | None = None
     latency_ms: float = Field(ge=0)
     input_tokens: int = Field(ge=0)
     output_tokens: int = Field(ge=0)
