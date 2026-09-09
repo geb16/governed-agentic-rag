@@ -6,6 +6,7 @@ import hashlib
 import json
 from typing import Any
 
+from paired_agent_evaluation.domain.audit import has_trustworthy_audit
 from paired_agent_evaluation.domain.executions import Condition
 from paired_agent_evaluation.domain.observations import (
     AcceptanceStatus,
@@ -82,18 +83,6 @@ def _governed_route(
     return None, "no_single_compatible_route", True
 
 
-def _audit_correlation_valid(raw: RawExecution) -> bool:
-    """Require the retained audit envelope to identify this exact invocation."""
-    request_id = raw.request.get("request_id")
-    response = raw.response or {}
-    return (
-        raw.audit_chain_valid is True
-        and raw.audit_workflow_id == response.get("workflow_id")
-        and raw.audit_trace_id == response.get("trace_id")
-        and raw.audit_request_id == request_id == response.get("request_id")
-    )
-
-
 def normalize(
     raw: RawExecution,
     *,
@@ -127,7 +116,7 @@ def normalize(
             for value in ((initial.get("approval_route") or {}).get("required_roles") or [])
         ]
     audit_correlation_valid = (
-        _audit_correlation_valid(raw) if raw.key.condition == Condition.GOVERNED else None
+        has_trustworthy_audit(raw) if raw.key.condition == Condition.GOVERNED else None
     )
     available = {item.chunk_id for item in raw.retrieved}
     available.update(str(item.get("evidence_id")) for item in response.get("evidence") or [])
