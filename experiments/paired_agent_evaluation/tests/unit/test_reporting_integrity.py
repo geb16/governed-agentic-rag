@@ -25,3 +25,16 @@ def test_scoring_rejects_schedule_drift(answer_case) -> None:
             expected_observations=len(payload),
         )
 
+
+def test_scoring_rejects_same_count_identity_substitution(answer_case) -> None:
+    """Reject substituted observations even when their total count is unchanged."""
+    payload, observation_ids = _schedule(answer_case)
+    observation_ids[-1] = observation_ids[0]
+
+    with pytest.raises(ValueError, match="identities do not match"):
+        _validate_schedule(
+            payload,
+            observation_ids,
+            expected_sha256=sha256_json(payload),
+            expected_observations=len(payload),
+        )
