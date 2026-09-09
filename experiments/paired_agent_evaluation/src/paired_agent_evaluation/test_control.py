@@ -14,11 +14,16 @@ from app.evaluation.dataset.enums import DatasetSplit
 from paired_agent_evaluation.adapters.dataset import Phase5Dataset
 from paired_agent_evaluation.adapters.storage.filesystem import (
     atomic_json,
+    exclusive_json,
     sha256_json,
 )
 from paired_agent_evaluation.application.scheduling import build_schedule
 from paired_agent_evaluation.domain.executions import ExperimentConfig
-from paired_agent_evaluation.domain.manifests import ExperimentManifest, HarnessFreezeManifest
+from paired_agent_evaluation.domain.manifests import (
+    ExperimentManifest,
+    HarnessFreezeManifest,
+    TestExecutionClaim,
+)
 
 HARNESS_FREEZE_ID = "paired-agent-evaluation-harness-v1"
 HARNESS_MANIFEST = Path("docs/phase-6-experiments/harness-freeze-manifest.json")
@@ -191,3 +196,38 @@ def write_harness_freeze(
         manifest.model_dump(mode="json"),
     )
     return manifest
+
+def verify_harness_freeze(paths: EvaluationControlPaths) -> HarnessFreezeManifest:
+    #TODO: Recompute the complete preregistered harness identity and validation evidence.
+    pass
+
+def _existing_test_runs(paths: EvaluationControlPaths) -> list[str]:
+    runs: list[str] = []
+    if not paths.artifacts.exists():
+        return runs
+    for manifest_path in paths.artifacts.glob("run_*/run-manifest.json"):
+        manifest = ExperimentManifest.model_validate_json(manifest_path.read_text(encoding="utf-8"))
+        if manifest.split == DatasetSplit.TEST.value:
+            runs.append(manifest.run_id)
+    return sorted(runs)
+
+
+
+def claim_test_execution(
+    paths: EvaluationControlPaths,
+    *,
+    run_id: str,
+) -> TestExecutionClaim:
+    """Atomically consume the preregistered test authorization before provider access."""
+
+    manifest = verify_harness_freeze(paths)
+    if run_id != manifest.preregistered_test_run_id:
+        raise ValueError("Test run ID does not match the preregistered harness identity")
+    prior_runs = _existing_test_runs(paths)
+    if prior_runs:
+        raise ValueError(f"Test split was already executed: {', '.join(prior_runs)}")
+    if paths.run_root(run_id).exists():
+        raise ValueError("Preregistered test run directory already exists")
+    if paths.release.exists() and any(paths.release.iterdir()):
+        raise ValueError("A sealed test release already exists")
+
