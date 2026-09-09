@@ -23,6 +23,8 @@ should be validated against human judgement:
 [available metrics](https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/).
 
 Point estimates are frozen-rubric ratios. Uncertainty uses a 95% nonparametric percentile bootstrap
-with 10,000 case-cluster resamples, seed `20260830`, and category-preserving resampling. Differences
-are governed minus baseline and require complete pairs. Results are reported overall and by category,
-expected route, intent, and risk level. No null-hypothesis test is added after observing results.
+with 10,000 case-cluster resamples and seed `20260830`. Overall and category-macro estimates preserve
+primary-category sizes; category, route, intent, and risk estimates resample cases within only the
+reported stratum. Category-macro results are the unweighted mean of all six category estimates and
+are not estimable if any category is not estimable. Differences are governed minus baseline and
+require complete pairs. No null-hypothesis test is added after observing results.
