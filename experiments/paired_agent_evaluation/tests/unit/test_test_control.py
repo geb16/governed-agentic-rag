@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+
 import pytest
 from app.evaluation.dataset.enums import DatasetSplit
 
@@ -95,3 +97,25 @@ def test_harness_verification_rejects_source_drift(control_paths, monkeypatch) -
 
     with pytest.raises(ValueError, match="source files changed"):
         control.verify_harness_freeze(control_paths)
+
+# checking if the test execution claim is only valid for the specific test run ID and 
+# can only be consumed once.
+def test_test_authorization_is_exact_and_consumed_once(control_paths) -> None:
+    _complete_validation(control_paths, "run_validation_gate")
+    control.write_harness_freeze(
+        control_paths,
+        validation_run_id="run_validation_gate",
+        test_run_id="run_test_once",
+    )
+
+    with pytest.raises(ValueError, match="does not match"):
+        control.claim_test_execution(control_paths, run_id="run_test_different")
+
+    claim = control.claim_test_execution(control_paths, run_id="run_test_once")
+    claim_payload = json.loads(
+        (control_paths.repository / control.TEST_EXECUTION_CLAIM).read_text()
+    )
+    assert claim_payload["test_run_id"] == claim.test_run_id
+
+    with pytest.raises(ValueError, match="already been consumed"):
+        control.claim_test_execution(control_paths, run_id="run_test_once")
