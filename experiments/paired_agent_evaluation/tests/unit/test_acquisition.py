@@ -1,11 +1,11 @@
 from datetime import UTC, datetime
 
 import pytest
-
 from paired_agent_evaluation.adapters.storage.attempt_journal import (
     FilesystemAttemptJournal,
     FilesystemAttemptJournalStore,
 )
+
 from paired_agent_evaluation.adapters.storage.filesystem import RawFilesystemStore
 from paired_agent_evaluation.application.acquisition import AcquisitionRunner
 from paired_agent_evaluation.application.scheduling import build_schedule
