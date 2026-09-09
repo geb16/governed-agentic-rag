@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -11,9 +12,9 @@ from typing import Any
 from app.core.config import Settings
 from app.evaluation.dataset.enums import DatasetSplit
 from app.evaluation.dataset.models import EvaluationCase, ScoringRubric
+from pydantic import TypeAdapter
 
 from paired_agent_evaluation.adapters.dataset import Phase5Dataset
-from paired_agent_evaluation.adapters.graders import RagasFaithfulnessGrader
 from paired_agent_evaluation.adapters.storage.filesystem import (
     JsonlStore,
     RawFilesystemStore,
@@ -36,6 +37,8 @@ from paired_agent_evaluation.application.statistics import (
     registered_strata,
 )
 from paired_agent_evaluation.composition import EvaluationPaths
+from paired_agent_evaluation.domain.executions import ScheduledExecution
+from paired_agent_evaluation.domain.manifests import ExperimentManifest
 from paired_agent_evaluation.domain.observations import AcceptanceStatus, NormalizedObservation
 from paired_agent_evaluation.domain.scores import (
     Adjudication,
@@ -63,6 +66,25 @@ def _load_adjudications(run_root: Path) -> dict[str, ResolvedAdjudication]:
         JsonlStore.read(resolution_path, ResolvedAdjudication) if resolution_path.is_file() else []
     )
     return resolve_reviews(reviews, resolutions=resolutions)
+
+
+def _validate_schedule(
+    payload: Any,
+    observation_ids: Sequence[str],
+    *,
+    expected_sha256: str,
+    expected_observations: int,
+) -> None:
+    if sha256_json(payload) != expected_sha256:
+        raise ValueError("Run schedule has changed")
+    schedule = TypeAdapter(list[ScheduledExecution]).validate_python(payload)
+    scheduled_ids = [item.key.observation_id for item in schedule]
+    if len(schedule) != expected_observations or len(observation_ids) != expected_observations:
+        raise ValueError("Observation count does not match the run manifest")
+    if len(set(observation_ids)) != len(observation_ids) or set(observation_ids) != set(
+        scheduled_ids
+    ):
+        raise ValueError("Raw observation identities do not match the run schedule")
 
 
 def _build_estimates(
@@ -158,19 +180,24 @@ def score_run(*, run_id: str) -> dict[str, Any]:
     paths = EvaluationPaths.discover()
     run_root = paths.run_root(run_id)
     manifest_path = run_root / "run-manifest.json"
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest = ExperimentManifest.model_validate_json(manifest_path.read_text(encoding="utf-8"))
     blinding_plan = BlindingPlan.model_validate_json(
         (run_root / "blinding-plan.json").read_text(encoding="utf-8")
     )
-    if sha256_json(blinding_plan.model_dump(mode="json")) != manifest.get("blinding_plan_sha256"):
+    if sha256_json(blinding_plan.model_dump(mode="json")) != manifest.blinding_plan_sha256:
         raise ValueError("Run blinding plan has changed")
-    split = DatasetSplit(str(manifest["split"]))
+    split = DatasetSplit(manifest.split)
     dataset = Phase5Dataset(paths.repository)
     cases = dataset.cases(split)
     rubric = dataset.rubric()
     raw = RawFilesystemStore(run_root / "raw" / "observations").read_all()
-    if len(raw) != int(manifest["expected_observations"]):
-        raise ValueError("Raw observation count does not match the run manifest")
+    schedule = json.loads((run_root / "schedule.json").read_text(encoding="utf-8"))
+    _validate_schedule(
+        schedule,
+        [item.key.observation_id for item in raw],
+        expected_sha256=manifest.schedule_sha256,
+        expected_observations=manifest.expected_observations,
+    )
     normalized = [normalize(item, trace_facts=project_trace_facts(item)) for item in raw]
     resolved = _load_adjudications(run_root)
     normalized = [
@@ -210,13 +237,19 @@ def score_run(*, run_id: str) -> dict[str, Any]:
     pending = sum(item.pending_reason is not None for item in contributions)
     summary = _summary(run_id, split, normalized, resolved, review_items, pending)
     atomic_json(run_root / "summary.json", summary)
-    manifest["status"] = "scored" if pending == 0 else "awaiting_adjudication"
-    manifest["completed_at"] = datetime.now(UTC).isoformat() if pending == 0 else None
-    atomic_json(manifest_path, manifest)
+    manifest = manifest.model_copy(
+        update={
+            "status": "scored" if pending == 0 else "awaiting_adjudication",
+            "completed_at": datetime.now(UTC) if pending == 0 else None,
+        }
+    )
+    atomic_json(manifest_path, manifest.model_dump(mode="json"))
     return summary
 
 
 async def _grade_ragas(run_id: str) -> list[SecondaryGrade]:
+    from paired_agent_evaluation.adapters.graders import RagasFaithfulnessGrader
+
     paths = EvaluationPaths.discover()
     run_root = paths.run_root(run_id)
     raw = RawFilesystemStore(run_root / "raw" / "observations").read_all()
