@@ -4,13 +4,16 @@ from __future__ import annotations
 
 import re
 import secrets
-from collections.abc import Iterable, Mapping
+from collections.abc import Hashable, Iterable, Mapping
+from typing import TypeVar
 
 from pydantic import Field, model_validator
 
 from paired_agent_evaluation.domain.executions import StrictModel
 from paired_agent_evaluation.domain.observations import NormalizedObservation
 from paired_agent_evaluation.domain.scores import Adjudication, ResolvedAdjudication
+
+DecisionT = TypeVar("DecisionT", bound=Hashable)
 
 
 class ReviewItem(StrictModel):
@@ -110,33 +113,65 @@ def order_review_items(items: Mapping[str, ReviewItem], *, plan: BlindingPlan) -
     ]
 
 
+def _resolve_field(
+    decisions: Iterable[tuple[str, DecisionT | None]],
+    *,
+    resolution: DecisionT | None,
+) -> tuple[DecisionT | None, set[str], bool]:
+    """Resolve one field only when at least two distinct reviewers decided it."""
+    provided = [(reviewer, value) for reviewer, value in decisions if value is not None]
+    reviewers = {reviewer for reviewer, _ in provided}
+    if len(reviewers) < 2:
+        return None, set(), False
+    values = {value for _, value in provided}
+    if len(values) == 1:
+        return next(iter(values)), reviewers, False
+    if resolution is not None:
+        return resolution, reviewers, True
+    return None, set(), False
+
+
 def resolve_reviews(
     reviews: list[Adjudication],
     *,
     resolutions: list[ResolvedAdjudication] | None = None,
 ) -> dict[str, ResolvedAdjudication]:
+    """Resolve route and claim-support fields from independent dual reviews."""
     supplied = {item.blinded_id: item for item in resolutions or []}
     grouped: dict[str, list[Adjudication]] = {}
     for review in reviews:
         grouped.setdefault(review.blinded_id, []).append(review)
     resolved: dict[str, ResolvedAdjudication] = {}
     for identity, items in grouped.items():
-        reviewers = {item.reviewer_id for item in items}
-        if len(reviewers) < 2:
+        supplied_resolution = supplied.get(identity)
+        usable_resolution = (
+            supplied_resolution
+            if supplied_resolution is not None and supplied_resolution.disagreement_resolved
+            else None
+        )
+        route, route_reviewers, route_resolved = _resolve_field(
+            ((item.reviewer_id, item.observed_route) for item in items),
+            resolution=usable_resolution.observed_route if usable_resolution else None,
+        )
+        claim, claim_reviewers, claim_resolved = _resolve_field(
+            ((item.reviewer_id, item.claim_support_passed) for item in items),
+            resolution=usable_resolution.claim_support_passed if usable_resolution else None,
+        )
+        reviewers = route_reviewers | claim_reviewers
+        if not reviewers:
             continue
-        routes = {item.observed_route for item in items if item.observed_route is not None}
-        claims = {
-            item.claim_support_passed for item in items if item.claim_support_passed is not None
-        }
-        if len(routes) <= 1 and len(claims) <= 1:
-            resolved[identity] = ResolvedAdjudication(
-                blinded_id=identity,
-                observed_route=next(iter(routes), None),
-                claim_support_passed=next(iter(claims), None),
-                reviewer_count=len(reviewers),
-            )
-        elif identity in supplied and supplied[identity].disagreement_resolved:
-            resolved[identity] = supplied[identity]
+        resolved[identity] = ResolvedAdjudication(
+            blinded_id=identity,
+            observed_route=route,
+            claim_support_passed=claim,
+            reviewer_count=len(reviewers),
+            disagreement_resolved=route_resolved or claim_resolved,
+            resolution_notes=(
+                usable_resolution.resolution_notes
+                if usable_resolution and (route_resolved or claim_resolved)
+                else ""
+            ),
+        )
     return resolved
 
 
