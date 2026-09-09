@@ -12,8 +12,9 @@ silently discounted.
 
 Groundedness is primary only when exact citation membership passes and two blinded reviewers agree
 that every material claim is supported by the supplied context. Baseline text-only routes also need
-blinded classification when no decisive structured tool or safety signal exists. One reviewer is
-insufficient. Disagreement requires an explicit resolution record.
+blinded classification when no decisive structured tool or safety signal exists. Dual review is
+enforced independently for each decision field: two route decisions cannot satisfy claim-support
+review, or vice versa. Disagreement in a field requires an explicit resolution for that field.
 
 Ragas `Faithfulness` 0.4.3 is a secondary sensitivity analysis, never a replacement for the frozen
 human claim-support label. Its own guidance notes that LLM-based metrics can be nondeterministic and
