@@ -13,6 +13,9 @@ from app.core.config import Settings
 from app.evaluation.dataset.enums import DatasetSplit
 
 from paired_agent_evaluation.adapters.dataset import Phase5Dataset
+from paired_agent_evaluation.adapters.storage.attempt_journal import (
+    FilesystemAttemptJournalStore,
+)
 from paired_agent_evaluation.adapters.storage.filesystem import (
     RawFilesystemStore,
     atomic_json,
@@ -210,7 +213,7 @@ def _acquire(
             Condition.GOVERNED: GovernedSystemRunner(settings),
         },
         store=store,
-        workspace=run_root / "work",
+        attempts=FilesystemAttemptJournalStore(run_root / "work"),
         max_pre_acceptance_attempts=config.max_pre_acceptance_attempts,
     ).run(schedule, cases)
     accepted = sum(item.request_accepted for item in executions)
