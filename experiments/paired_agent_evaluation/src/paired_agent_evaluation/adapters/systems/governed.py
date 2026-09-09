@@ -127,9 +127,19 @@ class GovernedSystemRunner:
                 list(state.final.cited_evidence_ids) if state is not None and state.final else []
             )
             trace = bundle.workflow.audit_trace(response.workflow_id)
+
             if response.status != WorkflowStatus.FAILED:
                 acceptance.mark_accepted()
             pre_acceptance_error = model.last_error if not acceptance.accepted else None
+
+            first_event = next(
+                (
+                    event
+                    for event in trace.events
+                    if event.event_type.value == "workflow_started"
+                ),
+                None,
+            )
             return RawExecution(
                 key=scheduled.key,
                 acceptance=(
@@ -147,6 +157,14 @@ class GovernedSystemRunner:
                 state_before=before,
                 state_after=state_snapshot(database_path, case.case_id),
                 audit_events=[event.model_dump(mode="json") for event in trace.events],
+                audit_chain_valid=trace.chain_valid,
+                audit_workflow_id=trace.workflow_id,
+                audit_trace_id=first_event.trace_id if first_event else None,
+                audit_request_id=(
+                    str(first_event.details["request_id"])
+                    if first_event and "request_id" in first_event.details
+                    else None
+                ),
                 error_type=(
                     type(pre_acceptance_error).__name__
                     if pre_acceptance_error is not None
