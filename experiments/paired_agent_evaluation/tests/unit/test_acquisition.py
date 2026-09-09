@@ -1,7 +1,11 @@
 from datetime import UTC, datetime
 
+from paired_agent_evaluation.adapters.storage.attempt_journal import (
+    FilesystemAttemptJournalStore,
+)
 from paired_agent_evaluation.adapters.storage.filesystem import RawFilesystemStore
 from paired_agent_evaluation.application.acquisition import AcquisitionRunner
+from paired_agent_evaluation.application.ports import AcceptanceRecorder
 from paired_agent_evaluation.application.scheduling import build_schedule
 from paired_agent_evaluation.domain.executions import Condition
 from paired_agent_evaluation.domain.observations import (
@@ -15,10 +19,14 @@ class SequencedRunner:
     def __init__(self) -> None:
         self.calls = 0
 
-    def execute(self, case, scheduled, workspace) -> RawExecution:
+    def execute(
+        self, case, scheduled, workspace, *, acceptance: AcceptanceRecorder
+    ) -> RawExecution:
         self.calls += 1
         now = datetime.now(UTC)
         accepted = self.calls > 1
+        if accepted:
+            acceptance.mark_accepted()
         return RawExecution(
             key=scheduled.key,
             acceptance=AcceptanceStatus.ACCEPTED if accepted else AcceptanceStatus.INVALID,
@@ -32,9 +40,7 @@ class SequencedRunner:
         )
 
 
-# Test to assert that the acquisition runner retries pre-acceptance once then resumes normally.
 def test_acquisition_retries_pre_acceptance_once_and_resumes(tmp_path, answer_case) -> None:
-
     scheduled = next(
         item
         for item in build_schedule([answer_case], repetitions=1, seed=1)
@@ -45,7 +51,7 @@ def test_acquisition_retries_pre_acceptance_once_and_resumes(tmp_path, answer_ca
     acquisition = AcquisitionRunner(
         runners={Condition.BASELINE: runner},
         store=store,
-        workspace=tmp_path / "work",
+        attempts=FilesystemAttemptJournalStore(tmp_path / "work"),
         max_pre_acceptance_attempts=2,
     )
     result = acquisition.run([scheduled], [answer_case])
