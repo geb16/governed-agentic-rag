@@ -19,8 +19,6 @@ from app.governance.security import IdentityService
 from app.infrastructure.persistence.sqlite import SqliteSyntheticRepository
 from app.rag.retriever import KnowledgeRetriever, Retriever
 
-from paired_agent_evaluation.adapters.systems._shared import RecordingRetriever, state_snapshot
-from paired_agent_evaluation.adapters.systems.acceptance import AcceptanceAwareGovernanceModel
 from paired_agent_evaluation.application.ports import AcceptanceRecorder
 from paired_agent_evaluation.domain.executions import ScheduledExecution
 from paired_agent_evaluation.domain.observations import (
@@ -28,6 +26,9 @@ from paired_agent_evaluation.domain.observations import (
     BusinessState,
     RawExecution,
 )
+
+from ._shared import RecordingRetriever, state_snapshot
+from .acceptance import AcceptanceAwareGovernanceModel
 
 ROLE_ALIASES = {
     "iam_manager": "iam_administrator",
@@ -133,11 +134,7 @@ class GovernedSystemRunner:
             pre_acceptance_error = model.last_error if not acceptance.accepted else None
 
             first_event = next(
-                (
-                    event
-                    for event in trace.events
-                    if event.event_type.value == "workflow_started"
-                ),
+                (event for event in trace.events if event.event_type.value == "workflow_started"),
                 None,
             )
             return RawExecution(
