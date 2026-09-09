@@ -55,8 +55,10 @@ class EvaluationControlPaths(Protocol):
 
     def run_root(self, run_id: str) -> Path: ...
 
+
 def _json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
+
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -75,6 +77,7 @@ def _run_inherited_freeze_verifiers(paths: EvaluationControlPaths) -> None:
             failed.append(script)
     if failed:
         raise ValueError(f"Inherited freeze verification failed: {', '.join(failed)}")
+
 
 def _verify_schedule_contract(paths: EvaluationControlPaths) -> None:
     dataset = Phase5Dataset(paths.repository)
@@ -98,6 +101,7 @@ def verify_harness_readiness(paths: EvaluationControlPaths) -> None:
     _run_inherited_freeze_verifiers(paths)
     _verify_schedule_contract(paths)
 
+
 def _source_paths(paths: EvaluationControlPaths) -> list[Path]:
     fixed = [paths.project / name for name in ("README.md", "pyproject.toml", "uv.lock")]
     scoped = [
@@ -112,6 +116,7 @@ def _source_paths(paths: EvaluationControlPaths) -> list[Path]:
     ]
     files = {path.resolve() for path in [*fixed, *scoped] if path.is_file()}
     return sorted(files, key=lambda path: path.as_posix())
+
 
 def _source_hashes(paths: EvaluationControlPaths) -> dict[str, str]:
     return {
@@ -155,8 +160,10 @@ def _completed_validation(paths: EvaluationControlPaths, run_id: str) -> tuple[s
         raise ValueError("Validation observation count is incomplete")
     return _sha256(manifest_path), _sha256(summary_path)
 
+
 def _manifest_payload(manifest: HarnessFreezeManifest) -> dict[str, Any]:
     return manifest.model_dump(mode="json", exclude={"aggregate_sha256"})
+
 
 def write_harness_freeze(
     paths: EvaluationControlPaths,
@@ -197,8 +204,10 @@ def write_harness_freeze(
     )
     return manifest
 
+
 def verify_harness_freeze(paths: EvaluationControlPaths) -> HarnessFreezeManifest:
     # Recompute the complete preregistered harness identity and validation evidence.
+
     verify_harness_readiness(paths)
     manifest_path = paths.repository / HARNESS_MANIFEST
     if not manifest_path.is_file():
@@ -233,7 +242,6 @@ def _existing_test_runs(paths: EvaluationControlPaths) -> list[str]:
         if manifest.split == DatasetSplit.TEST.value:
             runs.append(manifest.run_id)
     return sorted(runs)
-
 
 
 def claim_test_execution(

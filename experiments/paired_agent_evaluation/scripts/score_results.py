@@ -5,7 +5,7 @@ import argparse
 from paired_agent_evaluation.reporting import grade_ragas, score_run
 
 
-# script to run score results and summarize the results 
+# script to run score results and summarize the results
 # with optional secondary Ragas faithfulness grading
 def main() -> int:
     parser = argparse.ArgumentParser(description="Normalize and score a Phase-6 run.")

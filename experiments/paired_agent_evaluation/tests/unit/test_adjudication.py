@@ -2,7 +2,7 @@ from paired_agent_evaluation.application.adjudication import resolve_reviews
 from paired_agent_evaluation.domain.scores import Adjudication, ResolvedAdjudication
 
 
-# Testing that two independent reviews with the same blinded_id and the same 
+# Testing that two independent reviews with the same blinded_id and the same
 # observed_route value resolve to that value.
 def test_two_independent_matching_reviews_resolve() -> None:
     reviews = [
@@ -11,7 +11,7 @@ def test_two_independent_matching_reviews_resolve() -> None:
     ]
     assert resolve_reviews(reviews)["blind_1"].observed_route.value == "answer"
 
-# Testing that two independent reviews with the same blinded_id but different observed_route values 
+# Testing that two independent reviews with the same blinded_id but different observed_route values
 # do not resolve without an explicit resolution provided.
 def test_disagreement_requires_explicit_resolution() -> None:
     reviews = [
