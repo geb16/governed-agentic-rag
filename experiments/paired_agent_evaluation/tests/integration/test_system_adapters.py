@@ -14,6 +14,17 @@ from paired_agent_evaluation.adapters.systems import BaselineSystemRunner, Gover
 from paired_agent_evaluation.application.normalization import normalize
 from paired_agent_evaluation.application.scheduling import build_schedule
 from paired_agent_evaluation.domain.executions import Condition
+from paired_agent_evaluation.domain.observations import AcceptanceStatus
+
+
+class MemoryAcceptanceRecorder:
+    """Retain acceptance evidence for direct adapter integration tests."""
+
+    def __init__(self) -> None:
+        self.accepted = False
+
+    def mark_accepted(self) -> None:
+        self.accepted = True
 
 
 def test_both_frozen_systems_run_against_isolated_shared_fixture(
@@ -132,3 +143,59 @@ def test_governed_approval_replay_applies_every_available_decision(
     assert approvals_by_role["fraud_reviewer"] == "approved"
     assert approvals_by_role["finance_manager"] == "pending"
     assert execution.response["status"] == "pending_approval"
+
+
+class UnavailableBaselineModel:
+    """Simulate a provider connection failure before any response is accepted."""
+
+    model_name = "unavailable-test-model"
+
+    def complete(self, **_: Any):
+        raise ConnectionError("provider unavailable")
+
+
+class MalformedBaselineModel:
+    """Simulate response parsing failure after the provider returned data."""
+
+    model_name = "malformed-test-model"
+
+    def complete(self, **_: Any):
+        raise ValueError("provider response violated the structured-output contract")
+
+# Testing if a provider failure before the first response is not accepted by the system runner.
+def test_provider_failure_before_first_response_is_not_accepted(
+    tmp_path: Path, settings, answer_case
+) -> None:
+    schedule = build_schedule([answer_case], repetitions=1, seed=20260831)
+    scheduled = next(item for item in schedule if item.key.condition == Condition.BASELINE)
+    acceptance = MemoryAcceptanceRecorder()
+
+    execution = BaselineSystemRunner(
+        settings,
+        retriever_factory=lambda _: StaticRetriever(),
+        model_factory=lambda _: UnavailableBaselineModel(),
+    ).execute(answer_case, scheduled, tmp_path, acceptance=acceptance)
+
+    assert execution.acceptance == AcceptanceStatus.INVALID
+    assert execution.request_accepted is False
+    assert acceptance.accepted is False
+    assert execution.error_type == "ConnectionError"
+
+# Testing if a provider response that fails parsing after being returned 
+# is still accepted by the system runner.
+def test_response_processing_failure_after_provider_return_is_accepted(
+    tmp_path: Path, settings, answer_case
+) -> None:
+    schedule = build_schedule([answer_case], repetitions=1, seed=20260831)
+    scheduled = next(item for item in schedule if item.key.condition == Condition.BASELINE)
+    acceptance = MemoryAcceptanceRecorder()
+
+    execution = BaselineSystemRunner(
+        settings,
+        retriever_factory=lambda _: StaticRetriever(),
+        model_factory=lambda _: MalformedBaselineModel(),
+    ).execute(answer_case, scheduled, tmp_path, acceptance=acceptance)
+
+    assert execution.acceptance == AcceptanceStatus.ACCEPTED
+    assert execution.request_accepted is True
+    assert acceptance.accepted is True

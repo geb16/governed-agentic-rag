@@ -2,6 +2,7 @@ from datetime import UTC, datetime
 
 import pytest
 
+from paired_agent_evaluation.adapters.telemetry import project_trace_facts
 from paired_agent_evaluation.application.normalization import normalize
 from paired_agent_evaluation.domain.executions import Condition, ExecutionKey
 from paired_agent_evaluation.domain.observations import (
@@ -52,6 +53,37 @@ def test_normalization_preserves_chunk_level_context_and_trace_projection() -> N
     assert observation.citation_membership_valid is True
     assert observation.retrieved_chunk_documents == {"chunk-1": "policy-1"}
     assert observation.trace_facts == ["classification_recorded"]
+
+
+def test_normalization_preserves_audit_integrity_and_requires_correlation() -> None:
+    raw = _raw(
+        Condition.GOVERNED,
+        {
+            "status": "completed",
+            "workflow_id": "workflow-1",
+            "request_id": "request-1",
+            "trace_id": "trace-1",
+        },
+    ).model_copy(
+        update={
+            "request": {"request_id": "request-1"},
+            "audit_chain_valid": True,
+            "audit_workflow_id": "workflow-1",
+            "audit_trace_id": "trace-1",
+            "audit_request_id": "request-1",
+        }
+    )
+
+    observation = normalize(raw)
+
+    assert observation.audit_chain_valid is True
+    assert observation.audit_correlation_valid is True
+
+    tampered = raw.model_copy(update={"audit_chain_valid": False})
+    assert normalize(tampered).audit_chain_valid is False
+    assert normalize(tampered).audit_correlation_valid is False
+
+    assert project_trace_facts(tampered) == []
 
 
 @pytest.mark.parametrize(
