@@ -20,6 +20,8 @@ from app.infrastructure.persistence.sqlite import SqliteSyntheticRepository
 from app.rag.retriever import KnowledgeRetriever, Retriever
 
 from paired_agent_evaluation.adapters.systems._shared import RecordingRetriever, state_snapshot
+from paired_agent_evaluation.adapters.systems.acceptance import AcceptanceAwareGovernanceModel
+from paired_agent_evaluation.application.ports import AcceptanceRecorder
 from paired_agent_evaluation.domain.executions import ScheduledExecution
 from paired_agent_evaluation.domain.observations import (
     AcceptanceStatus,
@@ -54,6 +56,8 @@ class GovernedSystemRunner:
         case: EvaluationCase,
         scheduled: ScheduledExecution,
         workspace: Path,
+        *,
+        acceptance: AcceptanceRecorder,
     ) -> RawExecution:
         workspace.mkdir(parents=True, exist_ok=True)
         started_at = datetime.now(UTC)
@@ -61,7 +65,6 @@ class GovernedSystemRunner:
         database_path = workspace / "synthetic.db"
         before = BusinessState()
         retriever: RecordingRetriever | None = None
-        accepted = False
         try:
             settings = self._settings.model_copy(update={"synthetic_database_path": database_path})
             business = SqliteSyntheticRepository(database_path)
@@ -76,6 +79,10 @@ class GovernedSystemRunner:
             )
             audit.initialize()
             retriever = RecordingRetriever(self._retriever_factory(settings))
+            model = AcceptanceAwareGovernanceModel(
+                self._model_factory(settings),
+                acceptance,
+            )
             bundle = build_workflow_bundle(
                 settings=settings,
                 retriever=retriever,
@@ -83,9 +90,8 @@ class GovernedSystemRunner:
                 workflow_repository=workflows,
                 audit_repository=audit,
                 unit_of_work=SqliteGovernanceUnitOfWork(database_path),
-                model=self._model_factory(settings),
+                model=model,
             )
-            accepted = True
             initial = bundle.workflow.invoke(
                 GovernedRequest.model_validate(case.request.model_dump())
             )
@@ -121,10 +127,15 @@ class GovernedSystemRunner:
                 list(state.final.cited_evidence_ids) if state is not None and state.final else []
             )
             trace = bundle.workflow.audit_trace(response.workflow_id)
+            if response.status != WorkflowStatus.FAILED:
+                acceptance.mark_accepted()
+            pre_acceptance_error = model.last_error if not acceptance.accepted else None
             return RawExecution(
                 key=scheduled.key,
-                acceptance=AcceptanceStatus.ACCEPTED,
-                request_accepted=True,
+                acceptance=(
+                    AcceptanceStatus.ACCEPTED if acceptance.accepted else AcceptanceStatus.INVALID
+                ),
+                request_accepted=acceptance.accepted,
                 started_at=started_at,
                 completed_at=datetime.now(UTC),
                 latency_ms=(perf_counter() - started) * 1000,
@@ -136,6 +147,14 @@ class GovernedSystemRunner:
                 state_before=before,
                 state_after=state_snapshot(database_path, case.case_id),
                 audit_events=[event.model_dump(mode="json") for event in trace.events],
+                error_type=(
+                    type(pre_acceptance_error).__name__
+                    if pre_acceptance_error is not None
+                    else None
+                ),
+                error_message=(
+                    str(pre_acceptance_error)[:1000] if pre_acceptance_error is not None else None
+                ),
             )
         except Exception as error:
             after = (
@@ -143,8 +162,10 @@ class GovernedSystemRunner:
             )
             return RawExecution(
                 key=scheduled.key,
-                acceptance=(AcceptanceStatus.ACCEPTED if accepted else AcceptanceStatus.INVALID),
-                request_accepted=accepted,
+                acceptance=(
+                    AcceptanceStatus.ACCEPTED if acceptance.accepted else AcceptanceStatus.INVALID
+                ),
+                request_accepted=acceptance.accepted,
                 started_at=started_at,
                 completed_at=datetime.now(UTC),
                 latency_ms=(perf_counter() - started) * 1000,
