@@ -8,8 +8,16 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from pydantic import BaseModel
+
 from paired_agent_evaluation.adapters.storage.filesystem import atomic_json, canonical_json
-from paired_agent_evaluation.domain.manifests import ReleaseManifest, TestExecutionClaim
+from paired_agent_evaluation.composition import EvaluationPaths
+from paired_agent_evaluation.domain.manifests import (
+    ExperimentManifest,
+    ReleaseManifest,
+    TestExecutionClaim,
+)
+from paired_agent_evaluation.reporting import derive_primary_artifacts
 
 RELEASE_FILES = (
     "run-manifest.json",
@@ -60,25 +68,55 @@ def _write_sanitized(source: Path, destination: Path) -> None:
     atomic_json(destination, _sanitize(json.loads(source.read_text(encoding="utf-8"))))
 
 
+def _read_payload(path: Path) -> Any:
+    if path.suffix == ".jsonl":
+        return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _json_value(value: Any) -> Any:
+    if isinstance(value, BaseModel):
+        return value.model_dump(mode="json")
+    if isinstance(value, list):
+        return [_json_value(item) for item in value]
+    return value
+
+
+def verify_primary_artifacts(run_root: Path, manifest: ExperimentManifest) -> None:
+    """Fail unless stored primary results equal an independent deterministic derivation."""
+
+    expected = derive_primary_artifacts(
+        paths=EvaluationPaths.discover(), run_root=run_root, manifest=manifest
+    )
+    drift = [
+        name
+        for name, payload in expected.items()
+        if _read_payload(run_root / name) != _json_value(payload)
+    ]
+    if drift:
+        raise ValueError(f"Primary derived artifacts have changed: {', '.join(drift)}")
+
+
 def seal_run(*, run_root: Path, release_root: Path) -> ReleaseManifest:
     missing = [name for name in RELEASE_FILES if not (run_root / name).is_file()]
     if missing:
         raise ValueError(f"Cannot seal incomplete run; missing: {', '.join(missing)}")
-    run_manifest: dict[str, Any] = json.loads(
+    run_manifest = ExperimentManifest.model_validate_json(
         (run_root / "run-manifest.json").read_text(encoding="utf-8")
     )
     summary: dict[str, Any] = json.loads((run_root / "summary.json").read_text(encoding="utf-8"))
-    if run_manifest.get("status") != "scored" or not summary.get("primary_results_final"):
+    if run_manifest.status != "scored" or not summary.get("primary_results_final"):
         raise ValueError("Only a fully adjudicated scored run can be sealed")
-    if run_manifest.get("split") != "test":
+    if run_manifest.split != "test":
         raise ValueError(
-            f"Only a test-split run can be sealed; refusing split={run_manifest.get('split')!r}"
+            f"Only a test-split run can be sealed; refusing split={run_manifest.split!r}"
         )
     claim = TestExecutionClaim.model_validate_json(
         (run_root / "test-execution-claim.json").read_text(encoding="utf-8")
     )
-    if claim.test_run_id != run_manifest.get("run_id"):
+    if claim.test_run_id != run_manifest.run_id:
         raise ValueError("Test execution claim does not match the sealed run")
+    verify_primary_artifacts(run_root, run_manifest)
     if release_root.exists() and any(release_root.iterdir()):
         raise ValueError("Release directory must be empty before sealing")
     release_root.mkdir(parents=True, exist_ok=True)
@@ -87,7 +125,7 @@ def seal_run(*, run_root: Path, release_root: Path) -> ReleaseManifest:
     hashes = {name: _sha256(release_root / name) for name in RELEASE_FILES}
     payload = {
         "release_id": "paired-agent-evaluation-v1",
-        "run_id": str(run_manifest["run_id"]),
+        "run_id": run_manifest.run_id,
         "source_run_manifest_sha256": _sha256(run_root / "run-manifest.json"),
         "files": hashes,
     }
