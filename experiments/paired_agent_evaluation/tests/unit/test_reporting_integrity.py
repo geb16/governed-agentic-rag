@@ -1,0 +1,27 @@
+import pytest
+
+from paired_agent_evaluation.adapters.storage.filesystem import sha256_json
+from paired_agent_evaluation.application.scheduling import build_schedule
+from paired_agent_evaluation.reporting import _validate_schedule
+
+
+def _schedule(answer_case):
+    schedule = build_schedule([answer_case], repetitions=1, seed=1)
+    payload = [item.model_dump(mode="json") for item in schedule]
+    return payload, [item.key.observation_id for item in schedule]
+
+
+def test_scoring_rejects_schedule_drift(answer_case) -> None:
+    """Reject schedule bytes that differ from the run-manifest commitment."""
+    payload, observation_ids = _schedule(answer_case)
+    expected_sha256 = sha256_json(payload)
+    payload[0]["pair_order"] = 2 if payload[0]["pair_order"] == 1 else 1
+
+    with pytest.raises(ValueError, match="schedule has changed"):
+        _validate_schedule(
+            payload,
+            observation_ids,
+            expected_sha256=expected_sha256,
+            expected_observations=len(payload),
+        )
+
