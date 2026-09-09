@@ -198,8 +198,31 @@ def write_harness_freeze(
     return manifest
 
 def verify_harness_freeze(paths: EvaluationControlPaths) -> HarnessFreezeManifest:
-    #TODO: Recompute the complete preregistered harness identity and validation evidence.
-    pass
+    # Recompute the complete preregistered harness identity and validation evidence.
+    verify_harness_readiness(paths)
+    manifest_path = paths.repository / HARNESS_MANIFEST
+    if not manifest_path.is_file():
+        raise ValueError("Phase 6 harness is not frozen and preregistered")
+    manifest = HarnessFreezeManifest.model_validate_json(manifest_path.read_text(encoding="utf-8"))
+    if manifest.freeze_id != HARNESS_FREEZE_ID:
+        raise ValueError("Unexpected Phase 6 harness freeze identity")
+    if manifest.source_files != _source_hashes(paths):
+        raise ValueError("Phase 6 harness source files changed after preregistration")
+    inherited = _inherited_identities(paths)
+    if any(getattr(manifest, name) != value for name, value in inherited.items()):
+        raise ValueError("Inherited freeze identity changed after Phase 6 preregistration")
+    validation_manifest_hash, validation_summary_hash = _completed_validation(
+        paths, manifest.validation_run_id
+    )
+    if (
+        validation_manifest_hash != manifest.validation_run_manifest_sha256
+        or validation_summary_hash != manifest.validation_summary_sha256
+    ):
+        raise ValueError("Validation evidence changed after Phase 6 preregistration")
+    if sha256_json(_manifest_payload(manifest)) != manifest.aggregate_sha256:
+        raise ValueError("Phase 6 harness aggregate hash mismatch")
+    return manifest
+
 
 def _existing_test_runs(paths: EvaluationControlPaths) -> list[str]:
     runs: list[str] = []
