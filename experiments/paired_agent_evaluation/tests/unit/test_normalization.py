@@ -38,6 +38,7 @@ def _raw(condition: Condition, response: dict) -> RawExecution:
         state_after=BusinessState(),
     )
 
+
 def test_normalization_preserves_chunk_level_context_and_trace_projection() -> None:
     response = {
         "status": "completed",

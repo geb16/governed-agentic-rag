@@ -15,6 +15,15 @@ def _complete_run(root, *, split: str = "test") -> None:
                 "status": "scored",
                 "api_key": "secret",
             }
+        elif name == "test-execution-claim.json":
+            payload = {
+                "schema_version": 1,
+                "test_run_id": "run_test",
+                "harness_freeze_id": "paired-agent-evaluation-harness-v1",
+                "harness_aggregate_sha256": "a" * 64,
+                "validation_run_id": "run_validation",
+                "claimed_at": "2026-09-08T12:00:00Z",
+            }
         elif name == "summary.json":
             payload = {"primary_results_final": True}
         else:
