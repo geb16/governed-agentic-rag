@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
+from typing import Any
+
+from app.baseline.tool_router import ToolRouter
 from app.core.config import Settings
+from app.tools.registry import build_shared_tools
+from qdrant_client import QdrantClient
 
 from paired_agent_evaluation.adapters.storage.filesystem import sha256_json
 from paired_agent_evaluation.domain.executions import StrictModel
@@ -37,7 +42,10 @@ class RuntimeIdentity(StrictModel):
 
 
 def _tool_schema_sha256() -> str:
-    pass # TODO: Implement tool schema fingerprinting logic to compute SHA256 of tool schemas.
+    dependency: Any = object()
+    specs = ToolRouter(build_shared_tools(dependency, dependency)).specs
+    return sha256_json(specs)
+
 
 def _qdrant_snapshot(settings: Settings) -> tuple[str, int]:
     pass # TODO: Implement Qdrant snapshotting logic to compute SHA256 and point count.
