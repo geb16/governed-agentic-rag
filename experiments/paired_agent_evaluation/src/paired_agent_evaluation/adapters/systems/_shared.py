@@ -1,4 +1,9 @@
-"""Shared recording retrieval and isolated SQLite state probes."""
+"""Records retrieval evidence and snapshots isolated SQLite business state.
+
+References:
+    [1] Python, "sqlite3 — DB-API 2.0 interface for SQLite databases."
+        https://docs.python.org/3/library/sqlite3.html
+"""
 
 from __future__ import annotations
 
@@ -12,20 +17,29 @@ from paired_agent_evaluation.domain.observations import BusinessState, Retrieved
 
 
 class RecordingRetriever:
+    """Decorates a retriever while recording successful retrieval results."""
+
     def __init__(self, inner: Retriever) -> None:
         self._inner = inner
         self.calls: list[list[RetrievedChunk]] = []
 
     @property
     def backend_name(self) -> str:
+        """Returns the wrapped retriever's backend name."""
         return self._inner.backend_name
 
     def retrieve(self, query: str, top_k: int | None = None) -> list[RetrievedChunk]:
+        """Delegates retrieval and records the returned chunks."""
         chunks = self._inner.retrieve(query, top_k)
         self.calls.append(chunks)
         return chunks
 
     def evidence(self) -> list[RetrievedEvidence]:
+        """Returns recorded evidence deduplicated by chunk identity.
+
+        Chunk order follows first appearance across successful calls. If a chunk
+        appears again, its most recently returned values replace the earlier ones.
+        """
         unique: dict[str, RetrievedChunk] = {}
         for call in self.calls:
             unique.update((chunk.chunk_id, chunk) for chunk in call)
@@ -43,6 +57,19 @@ class RecordingRetriever:
 
 
 def state_snapshot(database_path: Path, case_id: str) -> BusinessState:
+    """Loads a deterministic business-state snapshot for one case.
+
+    Rows from each experiment-owned table are selected with a bound case ID and
+    stable ordering. Volatile ``created_at`` values are excluded before the
+    result is validated as ``BusinessState``.
+
+    Args:
+        database_path: SQLite database produced by an isolated execution.
+        case_id: Evaluation case whose records should be selected.
+
+    Returns:
+        Validated ticket, account, refund, and escalation state.
+    """
     tables = {
         "tickets": ("ticket_id",),
         "access_accounts": ("subject_id",),
