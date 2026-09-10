@@ -4,7 +4,7 @@ import argparse
 import sys
 
 from paired_agent_evaluation.composition import EvaluationPaths
-from paired_agent_evaluation.test_control import (
+from paired_agent_evaluation.experiment_control import (
     verify_harness_freeze,
     verify_harness_readiness,
     write_harness_freeze,

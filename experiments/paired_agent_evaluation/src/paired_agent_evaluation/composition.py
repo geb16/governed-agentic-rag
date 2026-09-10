@@ -31,6 +31,7 @@ from paired_agent_evaluation.domain.executions import (
     ScheduledExecution,
 )
 from paired_agent_evaluation.domain.manifests import ExperimentManifest, TestExecutionClaim
+from paired_agent_evaluation.experiment_control import claim_test_execution
 
 
 @dataclass(frozen=True, slots=True)
@@ -238,8 +239,6 @@ def acquire(*, run_id: str, split: DatasetSplit) -> ExperimentManifest:
 
 def acquire_preregistered_test(*, run_id: str) -> ExperimentManifest:
     """Claim the single preregistered test execution before invoking either system."""
-
-    from paired_agent_evaluation.test_control import claim_test_execution
 
     paths = EvaluationPaths.discover()
     claim = claim_test_execution(paths, run_id=run_id)

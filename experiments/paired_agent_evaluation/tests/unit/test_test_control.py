@@ -8,7 +8,7 @@ import pytest
 from app.evaluation.dataset.enums import DatasetSplit
 
 import paired_agent_evaluation.composition as composition_module
-import paired_agent_evaluation.test_control as control
+import paired_agent_evaluation.experiment_control as control
 from paired_agent_evaluation.adapters.storage.filesystem import atomic_json
 from paired_agent_evaluation.composition import EvaluationPaths, prepare_run
 from paired_agent_evaluation.domain.manifests import ExperimentManifest
