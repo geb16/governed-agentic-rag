@@ -106,3 +106,37 @@ def test_derived_artifact_drift_cannot_be_sealed(tmp_path, monkeypatch) -> None:
 
     with pytest.raises(ValueError, match=r"Primary derived artifacts.*summary\.json"):
         seal_run(run_root=run_root, release_root=tmp_path / "release")
+
+
+# testing  if drifts in visual report can be detected
+def test_visual_report_drift_is_detected(tmp_path, monkeypatch) -> None:
+    """Require the sealed visual report to match authoritative primary JSON."""
+
+    run_root = tmp_path / "run"
+    run_root.mkdir()
+    _complete_run(run_root)
+    manifest = release.ExperimentManifest.model_validate_json(
+        (run_root / "run-manifest.json").read_text(encoding="utf-8")
+    )
+    summary = {
+        "run_id": "run_test",
+        "split": "test",
+        "accepted_observations": 1,
+        "invalid_observations": 0,
+        "pending_metric_contributions": 0,
+        "review_items": 0,
+        "primary_results_final": True,
+    }
+    (run_root / "summary.json").write_text(json.dumps(summary), encoding="utf-8")
+    monkeypatch.setattr(
+        release,
+        "derive_primary_artifacts",
+        lambda **_: {
+            "summary.json": summary,
+            "estimates.json": [],
+            "paired-differences.json": [],
+        },
+    )
+
+    with pytest.raises(ValueError, match=r"Primary derived artifacts.*report\.html"):
+        release.verify_primary_artifacts(run_root, manifest)
