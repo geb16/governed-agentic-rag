@@ -48,6 +48,7 @@ from paired_agent_evaluation.domain.scores import (
     ResolvedAdjudication,
     SecondaryGrade,
 )
+from paired_agent_evaluation.visual_report import write_html_report
 
 
 def _load_adjudications(run_root: Path) -> dict[str, ResolvedAdjudication]:
@@ -251,6 +252,7 @@ def score_run(*, run_id: str) -> dict[str, Any]:
             JsonlStore.write(path, payload)
         else:
             atomic_json(path, payload)
+    write_html_report(run_root)
     summary = artifacts["summary.json"]
     pending = int(summary["pending_metric_contributions"])
     manifest = manifest.model_copy(
