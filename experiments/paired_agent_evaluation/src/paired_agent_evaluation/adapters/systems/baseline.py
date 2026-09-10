@@ -1,4 +1,9 @@
-"""Adapter that invokes the frozen conventional baseline without changing it."""
+"""Runs the frozen baseline system and captures evaluation observations.
+
+Each execution receives isolated synthetic state, records retrieved evidence and
+latency, and snapshots business state before and after agent invocation. Expected
+runtime failures are represented in the returned observation for later scoring.
+"""
 
 from __future__ import annotations
 
@@ -31,6 +36,14 @@ from paired_agent_evaluation.domain.observations import (
 
 
 class BaselineSystemRunner:
+    """Executes evaluation cases against the conventional baseline system.
+
+    Args:
+        settings: Runtime configuration copied for each isolated execution.
+        retriever_factory: Factory for the retrieval backend.
+        model_factory: Factory for the baseline model gateway.
+    """
+
     def __init__(
         self,
         settings: Settings,
@@ -50,6 +63,22 @@ class BaselineSystemRunner:
         *,
         acceptance: AcceptanceRecorder,
     ) -> RawExecution:
+        """Runs one scheduled case and captures its complete observation.
+
+        The runner initializes case-specific SQLite state inside ``workspace``,
+        invokes the baseline agent, and records acceptance, retrievals, latency,
+        and state changes. Invocation failures are converted to error-bearing
+        observations while preserving any evidence and state captured beforehand.
+
+        Args:
+            case: Evaluation case, including its request and synthetic fixture.
+            scheduled: Schedule entry that identifies condition and repetition.
+            workspace: Isolated directory for execution artifacts.
+            acceptance: Recorder controlling whether retry remains safe.
+
+        Returns:
+            The successful or failed raw execution observation.
+        """
         workspace.mkdir(parents=True, exist_ok=True)
         started_at = datetime.now(UTC)
         started = perf_counter()
