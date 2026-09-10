@@ -1,4 +1,13 @@
-"""Content-addressed run and sealed-release manifests."""
+"""Defines content-addressed manifests for runs, harnesses, and releases.
+
+The schemas bind experiment outputs to frozen inputs, runtime identities, and
+SHA-256 file digests. They also record the preregistered test authorization used
+to prevent unintended repeat execution.
+
+References:
+    [1] NIST, "Secure Hash Standard (SHS)," FIPS 180-4.
+        https://doi.org/10.6028/NIST.FIPS.180-4
+"""
 
 from __future__ import annotations
 
@@ -13,7 +22,7 @@ Sha256 = Annotated[str, Field(pattern=r"^[a-f0-9]{64}$")]
 
 
 class ExperimentManifest(StrictModel):
-    """Bind one acquisition run to its inputs, infrastructure, and outputs."""
+    """Binds one acquisition run to its inputs, infrastructure, and outputs."""
 
     schema_version: Literal[2] = 2
     run_id: str = Field(pattern=r"^run_[a-zA-Z0-9_-]+$")
@@ -44,7 +53,7 @@ class ExperimentManifest(StrictModel):
 
 
 class ReleaseManifest(StrictModel):
-    """Describe the content-addressed artifacts in one sealed test release."""
+    """Describes the content-addressed artifacts in a sealed test release."""
 
     schema_version: int = 1
     release_id: str
@@ -56,7 +65,7 @@ class ReleaseManifest(StrictModel):
 
 
 class HarnessFreezeManifest(StrictModel):
-    """Bind one reviewed harness revision to validation evidence and one test run."""
+    """Binds a reviewed harness to validation evidence and one test run ID."""
 
     schema_version: Literal[1] = 1
     freeze_id: str = Field(pattern=r"^paired-agent-evaluation-harness-v[1-9][0-9]*$")
@@ -75,7 +84,7 @@ class HarnessFreezeManifest(StrictModel):
 
 
 class TestExecutionClaim(StrictModel):
-    """Record the irreversible local claim made before test-provider invocation."""
+    """Records the irreversible claim made before invoking the test provider."""
 
     schema_version: Literal[1] = 1
     test_run_id: str = Field(pattern=r"^run_[a-zA-Z0-9_-]+$")
