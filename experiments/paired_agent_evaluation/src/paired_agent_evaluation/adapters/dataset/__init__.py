@@ -1,3 +1,3 @@
-from paired_agent_evaluation.adapters.dataset.phase5 import Phase5Dataset
+from paired_agent_evaluation.adapters.dataset.eval_dataset import EvaluationDataset
 
-__all__ = ["Phase5Dataset"]
+__all__ = ["EvaluationDataset"]

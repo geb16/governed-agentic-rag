@@ -16,7 +16,7 @@ from pathlib import Path
 
 from app.evaluation.dataset.enums import DatasetSplit
 
-from paired_agent_evaluation.adapters.dataset import Phase5Dataset
+from paired_agent_evaluation.adapters.dataset import EvaluationDataset
 from paired_agent_evaluation.adapters.storage.filesystem import atomic_json
 from paired_agent_evaluation.application.scheduling import build_schedule
 from paired_agent_evaluation.composition import EvaluationPaths, load_experiment_config
@@ -35,7 +35,7 @@ def main() -> int:
     args = parser.parse_args()
     paths = EvaluationPaths.discover()
     config = load_experiment_config(paths)
-    cases = Phase5Dataset(paths.repository).cases(DatasetSplit(args.split))
+    cases = EvaluationDataset(paths.repository).cases(DatasetSplit(args.split))
     schedule = build_schedule(
         cases,
         repetitions=config.repetitions_per_case,

@@ -16,7 +16,7 @@ from app.governance.contracts import (
 )
 from app.governance.llm import ModelResult
 
-from paired_agent_evaluation.adapters.dataset import Phase5Dataset
+from paired_agent_evaluation.adapters.dataset import EvaluationDataset
 from paired_agent_evaluation.composition import EvaluationPaths
 
 
@@ -99,7 +99,7 @@ def paths() -> EvaluationPaths:
 
 @pytest.fixture
 def answer_case(paths: EvaluationPaths) -> EvaluationCase:
-    cases = Phase5Dataset(paths.repository).cases(DatasetSplit.VALIDATION)
+    cases = EvaluationDataset(paths.repository).cases(DatasetSplit.VALIDATION)
     return next(case for case in cases if case.expected.route.value == "answer")
 
 

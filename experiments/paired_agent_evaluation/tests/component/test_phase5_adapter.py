@@ -1,11 +1,11 @@
 from app.evaluation.dataset.enums import DatasetSplit
 
-from paired_agent_evaluation.adapters.dataset import Phase5Dataset
+from paired_agent_evaluation.adapters.dataset import EvaluationDataset
 from paired_agent_evaluation.application.scheduling import build_schedule
 
 
 def test_frozen_splits_build_expected_paired_schedule(paths) -> None:
-    dataset = Phase5Dataset(paths.repository)
+    dataset = EvaluationDataset(paths.repository)
     validation = dataset.cases(DatasetSplit.VALIDATION)
     test = dataset.cases(DatasetSplit.TEST)
     assert len(validation) == 20

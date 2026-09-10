@@ -16,7 +16,7 @@ from app.evaluation.dataset.loader import load_cases, load_rubric
 from app.evaluation.dataset.models import EvaluationCase, ScoringRubric
 
 
-class Phase5Dataset:
+class EvaluationDataset:
     """Provides access to the repository's frozen Phase 5 release.
 
     Args:

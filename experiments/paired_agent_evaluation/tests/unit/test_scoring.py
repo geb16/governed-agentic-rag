@@ -1,6 +1,6 @@
 from app.evaluation.dataset.enums import DatasetSplit
 
-from paired_agent_evaluation.adapters.dataset import Phase5Dataset
+from paired_agent_evaluation.adapters.dataset import EvaluationDataset
 from paired_agent_evaluation.application.adjudication import BlindingPlan, blinded_id
 from paired_agent_evaluation.application.scoring import score_observation
 from paired_agent_evaluation.domain.executions import Condition, ExecutionKey
@@ -13,7 +13,7 @@ from paired_agent_evaluation.domain.scores import ResolvedAdjudication
 
 
 def _case(paths, case_id):
-    cases = Phase5Dataset(paths.repository).cases(DatasetSplit.VALIDATION)
+    cases = EvaluationDataset(paths.repository).cases(DatasetSplit.VALIDATION)
     return next(case for case in cases if case.case_id == case_id)
 
 

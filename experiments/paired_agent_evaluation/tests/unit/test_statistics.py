@@ -1,6 +1,6 @@
 from app.evaluation.dataset.enums import DatasetSplit
 
-from paired_agent_evaluation.adapters.dataset import Phase5Dataset
+from paired_agent_evaluation.adapters.dataset import EvaluationDataset
 from paired_agent_evaluation.application.statistics import (
     estimate_condition,
     estimate_paired_difference,
@@ -11,7 +11,7 @@ from paired_agent_evaluation.domain.scores import MetricContribution
 
 
 def test_case_cluster_bootstrap_is_reproducible(paths) -> None:
-    cases = Phase5Dataset(paths.repository).cases(DatasetSplit.VALIDATION)[:2]
+    cases = EvaluationDataset(paths.repository).cases(DatasetSplit.VALIDATION)[:2]
     contributions = [
         MetricContribution(
             key=ExecutionKey(case_id=case.case_id, repetition=1, condition=Condition.BASELINE),
@@ -39,7 +39,7 @@ def test_case_cluster_bootstrap_is_reproducible(paths) -> None:
 
 def test_bootstrap_resamples_case_ids_not_categories_when_unstratified(paths, monkeypatch) -> None:
     """Draw from one pooled group of case ids, not per-category groups, when unstratified."""
-    cases = Phase5Dataset(paths.repository).cases(DatasetSplit.VALIDATION)
+    cases = EvaluationDataset(paths.repository).cases(DatasetSplit.VALIDATION)
     contributions = [
         MetricContribution(
             key=ExecutionKey(case_id=case.case_id, repetition=1, condition=Condition.BASELINE),
@@ -77,7 +77,7 @@ def test_bootstrap_resamples_case_ids_not_categories_when_unstratified(paths, mo
 
 def test_only_aggregate_strata_resample_by_category(paths) -> None:
     """Apply category-stratified resampling only to aggregate estimates."""
-    cases = Phase5Dataset(paths.repository).cases(DatasetSplit.VALIDATION)
+    cases = EvaluationDataset(paths.repository).cases(DatasetSplit.VALIDATION)
     policies = {
         name: (stratified, category_macro)
         for name, _, stratified, category_macro in registered_strata(cases)
@@ -94,7 +94,7 @@ def test_only_aggregate_strata_resample_by_category(paths) -> None:
 
 def test_category_macro_is_unweighted(paths) -> None:
     """Average category ratios without weighting them by category size."""
-    cases = Phase5Dataset(paths.repository).cases(DatasetSplit.VALIDATION)
+    cases = EvaluationDataset(paths.repository).cases(DatasetSplit.VALIDATION)
     case_map = {case.case_id: case for case in cases}
     categories = sorted({case.category.value for case in cases})
     contributions = [

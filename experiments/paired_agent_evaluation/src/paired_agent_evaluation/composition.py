@@ -12,7 +12,7 @@ from typing import Any
 from app.core.config import Settings
 from app.evaluation.dataset.enums import DatasetSplit
 
-from paired_agent_evaluation.adapters.dataset import Phase5Dataset
+from paired_agent_evaluation.adapters.dataset import EvaluationDataset
 from paired_agent_evaluation.adapters.reproducibility import capture_runtime_identity
 from paired_agent_evaluation.adapters.storage.attempt_journal import (
     FilesystemAttemptJournalStore,
@@ -100,7 +100,7 @@ def prepare_run(
     paths = EvaluationPaths.discover()
     validate_run_id(run_id)
     config = load_experiment_config(paths)
-    dataset = Phase5Dataset(paths.repository)
+    dataset = EvaluationDataset(paths.repository)
     cases = dataset.cases(split)
     rubric = dataset.rubric()
     if rubric.repetitions_per_case != config.repetitions_per_case:
@@ -213,7 +213,7 @@ def _acquire(
 ) -> ExperimentManifest:
     paths, schedule, manifest, settings = prepare_run(run_id=run_id, split=split)
     config = load_experiment_config(paths)
-    cases = Phase5Dataset(paths.repository).cases(split)
+    cases = EvaluationDataset(paths.repository).cases(split)
     run_root = paths.run_root(run_id)
     if split == DatasetSplit.TEST:
         if test_claim is None or test_claim.test_run_id != run_id:

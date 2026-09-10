@@ -11,7 +11,7 @@ from typing import Any, Protocol
 
 from app.evaluation.dataset.enums import DatasetSplit
 
-from paired_agent_evaluation.adapters.dataset import Phase5Dataset
+from paired_agent_evaluation.adapters.dataset import EvaluationDataset
 from paired_agent_evaluation.adapters.storage.filesystem import (
     atomic_json,
     exclusive_json,
@@ -80,7 +80,7 @@ def _run_inherited_freeze_verifiers(paths: EvaluationControlPaths) -> None:
 
 
 def _verify_schedule_contract(paths: EvaluationControlPaths) -> None:
-    dataset = Phase5Dataset(paths.repository)
+    dataset = EvaluationDataset(paths.repository)
     config = ExperimentConfig.model_validate(_json(paths.configs / "experiment.json"))
     expected = {DatasetSplit.VALIDATION: 120, DatasetSplit.TEST: 480}
     for split, count in expected.items():

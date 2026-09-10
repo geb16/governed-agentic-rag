@@ -14,7 +14,7 @@ from app.evaluation.dataset.enums import DatasetSplit
 from app.evaluation.dataset.models import EvaluationCase, ScoringRubric
 from pydantic import TypeAdapter
 
-from paired_agent_evaluation.adapters.dataset import Phase5Dataset
+from paired_agent_evaluation.adapters.dataset import EvaluationDataset
 from paired_agent_evaluation.adapters.storage.filesystem import (
     JsonlStore,
     RawFilesystemStore,
@@ -188,7 +188,7 @@ def derive_primary_artifacts(
     if sha256_json(blinding_plan.model_dump(mode="json")) != manifest.blinding_plan_sha256:
         raise ValueError("Run blinding plan has changed")
     split = DatasetSplit(manifest.split)
-    dataset = Phase5Dataset(paths.repository)
+    dataset = EvaluationDataset(paths.repository)
     cases = dataset.cases(split)
     rubric = dataset.rubric()
     raw = RawFilesystemStore(run_root / "raw" / "observations").read_all()
