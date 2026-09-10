@@ -1,3 +1,14 @@
+"""Builds a deterministic execution schedule for a dataset split.
+
+The command expands each case into paired baseline and governed runs using
+the repetition count and condition-order seed from the experiment config. It
+writes the resulting JSON within ``artifacts/paired_agent_evaluation`` and
+rejects output paths outside that artifact root.
+
+Usage:
+    python build_schedule.py --split validation [--output PATH]
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -12,6 +23,8 @@ from paired_agent_evaluation.composition import EvaluationPaths, load_experiment
 
 
 def main() -> int:
+    """Parses CLI arguments, builds the schedule, and writes it as JSON."""
+
     parser = argparse.ArgumentParser(description="Build a frozen-protocol Phase 6 schedule.")
     parser.add_argument("--split", choices=[item.value for item in DatasetSplit], required=True)
     parser.add_argument(
