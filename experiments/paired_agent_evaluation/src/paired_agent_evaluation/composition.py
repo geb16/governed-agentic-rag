@@ -13,6 +13,7 @@ from app.core.config import Settings
 from app.evaluation.dataset.enums import DatasetSplit
 
 from paired_agent_evaluation.adapters.dataset import Phase5Dataset
+from paired_agent_evaluation.adapters.reproducibility import capture_runtime_identity
 from paired_agent_evaluation.adapters.storage.attempt_journal import (
     FilesystemAttemptJournalStore,
 )
@@ -36,6 +37,8 @@ from paired_agent_evaluation.experiment_control import claim_test_execution
 
 @dataclass(frozen=True, slots=True)
 class EvaluationPaths:
+    """Resolve repository-owned inputs and isolated Phase 6 artifact roots."""
+
     repository: Path
     project: Path
     artifacts: Path
@@ -60,6 +63,8 @@ class EvaluationPaths:
 
 
 def validate_run_id(run_id: str) -> None:
+    """Reject run identifiers that could escape the artifact directory."""
+
     if re.fullmatch(r"run_[A-Za-z0-9_-]+", run_id) is None:
         raise ValueError("run_id must match run_[A-Za-z0-9_-]+")
 
@@ -69,6 +74,8 @@ def _json(path: Path) -> Any:
 
 
 def load_experiment_config(paths: EvaluationPaths) -> ExperimentConfig:
+    """Load and validate the preregistered experiment configuration."""
+
     return ExperimentConfig.model_validate(_json(paths.configs / "experiment.json"))
 
 
@@ -88,6 +95,8 @@ def prepare_run(
     run_id: str,
     split: DatasetSplit,
 ) -> tuple[EvaluationPaths, list[ScheduledExecution], ExperimentManifest, Settings]:
+    """Create or validate the immutable identity and schedule for one run."""
+
     paths = EvaluationPaths.discover()
     validate_run_id(run_id)
     config = load_experiment_config(paths)
@@ -110,6 +119,7 @@ def prepare_run(
     )
     if settings.retrieval_backend != config.required_retrieval_backend:
         raise ValueError("Configured retrieval backend violates experiment.json")
+    runtime_identity = capture_runtime_identity(settings)
     phase3 = _freeze(paths.repository / "docs" / "phase-3-freeze-manifest.json")
     phase4 = _freeze(paths.repository / "docs" / "phase-4-freeze-manifest.json")
     phase5 = dataset.freeze_identity()
@@ -154,6 +164,7 @@ def prepare_run(
         retrieval_backend=settings.retrieval_backend,
         qdrant_collection=settings.qdrant_collection,
         configuration_sha256=sha256_json(configuration),
+        **runtime_identity.model_dump(),
         schedule_sha256=_schedule_hash(schedule),
         blinding_plan_sha256=sha256_json(blinding_plan.model_dump(mode="json")),
         expected_observations=len(schedule),
@@ -171,6 +182,10 @@ def prepare_run(
             "retrieval_backend",
             "qdrant_collection",
             "configuration_sha256",
+            "runtime_settings_sha256",
+            "tool_schema_sha256",
+            "qdrant_snapshot_sha256",
+            "qdrant_point_count",
             "schedule_sha256",
             "blinding_plan_sha256",
             "expected_observations",
