@@ -83,6 +83,7 @@ without an internal decomposition mandate.
 | `adapters/dataset` | Loading and freeze-identity verification of the Phase 5 release | Case scheduling or scoring |
 | `adapters/systems` | Constructing and invoking one frozen system per attempt, isolated per-attempt SQLite state and recording retrieval | Response interpretation |
 | `adapters/storage` | Atomic JSON/JSONL persistence, canonical hashing, and the monotonic attempt journal | Retry policy or system execution |
+| `adapters/reproducibility.py` | Non-secret settings, tool-schema, and exact Qdrant point fingerprints | Acquisition or scoring policy |
 | `adapters/graders` | The pinned Ragas 0.4 secondary faithfulness call | Primary scoring |
 | `composition.py` | `EvaluationPaths`, config loading, `prepare_run`/`acquire` wiring | Reporting or sealing |
 | `release.py` | Independent rederivation checks, sanitization, content-addressed sealing and verification | Metric definitions or acquisition |
@@ -175,9 +176,9 @@ invalid or mismatched envelope contribute no audit-completeness facts.
 | The review packet (`review-packet.jsonl`) | Reviewer-facing | Carries only opaque IDs in the private plan's random order; no `case_id`, `condition`, raw observation identity, or public derivation input |
 | Adjudication resolutions | Reviewer-authored, trusted after dual review | Consumed by scoring only after being written back under the real observation identity |
 | Secondary Ragas grades | Diagnostic only | Never merged into primary metric contributions |
-| Stored primary result artifacts | Derived, not authoritative | `seal_run` rederives and compares them from raw observations, the schedule, dataset, rubric, blinding plan, and adjudication inputs |
+| Stored primary result artifacts and `report.html` | Derived, not authoritative | `seal_run` rederives and compares them from raw observations, the schedule, dataset, rubric, blinding plan, and adjudication inputs |
 | Harness freeze and test-execution claim | Preregistered control evidence | Bind reviewed source bytes and completed validation to one test ID; claim is created exclusively before provider access and copied into the sealed run |
-| Run and release manifests | Content-addressed, internal | Hash every input file; sensitive-key fields redacted before sealing |
+| Run and release manifests | Content-addressed, internal | Hash every input file plus runtime, tool-schema, and Qdrant-content identities; sensitive-key fields are redacted before sealing |
 | Raw run artifacts (`artifacts/paired_agent_evaluation/`) | Mutable, local, gitignored | Never committed; only a sealed release under `data/evaluation/paired_agent_evaluation/v1/` is |
 | Sealed release directory | Immutable once verified | `seal_run` refuses a non-empty destination; `verify_release` re-derives every hash rather than trusting stored values |
 
