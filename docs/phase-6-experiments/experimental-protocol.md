@@ -34,8 +34,12 @@ is retained as a system outcome and scored under the frozen rubric.
    sanitized artifact set.
 
 Raw observations, normalized observations, metric contributions, estimates, paired differences,
-usage, latency, review packets, resolved decisions, and a content-addressed manifest are retained.
-Secrets are excluded from manifests and sensitive-key fields are redacted during sealing.
+usage, latency, review packets, resolved decisions, a deterministic HTML analysis report, and a
+content-addressed manifest are retained.
+Secrets are excluded from manifests and sensitive-key fields are redacted during sealing. Each run
+manifest binds the non-secret runtime settings, exact allowlisted tool schemas, and a logical Qdrant
+snapshot containing every point identifier, payload, and vector. Acquisition fails closed if the
+configured collection is empty, and repeating a run detects any identity drift.
 Before sealing, the harness validates the exact scheduled observation identities and independently
 rederives every primary result artifact. A stored count, status, or summary is never sufficient
 evidence of a valid result.
