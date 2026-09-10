@@ -46,3 +46,19 @@ def test_runtime_identity_captures_settings_tools_and_exact_qdrant_content(monke
             first.qdrant_snapshot_sha256,
         )
     )
+
+# Testing empty Qdrant collection behavior to ensure reproducibility capture fails as expected
+def test_empty_qdrant_collection_fails_closed(monkeypatch) -> None:
+    """Reject experiments whose configured collection has no frozen content."""
+
+    class EmptyQdrant(_Qdrant):
+        def scroll(self, **_):
+            return [], None
+
+    monkeypatch.setattr(reproducibility, "QdrantClient", lambda **_: EmptyQdrant())
+    settings = Settings(retrieval_backend="qdrant", qdrant_url="http://qdrant.test")
+
+    import pytest
+
+    with pytest.raises(ValueError, match="collection is empty"):
+        reproducibility.capture_runtime_identity(settings)
