@@ -1,4 +1,15 @@
-# Capture non-secret runtime and infrastructure identities for each run.
+"""Captures content identities for an experiment's runtime dependencies.
+
+Selected non-secret settings, registered tool schemas, and the complete Qdrant
+collection are normalized and hashed. Persisting these identities with each run
+makes later configuration or retrieval-data drift detectable.
+
+References:
+    [1] NIST, "Secure Hash Standard (SHS)," FIPS 180-4.
+        https://doi.org/10.6028/NIST.FIPS.180-4
+    [2] Qdrant, "Scroll points."
+        https://api.qdrant.tech/api-reference/points/scroll-points
+"""
 
 from __future__ import annotations
 
@@ -33,7 +44,14 @@ _RUNTIME_FIELDS = (
 
 
 class RuntimeIdentity(StrictModel):
-    """Content identities for runtime settings, tools, and vector data."""
+    """Records the inputs needed to detect runtime drift.
+
+    Attributes:
+        runtime_settings_sha256: Digest of selected non-secret settings.
+        tool_schema_sha256: Digest of the tools exposed to the baseline agent.
+        qdrant_snapshot_sha256: Digest of collection configuration and points.
+        qdrant_point_count: Number of points included in the snapshot.
+    """
 
     runtime_settings_sha256: Sha256
     tool_schema_sha256: Sha256
@@ -42,12 +60,29 @@ class RuntimeIdentity(StrictModel):
 
 
 def _tool_schema_sha256() -> str:
+    """Returns a stable digest of the registered tool specifications."""
     dependency: Any = object()
     specs = ToolRouter(build_shared_tools(dependency, dependency)).specs
     return sha256_json(specs)
 
 
 def _qdrant_snapshot(settings: Settings) -> tuple[str, int]:
+    """Hashes the configured Qdrant collection and all of its points.
+
+    Pagination includes every point's identifier, payload, and vector. Points are
+    sorted by identifier before hashing so the digest is independent of response
+    page ordering. The client is closed whether collection access succeeds or
+    fails.
+
+    Args:
+        settings: Qdrant connection and collection configuration.
+
+    Returns:
+        The collection snapshot digest and point count.
+
+    Raises:
+        ValueError: If the configured collection contains no points.
+    """
     client = QdrantClient(
         url=settings.qdrant_url,
         api_key=(
@@ -91,9 +126,17 @@ def _qdrant_snapshot(settings: Settings) -> tuple[str, int]:
     }
     return sha256_json(snapshot), len(points)
 
-# Fingerprint non-secret settings, tool schemas, and exact Qdrant records.
+
 def capture_runtime_identity(settings: Settings) -> RuntimeIdentity:
-    
+    """Captures the reproducibility identity for the current runtime.
+
+    Args:
+        settings: Runtime configuration used for the experiment.
+
+    Returns:
+        Digests for selected settings, tool schemas, and Qdrant contents.
+    """
+
     snapshot_sha256, point_count = _qdrant_snapshot(settings)
     runtime = {name: getattr(settings, name) for name in _RUNTIME_FIELDS}
     return RuntimeIdentity(
