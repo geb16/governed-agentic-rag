@@ -25,6 +25,10 @@ def _complete_run(root, *, split: str = "test") -> None:
                 "retrieval_backend": "qdrant",
                 "qdrant_collection": "test",
                 "configuration_sha256": "d" * 64,
+                "runtime_settings_sha256": "1" * 64,
+                "tool_schema_sha256": "2" * 64,
+                "qdrant_snapshot_sha256": "3" * 64,
+                "qdrant_point_count": 1,
                 "schedule_sha256": "e" * 64,
                 "blinding_plan_sha256": "f" * 64,
                 "expected_observations": 1,
@@ -46,7 +50,9 @@ def _complete_run(root, *, split: str = "test") -> None:
             payload = {"api_key": "secret"}
         else:
             payload = []
-        if name.endswith(".jsonl"):
+        if name == "report.html":
+            path.write_text("<!doctype html><title>Report</title>\n", encoding="utf-8")
+        elif name.endswith(".jsonl"):
             path.write_text(json.dumps({"value": payload}) + "\n", encoding="utf-8")
         else:
             path.write_text(json.dumps(payload), encoding="utf-8")
