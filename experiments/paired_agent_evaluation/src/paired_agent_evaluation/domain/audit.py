@@ -1,10 +1,26 @@
-"""Provider-neutral audit integrity rules for governed observations."""
+"""Defines the trust predicate for governed audit evidence.
+
+References:
+    [1] OWASP, "Logging Cheat Sheet."
+        https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html
+"""
 
 from paired_agent_evaluation.domain.observations import RawExecution
 
 
 def has_trustworthy_audit(raw: RawExecution) -> bool:
-    """Require a valid chain correlated to the exact governed invocation."""
+    """Checks audit integrity and correlation to the recorded invocation.
+
+    Trust requires an explicitly valid audit chain, nonempty correlation IDs,
+    and matching workflow, trace, and request identities across the audit
+    envelope, request, and response.
+
+    Args:
+        raw: Governed execution containing the audit envelope and response.
+
+    Returns:
+        ``True`` only when every integrity and correlation check passes.
+    """
     response = raw.response or {}
     identifiers = (
         raw.audit_workflow_id,
