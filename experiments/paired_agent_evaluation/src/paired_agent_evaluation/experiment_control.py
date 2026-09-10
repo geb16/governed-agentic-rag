@@ -103,7 +103,10 @@ def verify_harness_readiness(paths: EvaluationControlPaths) -> None:
 
 
 def _source_paths(paths: EvaluationControlPaths) -> list[Path]:
-    fixed = [paths.project / name for name in ("README.md", "pyproject.toml", "uv.lock")]
+    fixed = [
+        *(paths.project / name for name in ("README.md", "pyproject.toml", "uv.lock")),
+        paths.repository / ".gitignore",
+    ]
     scoped = [
         *paths.configs.glob("*.json"),
         *(paths.project / "scripts").glob("*.py"),
@@ -206,7 +209,7 @@ def write_harness_freeze(
 
 
 def verify_harness_freeze(paths: EvaluationControlPaths) -> HarnessFreezeManifest:
-    # Recompute the complete preregistered harness identity and validation evidence.
+    """Verify the harness manifest and all inherited and source identities."""
 
     verify_harness_readiness(paths)
     manifest_path = paths.repository / HARNESS_MANIFEST
