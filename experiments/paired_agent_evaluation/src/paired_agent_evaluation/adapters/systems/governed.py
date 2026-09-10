@@ -1,4 +1,9 @@
-"""Adapter that invokes and deterministically resumes the frozen governed workflow."""
+"""Runs the frozen governed workflow and captures evaluation observations.
+
+Each execution receives isolated business, workflow, and audit state. Pending
+approvals are replayed from the case's expected human decisions, after which the
+runner records evidence, state changes, audit integrity, latency, and failures.
+"""
 
 from __future__ import annotations
 
@@ -37,10 +42,19 @@ ROLE_ALIASES = {
 
 
 def _canonical_role(role: str) -> str:
+    """Maps legacy dataset roles to their governed-workflow equivalents."""
     return ROLE_ALIASES.get(role, role)
 
 
 class GovernedSystemRunner:
+    """Executes evaluation cases against the governed workflow.
+
+    Args:
+        settings: Runtime configuration copied for each isolated execution.
+        retriever_factory: Factory for the retrieval backend.
+        model_factory: Factory for the governed model gateway.
+    """
+
     def __init__(
         self,
         settings: Settings,
@@ -60,6 +74,23 @@ class GovernedSystemRunner:
         *,
         acceptance: AcceptanceRecorder,
     ) -> RawExecution:
+        """Runs one scheduled case and captures its complete observation.
+
+        The runner initializes isolated repositories, invokes the workflow, and
+        deterministically replays matching approval decisions from the dataset.
+        It captures the initial and final responses, cited evidence, audit trace,
+        acceptance status, latency, and business-state changes. Runtime failures
+        become error-bearing observations with any evidence already collected.
+
+        Args:
+            case: Evaluation case, including fixture and expected decisions.
+            scheduled: Schedule entry that identifies condition and repetition.
+            workspace: Isolated directory for execution artifacts.
+            acceptance: Recorder controlling whether retry remains safe.
+
+        Returns:
+            The successful or failed raw execution observation.
+        """
         workspace.mkdir(parents=True, exist_ok=True)
         started_at = datetime.now(UTC)
         started = perf_counter()
