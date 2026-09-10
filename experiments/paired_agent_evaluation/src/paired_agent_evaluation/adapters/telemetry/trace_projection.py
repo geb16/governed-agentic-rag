@@ -1,4 +1,9 @@
-"""Project only provable semantic facts from each system's retained records."""
+"""Projects comparable trace facts from retained execution evidence.
+
+Baseline facts come from its response and recorded retrieval activity. Governed
+stage and decision facts are emitted only when the retained audit chain passes
+integrity checks, preventing untrusted telemetry from influencing comparison.
+"""
 
 from __future__ import annotations
 
@@ -18,6 +23,19 @@ STAGE_FACT = {
 
 
 def project_trace_facts(raw: RawExecution) -> list[str]:
+    """Derives supported semantic facts from one raw execution.
+
+    Executions without a response produce no facts. Governed executions also
+    require a trustworthy audit chain; baseline executions use response tool
+    calls because they do not produce governed audit events. Duplicate facts are
+    removed and the result is sorted for deterministic reporting.
+
+    Args:
+        raw: Retained execution evidence to project.
+
+    Returns:
+        Deterministically ordered semantic fact names supported by the evidence.
+    """
     if raw.response is None:
         return []
     if raw.key.condition == Condition.GOVERNED and not has_trustworthy_audit(raw):
