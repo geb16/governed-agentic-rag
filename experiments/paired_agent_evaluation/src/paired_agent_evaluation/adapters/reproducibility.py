@@ -48,7 +48,48 @@ def _tool_schema_sha256() -> str:
 
 
 def _qdrant_snapshot(settings: Settings) -> tuple[str, int]:
-    pass # TODO: Implement Qdrant snapshotting logic to compute SHA256 and point count.
+    client = QdrantClient(
+        url=settings.qdrant_url,
+        api_key=(
+            settings.qdrant_read_api_key.get_secret_value()
+            if settings.qdrant_read_api_key is not None
+            else None
+        ),
+        timeout=settings.qdrant_timeout_seconds,
+    )
+    points: list[dict[str, Any]] = []
+    offset: Any = None
+    try:
+        configuration = client.get_collection(settings.qdrant_collection).config.params.model_dump(
+            mode="json"
+        )
+        while True:
+            records, offset = client.scroll(
+                collection_name=settings.qdrant_collection,
+                limit=256,
+                offset=offset,
+                with_payload=True,
+                with_vectors=True,
+            )
+            points.extend(
+                record.model_dump(mode="json", include={"id", "payload", "vector"})
+                if hasattr(record, "model_dump")
+                else {"id": str(record.id), "payload": record.payload, "vector": record.vector}
+                for record in records
+            )
+            if offset is None:
+                break
+    finally:
+        client.close()
+    if not points:
+        raise ValueError("The experiment Qdrant collection is empty")
+    points.sort(key=lambda point: str(point["id"]))
+    snapshot = {
+        "collection": settings.qdrant_collection,
+        "configuration": configuration,
+        "points": points,
+    }
+    return sha256_json(snapshot), len(points)
 
 # Fingerprint non-secret settings, tool schemas, and exact Qdrant records.
 def capture_runtime_identity(settings: Settings) -> RuntimeIdentity:
