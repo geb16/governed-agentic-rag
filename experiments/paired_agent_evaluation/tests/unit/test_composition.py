@@ -6,6 +6,7 @@ import pytest
 from app.evaluation.dataset.enums import DatasetSplit
 
 import paired_agent_evaluation.composition as composition_module
+from paired_agent_evaluation.adapters.reproducibility import RuntimeIdentity
 from paired_agent_evaluation.composition import EvaluationPaths, acquire, prepare_run
 
 
@@ -36,6 +37,16 @@ def isolated_paths(tmp_path) -> EvaluationPaths:
 def _stub_settings(monkeypatch, isolated_paths) -> None:
     monkeypatch.setattr(composition_module.EvaluationPaths, "discover", lambda: isolated_paths)
     monkeypatch.setattr(composition_module, "Settings", _StubSettings)
+    monkeypatch.setattr(
+        composition_module,
+        "capture_runtime_identity",
+        lambda _: RuntimeIdentity(
+            runtime_settings_sha256="a" * 64,
+            tool_schema_sha256="b" * 64,
+            qdrant_snapshot_sha256="c" * 64,
+            qdrant_point_count=1,
+        ),
+    )
 
 
 def test_prepare_run_is_idempotent_for_an_unchanged_repeat(isolated_paths) -> None:
