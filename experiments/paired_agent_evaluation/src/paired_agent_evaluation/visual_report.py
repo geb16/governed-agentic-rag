@@ -6,8 +6,22 @@ from html import escape
 from typing import Any
 
 
+def _number(value: Any) -> str:
+    return "—" if value is None else f"{float(value):.3f}"
+
+
 def _difference_rows(differences: list[dict[str, Any]]) -> str:
-    pass #TODO: Implement a simple table of differences
+    return "".join(
+        "<tr>"
+        f"<td>{escape(str(item['metric_id']))}</td>"
+        f"<td>{escape(str(item['stratum']))}</td>"
+        f"<td>{_number(item['governed_minus_baseline'])}</td>"
+        f"<td>[{_number(item['ci_lower'])}, {_number(item['ci_upper'])}]</td>"
+        f"<td>{int(item['complete_pairs'])}</td>"
+        "</tr>"
+        for item in differences
+    )
+
 
 def _effect_chart(differences: list[dict[str, Any]]) -> str:
     pass #TODO: Implement a simple SVG chart to visualize the effects.
