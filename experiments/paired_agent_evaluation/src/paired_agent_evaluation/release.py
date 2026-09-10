@@ -18,6 +18,7 @@ from paired_agent_evaluation.domain.manifests import (
     TestExecutionClaim,
 )
 from paired_agent_evaluation.reporting import derive_primary_artifacts
+from paired_agent_evaluation.visual_report import render_html_report
 
 RELEASE_FILES = (
     "run-manifest.json",
@@ -33,6 +34,7 @@ RELEASE_FILES = (
     "estimates.json",
     "paired-differences.json",
     "summary.json",
+    "report.html",
 )
 SENSITIVE_KEY_PARTS = ("api_key", "password", "secret", "access_token", "refresh_token")
 
@@ -57,6 +59,9 @@ def _sanitize(value: Any) -> Any:
 
 
 def _write_sanitized(source: Path, destination: Path) -> None:
+    if source.suffix == ".html":
+        destination.write_text(source.read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
+        return
     if source.suffix == ".jsonl":
         records = [json.loads(line) for line in source.read_text(encoding="utf-8").splitlines()]
         content = "".join(
@@ -69,6 +74,8 @@ def _write_sanitized(source: Path, destination: Path) -> None:
 
 
 def _read_payload(path: Path) -> Any:
+    if path.suffix == ".html":
+        return path.read_text(encoding="utf-8")
     if path.suffix == ".jsonl":
         return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
     return json.loads(path.read_text(encoding="utf-8"))
@@ -93,11 +100,22 @@ def verify_primary_artifacts(run_root: Path, manifest: ExperimentManifest) -> No
         for name, payload in expected.items()
         if _read_payload(run_root / name) != _json_value(payload)
     ]
+    report_inputs = {"summary.json", "estimates.json", "paired-differences.json"}
+    if report_inputs <= expected.keys():
+        expected_report = render_html_report(
+            expected["summary.json"],
+            expected["estimates.json"],
+            expected["paired-differences.json"],
+        )
+        if _read_payload(run_root / "report.html") != expected_report:
+            drift.append("report.html")
     if drift:
         raise ValueError(f"Primary derived artifacts have changed: {', '.join(drift)}")
 
 
 def seal_run(*, run_root: Path, release_root: Path) -> ReleaseManifest:
+    """Re-derive, sanitize, and content-address one final test-split run."""
+
     missing = [name for name in RELEASE_FILES if not (run_root / name).is_file()]
     if missing:
         raise ValueError(f"Cannot seal incomplete run; missing: {', '.join(missing)}")
@@ -139,6 +157,8 @@ def seal_run(*, run_root: Path, release_root: Path) -> ReleaseManifest:
 
 
 def verify_release(release_root: Path) -> ReleaseManifest:
+    """Verify a sealed release is complete, closed, and content-addressed."""
+
     manifest = ReleaseManifest.model_validate_json(
         (release_root / "manifest.json").read_text(encoding="utf-8")
     )
