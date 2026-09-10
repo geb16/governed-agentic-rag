@@ -162,6 +162,7 @@ class MalformedBaselineModel:
     def complete(self, **_: Any):
         raise ValueError("provider response violated the structured-output contract")
 
+
 # Testing if a provider failure before the first response is not accepted by the system runner.
 def test_provider_failure_before_first_response_is_not_accepted(
     tmp_path: Path, settings, answer_case
@@ -181,7 +182,8 @@ def test_provider_failure_before_first_response_is_not_accepted(
     assert acceptance.accepted is False
     assert execution.error_type == "ConnectionError"
 
-# Testing if a provider response that fails parsing after being returned 
+
+# Testing if a provider response that fails parsing after being returned
 # is still accepted by the system runner.
 def test_response_processing_failure_after_provider_return_is_accepted(
     tmp_path: Path, settings, answer_case

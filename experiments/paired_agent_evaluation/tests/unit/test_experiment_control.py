@@ -9,6 +9,7 @@ from app.evaluation.dataset.enums import DatasetSplit
 
 import paired_agent_evaluation.composition as composition_module
 import paired_agent_evaluation.experiment_control as control
+from paired_agent_evaluation.adapters.reproducibility import RuntimeIdentity
 from paired_agent_evaluation.adapters.storage.filesystem import atomic_json
 from paired_agent_evaluation.composition import EvaluationPaths, prepare_run
 from paired_agent_evaluation.domain.manifests import ExperimentManifest
@@ -33,6 +34,16 @@ def control_paths(tmp_path, monkeypatch) -> EvaluationPaths:
     )
     monkeypatch.setattr(composition_module.EvaluationPaths, "discover", lambda: isolated_paths)
     monkeypatch.setattr(composition_module, "Settings", _StubSettings)
+    monkeypatch.setattr(
+        composition_module,
+        "capture_runtime_identity",
+        lambda _: RuntimeIdentity(
+            runtime_settings_sha256="1" * 64,
+            tool_schema_sha256="2" * 64,
+            qdrant_snapshot_sha256="3" * 64,
+            qdrant_point_count=1,
+        ),
+    )
     monkeypatch.setattr(control, "HARNESS_MANIFEST", tmp_path / "harness-freeze.json")
     monkeypatch.setattr(control, "TEST_EXECUTION_CLAIM", tmp_path / "test-claim.json")
     monkeypatch.setattr(control, "verify_harness_readiness", lambda paths: None)
@@ -61,7 +72,7 @@ def _complete_validation(paths: EvaluationPaths, run_id: str) -> None:
     )
 
 
-# Testing the harness freeze is written and verified correctly, 
+# Testing the harness freeze is written and verified correctly,
 # and that the test run ID is correctly recorded in the freeze.
 def test_harness_freeze_pins_validation_and_one_test_identity(control_paths) -> None:
     _complete_validation(control_paths, "run_validation_complete")
@@ -77,6 +88,7 @@ def test_harness_freeze_pins_validation_and_one_test_identity(control_paths) -> 
     assert verified.preregistered_test_run_id == "run_test_registered"
     assert verified.validation_run_id == "run_validation_complete"
 
+
 def test_harness_freeze_requires_completed_validation(control_paths) -> None:
     with pytest.raises(ValueError, match="Validation must have"):
         control.write_harness_freeze(
@@ -85,7 +97,8 @@ def test_harness_freeze_requires_completed_validation(control_paths) -> None:
             test_run_id="run_test_registered",
         )
 
-# Testing that the harness freeze verification fails if the source code has 
+
+# Testing that the harness freeze verification fails if the source code has
 # changed since the freeze was written.
 def test_harness_verification_rejects_source_drift(control_paths, monkeypatch) -> None:
     _complete_validation(control_paths, "run_validation_drift")
@@ -99,7 +112,8 @@ def test_harness_verification_rejects_source_drift(control_paths, monkeypatch) -
     with pytest.raises(ValueError, match="source files changed"):
         control.verify_harness_freeze(control_paths)
 
-# checking if the test execution claim is only valid for the specific test run ID and 
+
+# checking if the test execution claim is only valid for the specific test run ID and
 # can only be consumed once.
 def test_test_authorization_is_exact_and_consumed_once(control_paths) -> None:
     _complete_validation(control_paths, "run_validation_gate")
@@ -120,6 +134,7 @@ def test_test_authorization_is_exact_and_consumed_once(control_paths) -> None:
 
     with pytest.raises(ValueError, match="already been consumed"):
         control.claim_test_execution(control_paths, run_id="run_test_once")
+
 
 # Checking that if a test run has already been executed and recorded in the manifest,
 def test_prior_test_manifest_blocks_the_preregistered_test_run(control_paths) -> None:

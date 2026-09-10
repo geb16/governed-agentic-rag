@@ -25,6 +25,10 @@ def _complete_run(root, *, split: str = "test") -> None:
                 "retrieval_backend": "qdrant",
                 "qdrant_collection": "test",
                 "configuration_sha256": "d" * 64,
+                "runtime_settings_sha256": "1" * 64,
+                "tool_schema_sha256": "2" * 64,
+                "qdrant_snapshot_sha256": "3" * 64,
+                "qdrant_point_count": 1,
                 "schedule_sha256": "e" * 64,
                 "blinding_plan_sha256": "f" * 64,
                 "expected_observations": 1,
@@ -46,7 +50,9 @@ def _complete_run(root, *, split: str = "test") -> None:
             payload = {"api_key": "secret"}
         else:
             payload = []
-        if name.endswith(".jsonl"):
+        if name == "report.html":
+            path.write_text("<!doctype html><title>Report</title>\n", encoding="utf-8")
+        elif name.endswith(".jsonl"):
             path.write_text(json.dumps({"value": payload}) + "\n", encoding="utf-8")
         else:
             path.write_text(json.dumps(payload), encoding="utf-8")
@@ -100,3 +106,37 @@ def test_derived_artifact_drift_cannot_be_sealed(tmp_path, monkeypatch) -> None:
 
     with pytest.raises(ValueError, match=r"Primary derived artifacts.*summary\.json"):
         seal_run(run_root=run_root, release_root=tmp_path / "release")
+
+
+# testing  if drifts in visual report can be detected
+def test_visual_report_drift_is_detected(tmp_path, monkeypatch) -> None:
+    """Require the sealed visual report to match authoritative primary JSON."""
+
+    run_root = tmp_path / "run"
+    run_root.mkdir()
+    _complete_run(run_root)
+    manifest = release.ExperimentManifest.model_validate_json(
+        (run_root / "run-manifest.json").read_text(encoding="utf-8")
+    )
+    summary = {
+        "run_id": "run_test",
+        "split": "test",
+        "accepted_observations": 1,
+        "invalid_observations": 0,
+        "pending_metric_contributions": 0,
+        "review_items": 0,
+        "primary_results_final": True,
+    }
+    (run_root / "summary.json").write_text(json.dumps(summary), encoding="utf-8")
+    monkeypatch.setattr(
+        release,
+        "derive_primary_artifacts",
+        lambda **_: {
+            "summary.json": summary,
+            "estimates.json": [],
+            "paired-differences.json": [],
+        },
+    )
+
+    with pytest.raises(ValueError, match=r"Primary derived artifacts.*report\.html"):
+        release.verify_primary_artifacts(run_root, manifest)
