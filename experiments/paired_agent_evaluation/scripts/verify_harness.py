@@ -1,3 +1,15 @@
+"""Verifies or freezes the Phase 6 evaluation harness.
+
+With no mode flag, the command checks readiness and inherited freeze identities.
+``--write`` records the harness and completed validation run; ``--frozen``
+rejects drift from that record. Readiness and filesystem errors produce a
+nonzero exit status.
+
+Usage:
+    python verify_harness.py [--frozen | --write --validation-run-id ID
+        --test-run-id ID]
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -12,6 +24,8 @@ from paired_agent_evaluation.experiment_control import (
 
 
 def main() -> int:
+    """Runs the selected harness readiness, freeze, or verification mode."""
+
     parser = argparse.ArgumentParser(
         description="Verify readiness or freeze the Phase 6 harness before test acquisition."
     )
