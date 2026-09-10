@@ -1,4 +1,9 @@
-"""Model decorators that persist the first successful provider response."""
+"""Records when a model request crosses the safe-retry boundary.
+
+References:
+    [1] OpenAI, "Error handling," OpenAI Python SDK.
+        https://github.com/openai/openai-python#handling-errors
+"""
 
 from __future__ import annotations
 
@@ -24,7 +29,12 @@ PRE_ACCEPTANCE_ERRORS = (APIConnectionError, APIStatusError, ConnectionError, Ti
 
 
 def _record_error_boundary(error: Exception, recorder: AcceptanceRecorder) -> None:
-    """Treat only provider rejection or transport failure as pre-acceptance."""
+    """Applies the experiment's acceptance policy to a model exception.
+
+    Connection, timeout, and API status errors remain pre-acceptance under the
+    protocol. Other errors conservatively mark the request accepted to prevent
+    an unsafe retry after a response may have been received or processed.
+    """
     if not isinstance(error, PRE_ACCEPTANCE_ERRORS):
         recorder.mark_accepted()
 
@@ -39,6 +49,7 @@ class AcceptanceAwareBaselineModel:
 
     @property
     def model_name(self) -> str:
+        """Returns the wrapped model's identifier."""
         return self._delegate.model_name
 
     @property
@@ -54,6 +65,7 @@ class AcceptanceAwareBaselineModel:
         tools: list[dict[str, Any]],
         safety_identifier: str,
     ) -> ModelTurn:
+        """Delegates completion and records its acceptance boundary."""
         try:
             result = self._delegate.complete(
                 input_items=input_items,
@@ -79,6 +91,7 @@ class AcceptanceAwareGovernanceModel:
 
     @property
     def model_name(self) -> str:
+        """Returns the wrapped model's identifier."""
         return self._delegate.model_name
 
     @property
@@ -92,6 +105,7 @@ class AcceptanceAwareGovernanceModel:
         *,
         safety_identifier: str,
     ) -> ModelResult[ClassificationDraft]:
+        """Delegates classification and records its acceptance boundary."""
         try:
             result = self._delegate.classify(request, safety_identifier=safety_identifier)
         except Exception as error:
@@ -110,6 +124,7 @@ class AcceptanceAwareGovernanceModel:
         *,
         safety_identifier: str,
     ) -> ModelResult[ProposedActionDraft]:
+        """Delegates action proposal and records its acceptance boundary."""
         try:
             result = self._delegate.propose(
                 request,
@@ -131,6 +146,7 @@ class AcceptanceAwareGovernanceModel:
         *,
         safety_identifier: str,
     ) -> ModelResult[GovernedFinalDraft]:
+        """Delegates finalization and records its acceptance boundary."""
         try:
             result = self._delegate.finalize(state, safety_identifier=safety_identifier)
         except Exception as error:
