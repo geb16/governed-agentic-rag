@@ -13,7 +13,9 @@ Sha256 = Annotated[str, Field(pattern=r"^[a-f0-9]{64}$")]
 
 
 class ExperimentManifest(StrictModel):
-    schema_version: int = 1
+    """Bind one acquisition run to its inputs, infrastructure, and outputs."""
+
+    schema_version: Literal[2] = 2
     run_id: str = Field(pattern=r"^run_[a-zA-Z0-9_-]+$")
     split: str
     status: str
@@ -29,6 +31,10 @@ class ExperimentManifest(StrictModel):
     retrieval_backend: str
     qdrant_collection: str
     configuration_sha256: Sha256
+    runtime_settings_sha256: Sha256
+    tool_schema_sha256: Sha256
+    qdrant_snapshot_sha256: Sha256
+    qdrant_point_count: int = Field(ge=1)
     schedule_sha256: Sha256
     blinding_plan_sha256: Sha256
     expected_observations: int = Field(ge=1)
@@ -38,6 +44,8 @@ class ExperimentManifest(StrictModel):
 
 
 class ReleaseManifest(StrictModel):
+    """Describe the content-addressed artifacts in one sealed test release."""
+
     schema_version: int = 1
     release_id: str
     run_id: str
