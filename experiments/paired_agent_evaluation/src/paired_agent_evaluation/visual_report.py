@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import json
 from html import escape
+from pathlib import Path
 from typing import Any
 
 
@@ -90,3 +92,20 @@ svg rect{{fill:var(--accent)}} svg line{{stroke:var(--ink)}}
 <p class="meta">Condition estimates: {len(estimates)}. Effects are descriptive unless the
 preregistered protocol states otherwise.</p>
 </main></body></html>"""
+
+
+def write_html_report(run_root: Path) -> Path:
+    # Write ``report.html`` from the run's authoritative primary JSON files.
+
+    def read(name: str) -> Any:
+        return json.loads((run_root / name).read_text(encoding="utf-8"))
+
+    output = run_root / "report.html"
+    output.write_text(
+        render_html_report(
+            read("summary.json"), read("estimates.json"), read("paired-differences.json")
+        ),
+        encoding="utf-8",
+        newline="\n",
+    )
+    return output
