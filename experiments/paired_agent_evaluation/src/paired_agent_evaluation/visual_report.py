@@ -24,7 +24,28 @@ def _difference_rows(differences: list[dict[str, Any]]) -> str:
 
 
 def _effect_chart(differences: list[dict[str, Any]]) -> str:
-    pass #TODO: Implement a simple SVG chart to visualize the effects.
+    
+    overall = [item for item in differences if item["stratum"] == "overall"]
+    rows = []
+    for index, item in enumerate(overall):
+        effect = item["governed_minus_baseline"]
+        if effect is None:
+            continue
+        value = max(-1.0, min(1.0, float(effect)))
+        width = abs(value) * 220
+        x = 300 if value >= 0 else 300 - width
+        y = 24 + index * 38
+        label = escape(str(item["metric_id"]))
+        rows.append(
+            f'<text x="8" y="{y + 15}">{label}</text>'
+            f'<rect x="{x:.1f}" y="{y}" width="{width:.1f}" height="20" rx="3">'
+            f"<title>{label}: {value:.3f}</title></rect>"
+        )
+    height = max(70, 40 + len(overall) * 38)
+    return (
+        f'<svg viewBox="0 0 540 {height}" role="img" aria-label="Overall paired effects">'
+        f'<line x1="300" y1="8" x2="300" y2="{height - 8}"/>' + "".join(rows) + "</svg>"
+    )
 
 def render_html_report(
     summary: dict[str, Any],
