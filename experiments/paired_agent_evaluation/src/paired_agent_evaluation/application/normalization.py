@@ -1,4 +1,15 @@
-"""Normalize heterogeneous frozen-system responses into common observations."""
+"""Normalize heterogeneous system outputs into comparable observations.
+
+Condition-specific response fields are projected into one evaluation contract while
+preserving route uncertainty for blinded review and hashing the source execution for
+traceability.
+
+References:
+    [1] NIST, "AI Risk Management Framework Core," Measure 2.1.
+        https://airc.nist.gov/airmf-resources/airmf/5-sec-core/
+    [2] NIST, "FIPS 180-4: Secure Hash Standard."
+        https://doi.org/10.6028/NIST.FIPS.180-4
+"""
 
 from __future__ import annotations
 
@@ -20,6 +31,7 @@ ROLE_ALIASES = {"iam_manager": "iam_administrator", "support_supervisor": "suppo
 
 
 def _sha256_json(value: Any) -> str:
+    """Returns the SHA-256 digest of a deterministic JSON representation."""
     payload = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
@@ -29,6 +41,7 @@ def _canonical_role(role: str) -> str:
 
 
 def _tool_attempts(response: dict[str, Any]) -> list[ToolAttempt]:
+    """Projects response tool calls into the shared attempt contract."""
     attempts: list[ToolAttempt] = []
     for call in response.get("tool_calls") or []:
         outcome = call.get("outcome") or {}
@@ -48,6 +61,7 @@ def _tool_attempts(response: dict[str, Any]) -> list[ToolAttempt]:
 def _baseline_route(
     response: dict[str, Any], attempts: list[ToolAttempt]
 ) -> tuple[ObservedRoute | None, str, bool]:
+    """Infers a baseline route, deferring ambiguous semantics to review."""
     status = response.get("status")
     if status == "refused" or bool((response.get("safety") or {}).get("blocked")):
         return ObservedRoute.DENY, "baseline_safety_status", False
@@ -64,6 +78,7 @@ def _baseline_route(
 def _governed_route(
     raw: RawExecution, attempts: list[ToolAttempt]
 ) -> tuple[ObservedRoute | None, str, bool]:
+    """Infers a governed route from workflow, recovery, and tool outcomes."""
     initial = raw.initial_response or raw.response or {}
     response = raw.response or {}
     initial_status = initial.get("status")
@@ -88,6 +103,20 @@ def normalize(
     *,
     trace_facts: list[str] | None = None,
 ) -> NormalizedObservation:
+    """Normalizes one raw execution for condition-independent scoring.
+
+    Invalid executions retain only acceptance, timing, zero token counts, and a
+    source digest. Accepted executions receive condition-specific route inference,
+    shared evidence and state projections, and audit correlation validation for the
+    governed condition. Ambiguous routes remain unset and require adjudication.
+
+    Args:
+        raw: Captured execution to normalize.
+        trace_facts: Optional telemetry facts already projected for scoring.
+
+    Returns:
+        A normalized observation with a digest of the complete raw execution.
+    """
     response = raw.response or {}
     attempts = _tool_attempts(response)
     if raw.acceptance == AcceptanceStatus.INVALID:
