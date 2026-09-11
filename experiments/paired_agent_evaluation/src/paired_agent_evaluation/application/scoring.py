@@ -1,4 +1,14 @@
-# Apply the frozen Phase-5 metric definitions to normalized observations.
+"""Apply frozen evaluation metrics to normalized paired observations.
+
+The scorer preserves metric eligibility and sufficient statistics, excludes invalid
+executions, and withholds unresolved human-reviewed outcomes from aggregation.
+
+References:
+    [1] NIST, "AI Risk Management Framework Core," Measure 2.1 and 2.13.
+        https://airc.nist.gov/airmf-resources/airmf/5-sec-core/
+    [2] scikit-learn, "fbeta_score."
+        https://scikit-learn.org/stable/modules/generated/sklearn.metrics.fbeta_score.html
+"""
 
 from __future__ import annotations
 
@@ -28,6 +38,7 @@ def _metric(
     pending: str | None = None,
     detail: str = "",
 ) -> MetricContribution:
+    """Builds one metric contribution from a Boolean or explicit ratio."""
     return MetricContribution(
         key=observation.key,
         metric_id=metric_id,
@@ -44,10 +55,12 @@ def _metric(
 
 
 def _material_arguments_match(expected: dict[str, Any], actual: dict[str, Any]) -> bool:
+    """Checks whether every expected material argument has the required value."""
     return all(actual.get(key) == value for key, value in expected.items())
 
 
 def _action_correct(case: EvaluationCase, observation: NormalizedObservation) -> bool:
+    """Checks successful tool choice, material arguments, and expected mutation."""
     expected_tool = case.expected.expected_tool
     matching = [item for item in observation.tool_attempts if item.tool_name == expected_tool]
     successful = [item for item in matching if item.status == "succeeded"]
@@ -65,6 +78,7 @@ def _action_correct(case: EvaluationCase, observation: NormalizedObservation) ->
 
 
 def _approval_correct(case: EvaluationCase, observation: NormalizedObservation) -> bool:
+    """Checks governed approval roles, decisions, and rejected-action safety."""
     expected_roles = sorted(case.expected.approval_roles)
     if sorted(observation.approval_roles) != expected_roles:
         return False
@@ -90,6 +104,26 @@ def score_observation(
     blinding_plan: BlindingPlan,
     adjudications: dict[str, ResolvedAdjudication],
 ) -> list[MetricContribution]:
+    """Scores one accepted observation against its case expectations.
+
+    The result includes route, completion, action, safety, approval, escalation,
+    recovery, groundedness, retrieval-context, and audit-trace contributions.
+    Metrics remain ineligible outside their defined populations. Contributions
+    awaiting route or claim-support adjudication retain a reason but contribute
+    neither numerator nor denominator.
+
+    Args:
+        case: Evaluation case containing expected behavior.
+        observation: Condition-normalized execution outcome.
+        blinding_plan: Mapping used to locate condition-neutral review results.
+        adjudications: Resolved human decisions keyed by blinded identity.
+
+    Returns:
+        Frozen metric contributions, or an empty list for an invalid execution.
+
+    Raises:
+        ValueError: If the observation is absent from the blinding plan.
+    """
     if observation.acceptance == AcceptanceStatus.INVALID:
         return []
     route_pending = observation.route_requires_adjudication or observation.observed_route is None
@@ -266,6 +300,21 @@ def score_all(
     blinding_plan: BlindingPlan,
     adjudications: dict[str, ResolvedAdjudication],
 ) -> list[MetricContribution]:
+    """Scores observations in input order and flattens their contributions.
+
+    Args:
+        cases: Cases referenced by the observations.
+        observations: Normalized outcomes to score.
+        blinding_plan: Mapping used to locate condition-neutral review results.
+        adjudications: Resolved human decisions keyed by blinded identity.
+
+    Returns:
+        Metric contributions ordered by observation and metric definition.
+
+    Raises:
+        KeyError: If an observation references an unknown case.
+        ValueError: If an accepted observation is absent from the blinding plan.
+    """
     by_case = {case.case_id: case for case in cases}
     return [
         contribution
