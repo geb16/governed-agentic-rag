@@ -1,4 +1,12 @@
-"""Build the exact SHA-256-seeded paired schedule frozen in Phase-5 governed workflow."""
+"""Build a reproducible, order-balanced schedule for paired evaluation.
+
+Each case receives a deterministic SHA-256-derived starting condition. Successive
+repetitions reverse that order so both conditions occupy each pair position.
+
+References:
+    [1] NIST/SEMATECH, "Choosing a Sampling Scheme."
+        https://www.itl.nist.gov/div898/handbook/ppc/section3/ppc332.htm
+"""
 
 from __future__ import annotations
 
@@ -10,6 +18,19 @@ from paired_agent_evaluation.domain.executions import Condition, ExecutionKey, S
 
 
 def condition_order(case_id: str, repetition: int, *, seed: int) -> tuple[Condition, Condition]:
+    """Returns the deterministic, repetition-balanced condition order.
+
+    The seed and case identity select the first repetition's order. Odd
+    repetitions retain that order and even repetitions reverse it.
+
+    Args:
+        case_id: Stable evaluation-case identifier.
+        repetition: One-based repetition number.
+        seed: Experiment seed used for deterministic assignment.
+
+    Returns:
+        Baseline and governed conditions in their execution order.
+    """
     digest = hashlib.sha256(f"{seed}:{case_id}".encode()).digest()
     initial = (
         (Condition.BASELINE, Condition.GOVERNED)
@@ -25,6 +46,17 @@ def build_schedule(
     repetitions: int,
     seed: int,
 ) -> list[ScheduledExecution]:
+    """Builds paired executions in stable case and repetition order.
+
+    Args:
+        cases: Evaluation cases to schedule.
+        repetitions: Number of paired repetitions per case.
+        seed: Experiment seed forwarded to condition assignment.
+
+    Returns:
+        Sequentially numbered executions containing both conditions for every
+        case and repetition.
+    """
     schedule: list[ScheduledExecution] = []
     sequence = 1
     for case in sorted(cases, key=lambda item: item.case_id):
