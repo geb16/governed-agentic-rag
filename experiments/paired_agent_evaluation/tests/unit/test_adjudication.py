@@ -1,10 +1,13 @@
-import paired_agent_evaluation.application.adjudication as adjudication_module
+import secrets
+
 from paired_agent_evaluation.application.adjudication import (
+    BlindingPlan,
     ReviewItem,
     create_blinding_plan,
     order_review_items,
     resolve_reviews,
 )
+from paired_agent_evaluation.domain.observations import ObservedRoute
 from paired_agent_evaluation.domain.scores import Adjudication, ResolvedAdjudication
 
 
@@ -15,8 +18,8 @@ class _ReverseRandom:
 
 def test_blinding_plan_uses_random_opaque_ids_and_an_independent_order(monkeypatch) -> None:
     tokens = iter(("1" * 32, "2" * 32))
-    monkeypatch.setattr(adjudication_module.secrets, "token_hex", lambda _: next(tokens))
-    monkeypatch.setattr(adjudication_module.secrets, "SystemRandom", _ReverseRandom)
+    monkeypatch.setattr(secrets, "token_hex", lambda _: next(tokens))
+    monkeypatch.setattr(secrets, "SystemRandom", _ReverseRandom)
     observation_ids = ["case_eval_0001__r1__baseline", "case_eval_0001__r1__governed"]
 
     plan = create_blinding_plan(observation_ids)
@@ -31,7 +34,7 @@ def test_blinding_plan_uses_random_opaque_ids_and_an_independent_order(monkeypat
 def test_review_packet_follows_private_plan_order() -> None:
     first = "case_eval_0001__r1__baseline"
     second = "case_eval_0001__r1__governed"
-    plan = adjudication_module.BlindingPlan(
+    plan = BlindingPlan(
         assignments={first: f"blind_{'1' * 32}", second: f"blind_{'2' * 32}"},
         review_order=[second, first],
     )
@@ -64,16 +67,28 @@ def test_review_packet_follows_private_plan_order() -> None:
 # observed_route value resolve to that value.
 def test_two_independent_matching_reviews_resolve() -> None:
     reviews = [
-        Adjudication(blinded_id="blind_1", reviewer_id="r1", observed_route="answer"),
-        Adjudication(blinded_id="blind_1", reviewer_id="r2", observed_route="answer"),
+        Adjudication(
+            blinded_id="blind_1",
+            reviewer_id="r1",
+            observed_route=ObservedRoute.ANSWER,
+        ),
+        Adjudication(
+            blinded_id="blind_1",
+            reviewer_id="r2",
+            observed_route=ObservedRoute.ANSWER,
+        ),
     ]
-    assert resolve_reviews(reviews)["blind_1"].observed_route.value == "answer"
+    assert resolve_reviews(reviews)["blind_1"].observed_route == ObservedRoute.ANSWER
 
 
 def test_reviewers_must_independently_decide_each_resolved_field() -> None:
     """Different single-reviewer fields do not constitute dual review."""
     reviews = [
-        Adjudication(blinded_id="blind_1", reviewer_id="r1", observed_route="answer"),
+        Adjudication(
+            blinded_id="blind_1",
+            reviewer_id="r1",
+            observed_route=ObservedRoute.ANSWER,
+        ),
         Adjudication(blinded_id="blind_1", reviewer_id="r2", claim_support_passed=True),
     ]
 
@@ -82,11 +97,15 @@ def test_reviewers_must_independently_decide_each_resolved_field() -> None:
 
 def test_independently_dual_reviewed_fields_resolve_together() -> None:
     reviews = [
-        Adjudication(blinded_id="blind_1", reviewer_id="r1", observed_route="answer"),
+        Adjudication(
+            blinded_id="blind_1",
+            reviewer_id="r1",
+            observed_route=ObservedRoute.ANSWER,
+        ),
         Adjudication(
             blinded_id="blind_1",
             reviewer_id="r2",
-            observed_route="answer",
+            observed_route=ObservedRoute.ANSWER,
             claim_support_passed=True,
         ),
         Adjudication(blinded_id="blind_1", reviewer_id="r3", claim_support_passed=True),
@@ -94,7 +113,7 @@ def test_independently_dual_reviewed_fields_resolve_together() -> None:
 
     decision = resolve_reviews(reviews)["blind_1"]
 
-    assert decision.observed_route.value == "answer"
+    assert decision.observed_route == ObservedRoute.ANSWER
     assert decision.claim_support_passed is True
     assert decision.reviewer_count == 3
 
