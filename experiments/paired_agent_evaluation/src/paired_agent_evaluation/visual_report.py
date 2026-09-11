@@ -1,4 +1,17 @@
-"""Render a deterministic, self-contained HTML view of primary results."""
+"""Render primary evaluation results as deterministic standalone HTML.
+
+Dynamic text is escaped before entering HTML or SVG contexts. The report includes
+tabular paired effects, a bounded visual summary, run finality, and print styles.
+
+References:
+    [1] W3C WAI, "Providing Accessible Names and Descriptions."
+        https://www.w3.org/WAI/ARIA/apg/practices/names-and-descriptions/
+    [2] MDN Web Docs, "table," "SVG," "CSS grid layout," and "Using media queries."
+        https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/table
+        https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/svg
+        https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Grid_layout
+        https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Media_queries/Using
+"""
 
 from __future__ import annotations
 
@@ -9,10 +22,12 @@ from typing import Any
 
 
 def _number(value: Any) -> str:
+    """Formats a numeric result or an em dash for a missing value."""
     return "—" if value is None else f"{float(value):.3f}"
 
 
 def _difference_rows(differences: list[dict[str, Any]]) -> str:
+    """Renders escaped paired-difference table rows in input order."""
     return "".join(
         "<tr>"
         f"<td>{escape(str(item['metric_id']))}</td>"
@@ -26,7 +41,11 @@ def _difference_rows(differences: list[dict[str, Any]]) -> str:
 
 
 def _effect_chart(differences: list[dict[str, Any]]) -> str:
-    
+    """Renders an accessible SVG chart for defined overall effects.
+
+    Bar geometry is clamped to the metric range of -1 to 1; the table retains the
+    authoritative values supplied in the input.
+    """
     overall = [item for item in differences if item["stratum"] == "overall"]
     rows = []
     for index, item in enumerate(overall):
@@ -49,12 +68,27 @@ def _effect_chart(differences: list[dict[str, Any]]) -> str:
         f'<line x1="300" y1="8" x2="300" y2="{height - 8}"/>' + "".join(rows) + "</svg>"
     )
 
+
 def render_html_report(
     summary: dict[str, Any],
     estimates: list[dict[str, Any]],
     differences: list[dict[str, Any]],
 ) -> str:
-    # Rendering the primary JSON results as an accessible standalone HTML report.
+    """Renders an escaped, self-contained report from primary result records.
+
+    Args:
+        summary: Run identity, finality, and observation-count fields.
+        estimates: Condition estimates; only their count is displayed.
+        differences: Paired effects and confidence intervals to display.
+
+    Returns:
+        A complete UTF-8-compatible HTML document with inline CSS and SVG.
+
+    Raises:
+        KeyError: If a required result field is missing.
+        TypeError: If a displayed numeric field cannot be converted.
+        ValueError: If a displayed numeric field has an invalid value.
+    """
 
     run_id = escape(str(summary["run_id"]))
     split = escape(str(summary["split"]))
@@ -95,7 +129,20 @@ preregistered protocol states otherwise.</p>
 
 
 def write_html_report(run_root: Path) -> Path:
-    # Write ``report.html`` from the run's authoritative primary JSON files.
+    """Writes report.html from a run's authoritative primary JSON files.
+
+    Args:
+        run_root: Directory containing summary, estimate, and paired-difference
+            artifacts.
+
+    Returns:
+        Path to the generated HTML report.
+
+    Raises:
+        OSError: If an input cannot be read or the report cannot be written.
+        ValueError: If an input is invalid JSON or contains invalid numeric data.
+        KeyError: If a required result field is missing.
+    """
 
     def read(name: str) -> Any:
         return json.loads((run_root / name).read_text(encoding="utf-8"))
