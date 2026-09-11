@@ -1,4 +1,18 @@
-# Fail-closed harness freezing and one-time test-split authorization.
+"""Freeze the evaluation harness and gate one preregistered test execution.
+
+The control boundary verifies inherited freezes, binds validation evidence and
+source files to digests, and atomically consumes authorization before test access.
+
+References:
+    [1] NIST, "AI Risk Management Framework Core," Measure 2.1 and 2.13.
+        https://airc.nist.gov/airmf-resources/airmf/5-sec-core/
+    [2] SLSA, "Provenance."
+        https://slsa.dev/spec/v1.2/provenance
+    [3] NIST, "FIPS 180-4: Secure Hash Standard."
+        https://doi.org/10.6028/NIST.FIPS.180-4
+    [4] Python Software Foundation, "subprocess — Subprocess management."
+        https://docs.python.org/3/library/subprocess.html
+"""
 
 from __future__ import annotations
 
@@ -36,7 +50,7 @@ INHERITED_VERIFIERS = (
 
 
 class EvaluationControlPaths(Protocol):
-    """Expose only paths needed by the experimental test-control boundary."""
+    """Exposes only paths required by the experiment-control boundary."""
 
     @property
     def repository(self) -> Path: ...
@@ -57,14 +71,17 @@ class EvaluationControlPaths(Protocol):
 
 
 def _json(path: Path) -> Any:
+    """Loads one UTF-8 JSON artifact."""
     return json.loads(path.read_text(encoding="utf-8"))
 
 
 def _sha256(path: Path) -> str:
+    """Returns the SHA-256 digest of a file's exact bytes."""
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def _run_inherited_freeze_verifiers(paths: EvaluationControlPaths) -> None:
+    """Runs every inherited phase verifier and reports all failures together."""
     failed: list[str] = []
     for script in INHERITED_VERIFIERS:
         result = subprocess.run(
@@ -80,6 +97,7 @@ def _run_inherited_freeze_verifiers(paths: EvaluationControlPaths) -> None:
 
 
 def _verify_schedule_contract(paths: EvaluationControlPaths) -> None:
+    """Validates the frozen observation count for each controlled split."""
     dataset = EvaluationDataset(paths.repository)
     config = ExperimentConfig.model_validate(_json(paths.configs / "experiment.json"))
     expected = {DatasetSplit.VALIDATION: 120, DatasetSplit.TEST: 480}
@@ -96,13 +114,14 @@ def _verify_schedule_contract(paths: EvaluationControlPaths) -> None:
 
 
 def verify_harness_readiness(paths: EvaluationControlPaths) -> None:
-    """Verify inherited releases and the registered schedule before any acquisition."""
+    """Verifies inherited freezes and schedule cardinality before acquisition."""
 
     _run_inherited_freeze_verifiers(paths)
     _verify_schedule_contract(paths)
 
 
 def _source_paths(paths: EvaluationControlPaths) -> list[Path]:
+    """Returns the sorted, deduplicated source boundary covered by the freeze."""
     fixed = [
         *(paths.project / name for name in ("README.md", "pyproject.toml", "uv.lock")),
         paths.repository / ".gitignore",
@@ -122,6 +141,7 @@ def _source_paths(paths: EvaluationControlPaths) -> list[Path]:
 
 
 def _source_hashes(paths: EvaluationControlPaths) -> dict[str, str]:
+    """Maps each frozen repository-relative source path to its digest."""
     return {
         path.relative_to(paths.repository).as_posix(): _sha256(path)
         for path in _source_paths(paths)
@@ -129,6 +149,7 @@ def _source_hashes(paths: EvaluationControlPaths) -> dict[str, str]:
 
 
 def _inherited_identities(paths: EvaluationControlPaths) -> dict[str, str]:
+    """Loads the freeze identities inherited from Phases 3 through 5."""
     phase3 = _json(paths.repository / "docs" / "phase-3-freeze-manifest.json")
     phase4 = _json(paths.repository / "docs" / "phase-4-freeze-manifest.json")
     phase5 = _json(paths.repository / "docs" / "phase-5-freeze-manifest.json")
@@ -143,6 +164,11 @@ def _inherited_identities(paths: EvaluationControlPaths) -> dict[str, str]:
 
 
 def _completed_validation(paths: EvaluationControlPaths, run_id: str) -> tuple[str, str]:
+    """Validates final validation evidence and returns its artifact digests.
+
+    Raises:
+        ValueError: If evidence is missing, inconsistent, unfinished, or incomplete.
+    """
     run_root = paths.run_root(run_id)
     manifest_path = run_root / "run-manifest.json"
     summary_path = run_root / "summary.json"
@@ -165,6 +191,7 @@ def _completed_validation(paths: EvaluationControlPaths, run_id: str) -> tuple[s
 
 
 def _manifest_payload(manifest: HarnessFreezeManifest) -> dict[str, Any]:
+    """Returns the manifest fields covered by its aggregate digest."""
     return manifest.model_dump(mode="json", exclude={"aggregate_sha256"})
 
 
@@ -174,7 +201,24 @@ def write_harness_freeze(
     validation_run_id: str,
     test_run_id: str,
 ) -> HarnessFreezeManifest:
-    """Freeze the validated harness and preregister exactly one untouched test run."""
+    """Freezes a validated harness and preregisters one untouched test run.
+
+    The operation is refused after any test claim, test run directory, or sealed
+    release exists. It verifies inherited artifacts and completed validation before
+    hashing the controlled source boundary and writing the aggregate manifest.
+
+    Args:
+        paths: Controlled repository and artifact locations.
+        validation_run_id: Completed validation run that justifies the freeze.
+        test_run_id: Distinct run identity authorized for the test split.
+
+    Returns:
+        The persisted, self-digested harness freeze manifest.
+
+    Raises:
+        ValueError: If prerequisites, identities, or lifecycle guards fail.
+        OSError: If required evidence cannot be read or the manifest cannot be written.
+    """
 
     if validation_run_id == test_run_id:
         raise ValueError("Validation and test runs require distinct identifiers")
@@ -209,7 +253,15 @@ def write_harness_freeze(
 
 
 def verify_harness_freeze(paths: EvaluationControlPaths) -> HarnessFreezeManifest:
-    """Verify the harness manifest and all inherited and source identities."""
+    """Verifies the harness manifest and every identity bound by its freeze.
+
+    Returns:
+        The validated manifest when source, inherited, validation, and aggregate
+        digests all match.
+
+    Raises:
+        ValueError: If the harness is unfrozen or any frozen identity has drifted.
+    """
 
     verify_harness_readiness(paths)
     manifest_path = paths.repository / HARNESS_MANIFEST
@@ -237,6 +289,7 @@ def verify_harness_freeze(paths: EvaluationControlPaths) -> HarnessFreezeManifes
 
 
 def _existing_test_runs(paths: EvaluationControlPaths) -> list[str]:
+    """Returns sorted test-run identities already present in artifact manifests."""
     runs: list[str] = []
     if not paths.artifacts.exists():
         return runs
@@ -252,7 +305,24 @@ def claim_test_execution(
     *,
     run_id: str,
 ) -> TestExecutionClaim:
-    """Atomically consume the preregistered test authorization before provider access."""
+    """Atomically consumes authorization for the preregistered test run.
+
+    The claim is created exclusively only after verifying the frozen harness, exact
+    run identity, and absence of prior test artifacts or a sealed release. A
+    concurrent or repeated claimant therefore fails before provider access.
+
+    Args:
+        paths: Controlled repository and artifact locations.
+        run_id: Test identity recorded in the harness freeze.
+
+    Returns:
+        The persisted claim binding the test run to its harness and validation run.
+
+    Raises:
+        ValueError: If the harness changed, the identity differs, test execution
+            already occurred, or authorization was previously consumed.
+        OSError: If control artifacts cannot be read or the claim cannot be written.
+    """
 
     manifest = verify_harness_freeze(paths)
     if run_id != manifest.preregistered_test_run_id:
