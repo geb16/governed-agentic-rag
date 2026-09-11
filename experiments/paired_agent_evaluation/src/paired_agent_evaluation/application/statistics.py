@@ -1,4 +1,13 @@
-# Frozen ratio estimators and case-cluster percentile bootstrap.
+"""Estimate frozen metrics with deterministic case-cluster bootstrapping.
+
+Resampling treats each case as a cluster, preserves within-case repetitions and
+condition pairing, and optionally stratifies draws by case category. Confidence
+limits are the 2.5th and 97.5th percentiles of valid bootstrap estimates.
+
+References:
+    [1] SciPy, "bootstrap."
+        https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html
+"""
 
 from __future__ import annotations
 
@@ -12,12 +21,14 @@ from paired_agent_evaluation.domain.scores import Estimate, MetricContribution, 
 
 
 def _ratio(items: Iterable[MetricContribution]) -> float | None:
+    """Returns the pooled eligible ratio, excluding unresolved contributions."""
     values = [item for item in items if item.eligible and item.pending_reason is None]
     denominator = sum(item.denominator for item in values)
     return sum(item.numerator for item in values) / denominator if denominator else None
 
 
 def _percentile(values: list[float], probability: float) -> float:
+    """Returns a linearly interpolated percentile from a non-empty sample."""
     ordered = sorted(values)
     index = (len(ordered) - 1) * probability
     lower = int(index)
@@ -32,6 +43,7 @@ def _case_groups(
     *,
     stratify_by_category: bool,
 ) -> list[list[str]]:
+    """Groups sorted case identities for pooled or category-stratified draws."""
     ordered = sorted(case_ids)
     if not stratify_by_category:
         return [ordered]
@@ -42,12 +54,14 @@ def _case_groups(
 
 
 def _draw_case_ids(groups: list[list[str]], rng: random.Random) -> list[str]:
+    """Resamples each case group with replacement at its original size."""
     return [rng.choice(group) for group in groups for _ in range(len(group))]
 
 
 def _category_macro(
     items: Iterable[MetricContribution], cases: dict[str, EvaluationCase]
 ) -> float | None:
+    """Returns the unweighted mean of category-level pooled ratios."""
     by_category: dict[str, list[MetricContribution]] = defaultdict(list)
     materialized = list(items)
     for item in materialized:
@@ -73,6 +87,32 @@ def estimate_condition(
     stratify_by_category: bool,
     category_macro: bool = False,
 ) -> Estimate:
+    """Estimates one condition metric and its 95% percentile interval.
+
+    Matching contributions are clustered by case. Bootstrap draws resample whole
+    cases, preserving all repetitions within a selected case, and optionally
+    preserve each category's case count. The interval is withheld unless the
+    configured minimum number of bootstrap replicates produces defined ratios.
+
+    Args:
+        contributions: Frozen per-observation metric contributions.
+        cases: Evaluation cases keyed by case identifier.
+        metric_id: Metric to estimate.
+        condition: Condition value to select.
+        stratum: Output label for the selected population.
+        include_case: Predicate defining membership in the stratum.
+        replicates: Number of bootstrap samples to attempt.
+        seed: Seed for deterministic resampling.
+        minimum_valid: Minimum defined replicates required for an interval.
+        stratify_by_category: Whether to resample within category groups.
+        category_macro: Whether to average category ratios without size weighting.
+
+    Returns:
+        The point estimate, interval metadata, and contributing sample counts.
+
+    Raises:
+        KeyError: If a selected contribution references an unknown case.
+    """
     selected = [
         item
         for item in contributions
@@ -121,6 +161,31 @@ def estimate_paired_difference(
     stratify_by_category: bool,
     category_macro: bool = False,
 ) -> PairedDifference:
+    """Estimates the governed-minus-baseline difference for complete pairs.
+
+    Pairing occurs within case and repetition. Pairs with either condition missing
+    or pending are excluded, while case-level bootstrap draws preserve all complete
+    pairs belonging to a sampled case. Interval generation follows the same
+    validity threshold and optional category stratification as condition estimates.
+
+    Args:
+        contributions: Frozen per-observation metric contributions.
+        cases: Evaluation cases keyed by case identifier.
+        metric_id: Metric to compare.
+        stratum: Output label for the selected population.
+        include_case: Predicate defining membership in the stratum.
+        replicates: Number of bootstrap samples to attempt.
+        seed: Seed for deterministic resampling.
+        minimum_valid: Minimum defined replicates required for an interval.
+        stratify_by_category: Whether to resample within category groups.
+        category_macro: Whether to average category ratios without size weighting.
+
+    Returns:
+        The paired difference, interval metadata, and complete-pair counts.
+
+    Raises:
+        KeyError: If a selected contribution references an unknown case.
+    """
     keyed = {
         (item.key.case_id, item.key.repetition, item.key.condition.value): item
         for item in contributions
@@ -171,6 +236,13 @@ def estimate_paired_difference(
 def registered_strata(
     cases: list[EvaluationCase],
 ) -> list[tuple[str, Callable[[EvaluationCase], bool], bool, bool]]:
+    """Registers aggregate and case-attribute strata in deterministic order.
+
+    Aggregate estimates use category-stratified resampling; category-macro also
+    uses unweighted category aggregation. Dimension-specific strata use pooled
+    resampling because each predicate already selects one dimension value.
+    """
+
     def include_all(_: EvaluationCase) -> bool:
         return True
 
