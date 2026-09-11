@@ -9,6 +9,8 @@ from app.evaluation.dataset.enums import DatasetSplit
 
 import paired_agent_evaluation.composition.builder as composition_builder
 import paired_agent_evaluation.experiment_control as control
+import paired_agent_evaluation.experiment_control.authorization as control_authorization
+import paired_agent_evaluation.experiment_control.freeze as control_freeze
 from paired_agent_evaluation.adapters.reproducibility import RuntimeIdentity
 from paired_agent_evaluation.adapters.storage.filesystem import atomic_json
 from paired_agent_evaluation.composition import EvaluationPaths, prepare_run
@@ -44,9 +46,10 @@ def control_paths(tmp_path, monkeypatch) -> EvaluationPaths:
             qdrant_point_count=1,
         ),
     )
-    monkeypatch.setattr(control, "HARNESS_MANIFEST", tmp_path / "harness-freeze.json")
-    monkeypatch.setattr(control, "TEST_EXECUTION_CLAIM", tmp_path / "test-claim.json")
-    monkeypatch.setattr(control, "verify_harness_readiness", lambda paths: None)
+    monkeypatch.setattr(control_freeze, "HARNESS_MANIFEST", tmp_path / "harness-freeze.json")
+    monkeypatch.setattr(control_freeze, "TEST_EXECUTION_CLAIM", tmp_path / "test-claim.json")
+    monkeypatch.setattr(control_authorization, "TEST_EXECUTION_CLAIM", tmp_path / "test-claim.json")
+    monkeypatch.setattr(control_freeze, "verify_harness_readiness", lambda paths: None)
     return isolated_paths
 
 
@@ -107,7 +110,7 @@ def test_harness_verification_rejects_source_drift(control_paths, monkeypatch) -
         validation_run_id="run_validation_drift",
         test_run_id="run_test_drift",
     )
-    monkeypatch.setattr(control, "_source_hashes", lambda paths: {"changed.py": "0" * 64})
+    monkeypatch.setattr(control_freeze, "source_hashes", lambda paths: {"changed.py": "0" * 64})
 
     with pytest.raises(ValueError, match="source files changed"):
         control.verify_harness_freeze(control_paths)
@@ -128,7 +131,7 @@ def test_test_authorization_is_exact_and_consumed_once(control_paths) -> None:
 
     claim = control.claim_test_execution(control_paths, run_id="run_test_once")
     claim_payload = json.loads(
-        (control_paths.repository / control.TEST_EXECUTION_CLAIM).read_text()
+        (control_paths.repository / control_authorization.TEST_EXECUTION_CLAIM).read_text()
     )
     assert claim_payload["test_run_id"] == claim.test_run_id
 
