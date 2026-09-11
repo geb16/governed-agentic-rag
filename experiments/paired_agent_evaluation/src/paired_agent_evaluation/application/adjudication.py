@@ -1,4 +1,16 @@
-"""Create opaque review identities and resolve independent reviewer decisions."""
+"""Prepare blinded review items and reconcile independent decisions.
+
+The module preserves opaque identities and randomized review order across a run,
+then accepts field-level outcomes only when distinct reviewers agree or an explicit
+resolution settles their disagreement.
+
+References:
+    [1] NIST, "AI Risk Management Framework Core," Measure 1.3 and Map 3.5.
+        https://airc.nist.gov/airmf-resources/airmf/5-sec-core/
+    [2] Python Software Foundation, "secrets — Generate secure random numbers
+        for managing secrets."
+        https://docs.python.org/3/library/secrets.html
+"""
 
 from __future__ import annotations
 
@@ -17,6 +29,8 @@ DecisionT = TypeVar("DecisionT", bound=Hashable)
 
 
 class ReviewItem(StrictModel):
+    """Represents the condition-neutral evidence shown to a reviewer."""
+
     blinded_id: str
     query: str
     response: str
@@ -27,7 +41,7 @@ class ReviewItem(StrictModel):
 
 
 class BlindingPlan(StrictModel):
-    """Persist opaque identities and reviewer order without exposing conditions."""
+    """Persists opaque identities and condition-independent review order."""
 
     schema_version: int = 1
     assignments: dict[str, str]
@@ -35,7 +49,7 @@ class BlindingPlan(StrictModel):
 
     @model_validator(mode="after")
     def validate_closed_mapping(self) -> BlindingPlan:
-        """Require one unique opaque identity and one order entry per observation."""
+        """Validates a complete, one-to-one assignment and review order."""
         observation_ids = set(self.assignments)
         if not observation_ids or observation_ids != set(self.review_order):
             raise ValueError("blinding assignments and review order must contain the same IDs")
@@ -59,7 +73,17 @@ class BlindingPlan(StrictModel):
 
 
 def create_blinding_plan(observation_ids: Iterable[str]) -> BlindingPlan:
-    """Create a cryptographically random mapping and independent review order."""
+    """Creates opaque identifiers and a randomized order for unique observations.
+
+    Args:
+        observation_ids: Stable observation identifiers to blind.
+
+    Returns:
+        A validated plan containing one opaque identity per observation.
+
+    Raises:
+        ValueError: If an observation identifier occurs more than once.
+    """
     identities = list(observation_ids)
     if len(identities) != len(set(identities)):
         raise ValueError("observation identities must be unique")
@@ -88,6 +112,15 @@ def build_review_item(
     query: str,
     contexts: list[str],
 ) -> ReviewItem | None:
+    """Builds a reviewer-visible item when human judgment is required.
+
+    Route review takes precedence over automatic groundedness eligibility. An
+    answered observation still requests claim-support review, including when its
+    route also requires adjudication.
+
+    Returns:
+        A blinded review item, or ``None`` when no review is required.
+    """
     grounded = bool(observation.answer and not observation.route_requires_adjudication)
     route = observation.route_requires_adjudication
     if not grounded and not route:
@@ -104,7 +137,11 @@ def build_review_item(
 
 
 def order_review_items(items: Mapping[str, ReviewItem], *, plan: BlindingPlan) -> list[ReviewItem]:
-    """Order reviewer-visible items by the plan's random, condition-independent order."""
+    """Orders available review items according to the persisted random order.
+
+    Raises:
+        ValueError: If an item identifies an observation absent from the plan.
+    """
     unexpected = set(items) - set(plan.assignments)
     if unexpected:
         raise ValueError(f"Review items are absent from the blinding plan: {sorted(unexpected)}")
@@ -136,7 +173,20 @@ def resolve_reviews(
     *,
     resolutions: list[ResolvedAdjudication] | None = None,
 ) -> dict[str, ResolvedAdjudication]:
-    """Resolve route and claim-support fields from independent dual reviews."""
+    """Resolves each decision field from independent reviewer submissions.
+
+    A field is resolved only after two distinct reviewers provide it. Agreement is
+    accepted directly; disagreement requires a supplied resolution explicitly
+    marked as resolved. Fields without sufficient evidence remain unresolved.
+
+    Args:
+        reviews: Independent decisions grouped by blinded identity.
+        resolutions: Optional decisions that settle reviewer disagreements.
+
+    Returns:
+        Resolved records keyed by blinded identity. Identities with no resolvable
+        field are omitted.
+    """
     supplied = {item.blinded_id: item for item in resolutions or []}
     grouped: dict[str, list[Adjudication]] = {}
     for review in reviews:
@@ -181,6 +231,11 @@ def apply_route_review(
     plan: BlindingPlan,
     resolved: dict[str, ResolvedAdjudication],
 ) -> NormalizedObservation:
+    """Applies a resolved route decision to an observation awaiting review.
+
+    Returns the original observation when route review is unnecessary or remains
+    unresolved; otherwise returns a copy marked as decided by blinded dual review.
+    """
     if not observation.route_requires_adjudication:
         return observation
     decision = resolved.get(blinded_id(observation.key.observation_id, plan=plan))
