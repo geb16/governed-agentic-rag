@@ -1,4 +1,16 @@
-# Phase-6 reporting orchestration over pure application services.
+"""Derive and persist reproducible evaluation reports from run artifacts.
+
+Reporting verifies frozen identities before normalization, blinded adjudication,
+scoring, bootstrap estimation, summary generation, and optional secondary grading.
+
+References:
+    [1] NIST, "AI Risk Management Framework Core," Measure 2.1 and 2.13.
+        https://airc.nist.gov/airmf-resources/airmf/5-sec-core/
+    [2] Ragas, "Faithfulness."
+        https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/faithfulness/
+    [3] Python Software Foundation, "asyncio — Asynchronous I/O."
+        https://docs.python.org/3/library/asyncio.html
+"""
 
 from __future__ import annotations
 
@@ -52,6 +64,7 @@ from paired_agent_evaluation.visual_report import write_html_report
 
 
 def _load_adjudications(run_root: Path) -> dict[str, ResolvedAdjudication]:
+    """Loads reviewer files and applies any explicit disagreement resolutions."""
     review_dir = run_root / "adjudication"
     reviews = (
         [
@@ -76,6 +89,12 @@ def _validate_schedule(
     expected_sha256: str,
     expected_observations: int,
 ) -> None:
+    """Validates schedule integrity, cardinality, and observation membership.
+
+    Raises:
+        ValueError: If the schedule digest or count differs from the manifest, its
+            schema is invalid, or raw observation identities are not an exact set.
+    """
     if sha256_json(payload) != expected_sha256:
         raise ValueError("Run schedule has changed")
     schedule = TypeAdapter(list[ScheduledExecution]).validate_python(payload)
@@ -94,6 +113,7 @@ def _build_estimates(
     rubric: ScoringRubric,
     reporting: dict[str, Any],
 ) -> tuple[list[Estimate], list[PairedDifference]]:
+    """Builds condition estimates and paired effects for every metric and stratum."""
     case_map = {case.case_id: case for case in cases}
     estimates = []
     differences = []
@@ -140,6 +160,7 @@ def _summary(
     review_items: list[Any],
     pending: int,
 ) -> dict[str, Any]:
+    """Summarizes finality, adjudication, latency, and token usage for a run."""
     return {
         "run_id": run_id,
         "split": split.value,
@@ -180,7 +201,26 @@ def _summary(
 def derive_primary_artifacts(
     *, paths: EvaluationPaths, run_root: Path, manifest: ExperimentManifest
 ) -> dict[str, Any]:
-    """Derive every primary result artifact from authoritative run inputs."""
+    """Derives every primary result artifact from authoritative run inputs.
+
+    The pipeline verifies the private blinding plan and schedule commitment before
+    reading raw observations. It then normalizes executions, applies resolved route
+    reviews, creates the blinded review packet, scores all observations, and
+    computes configured condition and paired estimates. Returned values are not
+    persisted, allowing release verification to repeat the derivation independently.
+
+    Args:
+        paths: Repository, configuration, and artifact locations.
+        run_root: Directory containing the authoritative run inputs.
+        manifest: Run identity and integrity commitments.
+
+    Returns:
+        Primary artifact payloads keyed by their release filenames.
+
+    Raises:
+        ValueError: If an integrity, schema, identity, or scoring invariant fails.
+        OSError: If a required run, dataset, or configuration artifact cannot be read.
+    """
 
     blinding_plan = BlindingPlan.model_validate_json(
         (run_root / "blinding-plan.json").read_text(encoding="utf-8")
@@ -241,6 +281,21 @@ def derive_primary_artifacts(
 
 
 def score_run(*, run_id: str) -> dict[str, Any]:
+    """Derives and persists primary results, report HTML, and manifest status.
+
+    A run remains awaiting adjudication while any metric contribution is pending.
+    Only a fully resolved run becomes scored and receives a completion timestamp.
+
+    Args:
+        run_id: Existing acquired run to score.
+
+    Returns:
+        The persisted summary payload.
+
+    Raises:
+        ValueError: If run integrity or scoring invariants fail.
+        OSError: If required artifacts cannot be read or outputs cannot be written.
+    """
     paths = EvaluationPaths.discover()
     run_root = paths.run_root(run_id)
     manifest_path = run_root / "run-manifest.json"
@@ -266,6 +321,20 @@ def score_run(*, run_id: str) -> dict[str, Any]:
 
 
 async def _grade_ragas(run_id: str) -> list[SecondaryGrade]:
+    """Grades answer-bearing executions against retrieved context with Ragas.
+
+    This diagnostic excludes executions without both an answer and context and does
+    not alter primary metric artifacts.
+
+    Args:
+        run_id: Existing run containing raw observations.
+
+    Returns:
+        Persisted secondary faithfulness grades in observation order.
+
+    Raises:
+        ValueError: If the secondary grader API key is unavailable.
+    """
     from paired_agent_evaluation.adapters.graders import RagasFaithfulnessGrader
 
     paths = EvaluationPaths.discover()
@@ -303,4 +372,5 @@ async def _grade_ragas(run_id: str) -> list[SecondaryGrade]:
 
 
 def grade_ragas(*, run_id: str) -> list[SecondaryGrade]:
+    """Runs asynchronous secondary Ragas grading from synchronous code."""
     return asyncio.run(_grade_ragas(run_id))
