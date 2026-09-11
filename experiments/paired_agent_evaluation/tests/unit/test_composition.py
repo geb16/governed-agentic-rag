@@ -5,7 +5,7 @@ import json
 import pytest
 from app.evaluation.dataset.enums import DatasetSplit
 
-import paired_agent_evaluation.composition as composition_module
+import paired_agent_evaluation.composition.builder as composition_builder
 from paired_agent_evaluation.adapters.reproducibility import RuntimeIdentity
 from paired_agent_evaluation.composition import EvaluationPaths, acquire, prepare_run
 
@@ -35,10 +35,10 @@ def isolated_paths(tmp_path) -> EvaluationPaths:
 
 @pytest.fixture(autouse=True)
 def _stub_settings(monkeypatch, isolated_paths) -> None:
-    monkeypatch.setattr(composition_module.EvaluationPaths, "discover", lambda: isolated_paths)
-    monkeypatch.setattr(composition_module, "Settings", _StubSettings)
+    monkeypatch.setattr(composition_builder.EvaluationPaths, "discover", lambda: isolated_paths)
+    monkeypatch.setattr(composition_builder, "Settings", _StubSettings)
     monkeypatch.setattr(
-        composition_module,
+        composition_builder,
         "capture_runtime_identity",
         lambda _: RuntimeIdentity(
             runtime_settings_sha256="a" * 64,
@@ -75,7 +75,7 @@ def test_prepare_run_rejects_drift_in_an_existing_run_manifest(monkeypatch, isol
     prepare_run(run_id="run_composition_drift", split=DatasetSplit.VALIDATION)
 
     monkeypatch.setattr(
-        composition_module,
+        composition_builder,
         "Settings",
         lambda **kwargs: _StubSettings(openai_model="a-different-model", **kwargs),
     )
@@ -83,13 +83,14 @@ def test_prepare_run_rejects_drift_in_an_existing_run_manifest(monkeypatch, isol
     with pytest.raises(ValueError, match="Existing run manifest drift"):
         prepare_run(run_id="run_composition_drift", split=DatasetSplit.VALIDATION)
 
+
 # Testing if drifts in visual report can be detected
 def test_prepare_run_rejects_runtime_identity_drift(monkeypatch) -> None:
     """Prevent reuse after settings, tool schemas, or Qdrant content changes."""
 
     prepare_run(run_id="run_runtime_drift", split=DatasetSplit.VALIDATION)
     monkeypatch.setattr(
-        composition_module,
+        composition_builder,
         "capture_runtime_identity",
         lambda _: RuntimeIdentity(
             runtime_settings_sha256="9" * 64,

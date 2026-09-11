@@ -7,7 +7,7 @@ import json
 import pytest
 from app.evaluation.dataset.enums import DatasetSplit
 
-import paired_agent_evaluation.composition as composition_module
+import paired_agent_evaluation.composition.builder as composition_builder
 import paired_agent_evaluation.experiment_control as control
 from paired_agent_evaluation.adapters.reproducibility import RuntimeIdentity
 from paired_agent_evaluation.adapters.storage.filesystem import atomic_json
@@ -32,10 +32,10 @@ def control_paths(tmp_path, monkeypatch) -> EvaluationPaths:
         release=tmp_path / "release",
         configs=real.configs,
     )
-    monkeypatch.setattr(composition_module.EvaluationPaths, "discover", lambda: isolated_paths)
-    monkeypatch.setattr(composition_module, "Settings", _StubSettings)
+    monkeypatch.setattr(composition_builder.EvaluationPaths, "discover", lambda: isolated_paths)
+    monkeypatch.setattr(composition_builder, "Settings", _StubSettings)
     monkeypatch.setattr(
-        composition_module,
+        composition_builder,
         "capture_runtime_identity",
         lambda _: RuntimeIdentity(
             runtime_settings_sha256="1" * 64,
