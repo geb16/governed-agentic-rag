@@ -2,7 +2,9 @@ import json
 
 import pytest
 
-import paired_agent_evaluation.release as release
+import paired_agent_evaluation.release.sealing as release_sealing
+import paired_agent_evaluation.release.verification as release_verification
+from paired_agent_evaluation.domain.manifests import ExperimentManifest
 from paired_agent_evaluation.release import RELEASE_FILES, seal_run, verify_release
 
 
@@ -63,7 +65,7 @@ def test_release_is_sanitized_closed_and_content_addressed(tmp_path, monkeypatch
     release_root = tmp_path / "release"
     run_root.mkdir()
     _complete_run(run_root)
-    monkeypatch.setattr(release, "verify_primary_artifacts", lambda *_: None)
+    monkeypatch.setattr(release_sealing, "verify_primary_artifacts", lambda *_: None)
     manifest = seal_run(run_root=run_root, release_root=release_root)
     assert manifest == verify_release(release_root)
     released = json.loads((release_root / "secondary-ragas.jsonl").read_text())
@@ -99,7 +101,7 @@ def test_derived_artifact_drift_cannot_be_sealed(tmp_path, monkeypatch) -> None:
     run_root.mkdir()
     _complete_run(run_root)
     monkeypatch.setattr(
-        release,
+        release_verification,
         "derive_primary_artifacts",
         lambda **_: {"summary.json": {"primary_results_final": True, "trusted": True}},
     )
@@ -115,7 +117,7 @@ def test_visual_report_drift_is_detected(tmp_path, monkeypatch) -> None:
     run_root = tmp_path / "run"
     run_root.mkdir()
     _complete_run(run_root)
-    manifest = release.ExperimentManifest.model_validate_json(
+    manifest = ExperimentManifest.model_validate_json(
         (run_root / "run-manifest.json").read_text(encoding="utf-8")
     )
     summary = {
@@ -129,7 +131,7 @@ def test_visual_report_drift_is_detected(tmp_path, monkeypatch) -> None:
     }
     (run_root / "summary.json").write_text(json.dumps(summary), encoding="utf-8")
     monkeypatch.setattr(
-        release,
+        release_verification,
         "derive_primary_artifacts",
         lambda **_: {
             "summary.json": summary,
@@ -139,4 +141,4 @@ def test_visual_report_drift_is_detected(tmp_path, monkeypatch) -> None:
     )
 
     with pytest.raises(ValueError, match=r"Primary derived artifacts.*report\.html"):
-        release.verify_primary_artifacts(run_root, manifest)
+        release_verification.verify_primary_artifacts(run_root, manifest)
