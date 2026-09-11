@@ -21,7 +21,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Protocol, TypedDict
 
 from app.evaluation.dataset.enums import DatasetSplit
 
@@ -48,6 +48,16 @@ INHERITED_VERIFIERS = (
     "scripts/verify_phase5_freeze.py",
 )
 
+
+class _InheritedIdentities(TypedDict):
+    """Identities inherited from the Phase 3 through 5 freeze manifests."""
+
+    phase3_freeze_id: str
+    phase3_aggregate_sha256: str
+    phase4_freeze_id: str
+    phase4_aggregate_sha256: str
+    phase5_freeze_id: str
+    phase5_aggregate_sha256: str
 
 class EvaluationControlPaths(Protocol):
     """Exposes only paths required by the experiment-control boundary."""
@@ -148,7 +158,7 @@ def _source_hashes(paths: EvaluationControlPaths) -> dict[str, str]:
     }
 
 
-def _inherited_identities(paths: EvaluationControlPaths) -> dict[str, str]:
+def _inherited_identities(paths: EvaluationControlPaths) -> _InheritedIdentities:
     """Loads the freeze identities inherited from Phases 3 through 5."""
     phase3 = _json(paths.repository / "docs" / "phase-3-freeze-manifest.json")
     phase4 = _json(paths.repository / "docs" / "phase-4-freeze-manifest.json")
