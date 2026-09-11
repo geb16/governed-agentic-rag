@@ -1,6 +1,7 @@
 import json
 
 import paired_agent_evaluation.reporting as reporting
+import paired_agent_evaluation.reporting.scoring as reporting_scoring
 from paired_agent_evaluation.adapters.storage.filesystem import atomic_json
 from paired_agent_evaluation.composition import EvaluationPaths
 from paired_agent_evaluation.domain.manifests import ExperimentManifest
@@ -67,8 +68,8 @@ def test_score_run_persists_derived_outputs_report_and_terminal_status(
         "paired-differences.json": [],
         "summary.json": summary,
     }
-    monkeypatch.setattr(reporting.EvaluationPaths, "discover", lambda: paths)
-    monkeypatch.setattr(reporting, "derive_primary_artifacts", lambda **_: artifacts)
+    monkeypatch.setattr(reporting_scoring.EvaluationPaths, "discover", lambda: paths)
+    monkeypatch.setattr(reporting_scoring, "derive_primary_artifacts", lambda **_: artifacts)
 
     assert reporting.score_run(run_id="run_reporting") == summary
     persisted = json.loads((run_root / "run-manifest.json").read_text(encoding="utf-8"))

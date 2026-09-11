@@ -17,7 +17,7 @@ from paired_agent_evaluation.composition import EvaluationPaths
 from paired_agent_evaluation.domain.manifests import ExperimentManifest, ReleaseManifest
 from paired_agent_evaluation.release.artifacts import json_value, read_payload, sha256_file
 from paired_agent_evaluation.reporting import derive_primary_artifacts
-from paired_agent_evaluation.visual_report import render_html_report
+from paired_agent_evaluation.reporting.visual_report import render_html_report
 
 
 def verify_primary_artifacts(run_root: Path, manifest: ExperimentManifest) -> None:

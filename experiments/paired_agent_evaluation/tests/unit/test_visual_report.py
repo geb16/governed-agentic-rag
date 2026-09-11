@@ -1,4 +1,4 @@
-from paired_agent_evaluation.visual_report import render_html_report
+from paired_agent_evaluation.reporting.visual_report import render_html_report
 
 
 def test_visual_report_is_accessible_printable_and_escapes_result_labels() -> None:

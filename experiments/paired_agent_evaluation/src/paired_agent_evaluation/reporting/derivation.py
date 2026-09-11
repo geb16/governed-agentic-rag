@@ -1,27 +1,17 @@
-"""Derive and persist reproducible evaluation reports from run artifacts.
-
-Reporting verifies frozen identities before normalization, blinded adjudication,
-scoring, bootstrap estimation, summary generation, and optional secondary grading.
+"""Derive reproducible primary artifacts from authoritative run inputs.
 
 References:
     [1] NIST, "AI Risk Management Framework Core," Measure 2.1 and 2.13.
         https://airc.nist.gov/airmf-resources/airmf/5-sec-core/
-    [2] Ragas, "Faithfulness."
-        https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/faithfulness/
-    [3] Python Software Foundation, "asyncio — Asynchronous I/O."
-        https://docs.python.org/3/library/asyncio.html
 """
 
 from __future__ import annotations
 
-import asyncio
 import json
 from collections.abc import Sequence
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from app.core.config import Settings
 from app.evaluation.dataset.enums import DatasetSplit
 from app.evaluation.dataset.models import EvaluationCase, ScoringRubric
 from pydantic import TypeAdapter
@@ -30,7 +20,6 @@ from paired_agent_evaluation.adapters.dataset import EvaluationDataset
 from paired_agent_evaluation.adapters.storage.filesystem import (
     JsonlStore,
     RawFilesystemStore,
-    atomic_json,
     sha256_json,
 )
 from paired_agent_evaluation.adapters.telemetry import project_trace_facts
@@ -58,13 +47,11 @@ from paired_agent_evaluation.domain.scores import (
     MetricContribution,
     PairedDifference,
     ResolvedAdjudication,
-    SecondaryGrade,
 )
-from paired_agent_evaluation.visual_report import write_html_report
 
 
 def _load_adjudications(run_root: Path) -> dict[str, ResolvedAdjudication]:
-    """Loads reviewer files and applies any explicit disagreement resolutions."""
+    """Loads reviewer files and applies explicit disagreement resolutions."""
     review_dir = run_root / "adjudication"
     reviews = (
         [
@@ -92,8 +79,7 @@ def _validate_schedule(
     """Validates schedule integrity, cardinality, and observation membership.
 
     Raises:
-        ValueError: If the schedule digest or count differs from the manifest, its
-            schema is invalid, or raw observation identities are not an exact set.
+        ValueError: If the schedule or observation identities violate the manifest.
     """
     if sha256_json(payload) != expected_sha256:
         raise ValueError("Run schedule has changed")
@@ -113,7 +99,7 @@ def _build_estimates(
     rubric: ScoringRubric,
     reporting: dict[str, Any],
 ) -> tuple[list[Estimate], list[PairedDifference]]:
-    """Builds condition estimates and paired effects for every metric and stratum."""
+    """Builds condition estimates and paired effects for all registered strata."""
     case_map = {case.case_id: case for case in cases}
     estimates = []
     differences = []
@@ -160,7 +146,7 @@ def _summary(
     review_items: list[Any],
     pending: int,
 ) -> dict[str, Any]:
-    """Summarizes finality, adjudication, latency, and token usage for a run."""
+    """Summarizes finality, adjudication, latency, and token usage."""
     return {
         "run_id": run_id,
         "split": split.value,
@@ -199,29 +185,24 @@ def _summary(
 
 
 def derive_primary_artifacts(
-    *, paths: EvaluationPaths, run_root: Path, manifest: ExperimentManifest
+    *,
+    paths: EvaluationPaths,
+    run_root: Path,
+    manifest: ExperimentManifest,
 ) -> dict[str, Any]:
     """Derives every primary result artifact from authoritative run inputs.
 
-    The pipeline verifies the private blinding plan and schedule commitment before
-    reading raw observations. It then normalizes executions, applies resolved route
-    reviews, creates the blinded review packet, scores all observations, and
-    computes configured condition and paired estimates. Returned values are not
-    persisted, allowing release verification to repeat the derivation independently.
-
-    Args:
-        paths: Repository, configuration, and artifact locations.
-        run_root: Directory containing the authoritative run inputs.
-        manifest: Run identity and integrity commitments.
+    The pipeline verifies blinding and schedule commitments, normalizes executions,
+    applies route reviews, scores observations, and computes registered estimates.
+    Results are returned without persistence for independent release verification.
 
     Returns:
-        Primary artifact payloads keyed by their release filenames.
+        Primary artifact payloads keyed by release filename.
 
     Raises:
-        ValueError: If an integrity, schema, identity, or scoring invariant fails.
-        OSError: If a required run, dataset, or configuration artifact cannot be read.
+        ValueError: If an integrity, identity, schema, or scoring invariant fails.
+        OSError: If a required artifact cannot be read.
     """
-
     blinding_plan = BlindingPlan.model_validate_json(
         (run_root / "blinding-plan.json").read_text(encoding="utf-8")
     )
@@ -275,102 +256,11 @@ def derive_primary_artifacts(
         "estimates.json": [item.model_dump(mode="json") for item in estimates],
         "paired-differences.json": [item.model_dump(mode="json") for item in differences],
         "summary.json": _summary(
-            manifest.run_id, split, normalized, resolved, review_items, pending
+            manifest.run_id,
+            split,
+            normalized,
+            resolved,
+            review_items,
+            pending,
         ),
     }
-
-
-def score_run(*, run_id: str) -> dict[str, Any]:
-    """Derives and persists primary results, report HTML, and manifest status.
-
-    A run remains awaiting adjudication while any metric contribution is pending.
-    Only a fully resolved run becomes scored and receives a completion timestamp.
-
-    Args:
-        run_id: Existing acquired run to score.
-
-    Returns:
-        The persisted summary payload.
-
-    Raises:
-        ValueError: If run integrity or scoring invariants fail.
-        OSError: If required artifacts cannot be read or outputs cannot be written.
-    """
-    paths = EvaluationPaths.discover()
-    run_root = paths.run_root(run_id)
-    manifest_path = run_root / "run-manifest.json"
-    manifest = ExperimentManifest.model_validate_json(manifest_path.read_text(encoding="utf-8"))
-    artifacts = derive_primary_artifacts(paths=paths, run_root=run_root, manifest=manifest)
-    for name, payload in artifacts.items():
-        path = run_root / name
-        if name.endswith(".jsonl"):
-            JsonlStore.write(path, payload)
-        else:
-            atomic_json(path, payload)
-    write_html_report(run_root)
-    summary = artifacts["summary.json"]
-    pending = int(summary["pending_metric_contributions"])
-    manifest = manifest.model_copy(
-        update={
-            "status": "scored" if pending == 0 else "awaiting_adjudication",
-            "completed_at": datetime.now(UTC) if pending == 0 else None,
-        }
-    )
-    atomic_json(manifest_path, manifest.model_dump(mode="json"))
-    return summary
-
-
-async def _grade_ragas(run_id: str) -> list[SecondaryGrade]:
-    """Grades answer-bearing executions against retrieved context with Ragas.
-
-    This diagnostic excludes executions without both an answer and context and does
-    not alter primary metric artifacts.
-
-    Args:
-        run_id: Existing run containing raw observations.
-
-    Returns:
-        Persisted secondary faithfulness grades in observation order.
-
-    Raises:
-        ValueError: If the secondary grader API key is unavailable.
-    """
-    from paired_agent_evaluation.adapters.graders import RagasFaithfulnessGrader
-
-    paths = EvaluationPaths.discover()
-    run_root = paths.run_root(run_id)
-    raw = RawFilesystemStore(run_root / "raw" / "observations").read_all()
-    manifest = json.loads((run_root / "run-manifest.json").read_text(encoding="utf-8"))
-    settings = Settings(_env_file=paths.repository / ".env") #pyright: ignore
-    if settings.openai_api_key is None:
-        raise ValueError("RAG_OPENAI_API_KEY is required for secondary Ragas grading")
-    grader = RagasFaithfulnessGrader(
-        api_key=settings.openai_api_key.get_secret_value(),
-        model=str(manifest["model_identifier"]),
-    )
-    grades = []
-    for execution in raw:
-        answer = str((execution.response or {}).get("answer") or "")
-        contexts = [item.content for item in execution.retrieved]
-        if not answer or not contexts:
-            continue
-        value, reason = await grader.grade(
-            query=str(execution.request["query"]), response=answer, contexts=contexts
-        )
-        grades.append(
-            SecondaryGrade(
-                observation_id=execution.key.observation_id,
-                grader="ragas.Faithfulness",
-                grader_version="0.4.3",
-                model_identifier=str(manifest["model_identifier"]),
-                value=value,
-                reason=reason,
-            )
-        )
-    JsonlStore.write(run_root / "secondary-ragas.jsonl", grades)
-    return grades
-
-
-def grade_ragas(*, run_id: str) -> list[SecondaryGrade]:
-    """Runs asynchronous secondary Ragas grading from synchronous code."""
-    return asyncio.run(_grade_ragas(run_id))
