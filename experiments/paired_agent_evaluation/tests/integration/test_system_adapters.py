@@ -3,7 +3,15 @@ from typing import Any
 
 from app.evaluation.dataset.enums import ReviewDecision
 from app.evaluation.dataset.models import HumanDecision
-from app.governance.contracts import ClassificationDraft, GovernedFinalDraft, ProposedActionDraft
+from app.governance.contracts import (
+    ClassificationDraft,
+    GovernedFinalDraft,
+    ProposedActionDraft,
+    ProposedActionKind,
+    Sensitivity,
+    TaskIntent,
+    TaskType,
+)
 from app.governance.llm import ModelResult
 from conftest import BaselineAnswerModel, GovernedAnswerModel, StaticRetriever
 
@@ -14,7 +22,7 @@ from paired_agent_evaluation.adapters.systems import BaselineSystemRunner, Gover
 from paired_agent_evaluation.application.normalization import normalize
 from paired_agent_evaluation.application.scheduling import build_schedule
 from paired_agent_evaluation.domain.executions import Condition
-from paired_agent_evaluation.domain.observations import AcceptanceStatus
+from paired_agent_evaluation.domain.observations import AcceptanceStatus, ObservedRoute
 
 
 class MemoryAcceptanceRecorder:
@@ -61,7 +69,7 @@ def test_both_frozen_systems_run_against_isolated_shared_fixture(
     assert baseline.state_before == governed.state_before
     assert governed.audit_events
     assert normalize(baseline).route_requires_adjudication is True
-    assert normalize(governed).observed_route.value == "answer"
+    assert normalize(governed).observed_route == ObservedRoute.ANSWER
 
 
 class GovernedDualRoleRefundModel:
@@ -72,9 +80,9 @@ class GovernedDualRoleRefundModel:
     def classify(self, *_: Any, **__: Any) -> ModelResult[ClassificationDraft]:
         return ModelResult(
             ClassificationDraft(
-                intent="refund",
-                task_type="state_changing",
-                sensitivity="moderate",
+                intent=TaskIntent.REFUND,
+                task_type=TaskType.STATE_CHANGING,
+                sensitivity=Sensitivity.MODERATE,
                 confidence=1.0,
                 summary="A large refund was requested.",
             ),
@@ -85,7 +93,7 @@ class GovernedDualRoleRefundModel:
     def propose(self, *_: Any, **__: Any) -> ModelResult[ProposedActionDraft]:
         return ModelResult(
             ProposedActionDraft(
-                kind="tool",
+                kind=ProposedActionKind.TOOL,
                 tool_name="issue_refund",
                 arguments_json=(
                     '{"ticket_id": "TKT-1003", "amount_minor": 500000, "currency": "GBP", '
