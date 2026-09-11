@@ -1,4 +1,9 @@
-"""Resumable sequential acquisition with one permitted pre-acceptance rerun."""
+"""Runs resumable sequential acquisition with fail-closed retries.
+
+Persisted observations are skipped when a run resumes. An incomplete observation
+may continue only after every prior attempt records a confirmed pre-acceptance
+failure; accepted or indeterminate attempts require operator intervention.
+"""
 
 from __future__ import annotations
 
@@ -14,6 +19,15 @@ from paired_agent_evaluation.domain.observations import AcceptanceStatus, RawExe
 
 
 class AcquisitionRunner:
+    """Coordinates system execution, attempt journals, and raw observations.
+
+    Args:
+        runners: System adapter selected by experiment condition.
+        store: Persistence boundary for completed raw observations.
+        attempts: Persistence boundary for retry-relevant attempt states.
+        max_pre_acceptance_attempts: Maximum attempts allowed per observation.
+    """
+
     def __init__(
         self,
         *,
@@ -32,6 +46,25 @@ class AcquisitionRunner:
         schedule: list[ScheduledExecution],
         cases: list[EvaluationCase],
     ) -> list[RawExecution]:
+        """Acquires every missing observation in schedule order.
+
+        Before retrying, the method validates prior journal identity, numbering,
+        and state. Each new execution must agree with its journal about provider
+        acceptance. The raw observation is stored before its attempt is marked
+        terminal, allowing completed observations to be skipped on later runs.
+
+        Args:
+            schedule: Ordered executions to acquire.
+            cases: Evaluation cases referenced by the schedule.
+
+        Returns:
+            All raw observations currently available from the configured store.
+
+        Raises:
+            KeyError: If a schedule entry references an unknown case or condition.
+            RuntimeError: If prior journals are inconsistent or indeterminate,
+                the attempt limit is exhausted, or acceptance evidence disagrees.
+        """
         by_case = {case.case_id: case for case in cases}
         for scheduled in schedule:
             identity = scheduled.key.observation_id
