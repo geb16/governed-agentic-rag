@@ -35,7 +35,7 @@ def isolated_paths(tmp_path) -> EvaluationPaths:
 
 @pytest.fixture(autouse=True)
 def _stub_settings(monkeypatch, isolated_paths) -> None:
-    monkeypatch.setattr(composition_builder.EvaluationPaths, "discover", lambda: isolated_paths)
+    monkeypatch.setattr(EvaluationPaths, "discover", lambda: isolated_paths)
     monkeypatch.setattr(composition_builder, "Settings", _StubSettings)
     monkeypatch.setattr(
         composition_builder,
