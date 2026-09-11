@@ -1,4 +1,14 @@
-# Phase 6 sanitization and content-addressed release sealing.
+"""Sanitize, seal, and verify the final evaluation release.
+
+Sealing independently re-derives primary results, removes named secret fields, and
+binds a closed artifact set to per-file and aggregate SHA-256 digests.
+
+References:
+    [1] OWASP, "Logging Cheat Sheet," Data to exclude.
+        https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html
+    [2] Pydantic, "Configuration." 
+        https://pydantic.dev/docs/validation/latest/api/pydantic/base_model/
+"""
 
 from __future__ import annotations
 
@@ -40,10 +50,12 @@ SENSITIVE_KEY_PARTS = ("api_key", "password", "secret", "access_token", "refresh
 
 
 def _sha256(path: Path) -> str:
+    """Returns the SHA-256 digest of a file's exact bytes."""
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def _sanitize(value: Any) -> Any:
+    """Recursively redacts values whose mapping keys indicate secrets."""
     if isinstance(value, dict):
         return {
             str(key): (
@@ -59,6 +71,7 @@ def _sanitize(value: Any) -> Any:
 
 
 def _write_sanitized(source: Path, destination: Path) -> None:
+    """Copies HTML or writes sanitized, deterministic JSON content."""
     if source.suffix == ".html":
         destination.write_text(source.read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
         return
@@ -74,6 +87,7 @@ def _write_sanitized(source: Path, destination: Path) -> None:
 
 
 def _read_payload(path: Path) -> Any:
+    """Reads an HTML, JSON Lines, or JSON artifact for semantic comparison."""
     if path.suffix == ".html":
         return path.read_text(encoding="utf-8")
     if path.suffix == ".jsonl":
@@ -82,6 +96,7 @@ def _read_payload(path: Path) -> Any:
 
 
 def _json_value(value: Any) -> Any:
+    """Converts models and model lists to JSON-compatible values."""
     if isinstance(value, BaseModel):
         return value.model_dump(mode="json")
     if isinstance(value, list):
@@ -90,7 +105,20 @@ def _json_value(value: Any) -> Any:
 
 
 def verify_primary_artifacts(run_root: Path, manifest: ExperimentManifest) -> None:
-    """Fail unless stored primary results equal an independent deterministic derivation."""
+    """Verifies stored primary results against an independent derivation.
+
+    Structured artifacts are compared semantically. The HTML report is regenerated
+    from the independently derived summary, estimates, and paired differences and
+    then compared byte-for-text with the stored report.
+
+    Args:
+        run_root: Scored run containing the primary artifacts.
+        manifest: Validated manifest governing the derivation.
+
+    Raises:
+        ValueError: If any stored primary artifact differs from its derivation.
+        OSError: If a required artifact cannot be read.
+    """
 
     expected = derive_primary_artifacts(
         paths=EvaluationPaths.discover(), run_root=run_root, manifest=manifest
@@ -114,7 +142,25 @@ def verify_primary_artifacts(run_root: Path, manifest: ExperimentManifest) -> No
 
 
 def seal_run(*, run_root: Path, release_root: Path) -> ReleaseManifest:
-    """Re-derive, sanitize, and content-address one final test-split run."""
+    """Seals one final test run into an empty release directory.
+
+    The run must be fully scored and adjudicated, belong to the test split, carry
+    its matching execution claim, and reproduce every primary artifact. JSON
+    artifacts are sanitized before per-file hashes and the closed file-set digest
+    are recorded in the release manifest.
+
+    Args:
+        run_root: Source directory containing the complete scored run.
+        release_root: Empty destination for sanitized release artifacts.
+
+    Returns:
+        The persisted content-addressed release manifest.
+
+    Raises:
+        ValueError: If the run is incomplete, non-final, not a claimed test run,
+            fails deterministic verification, or the destination is not empty.
+        OSError: If source artifacts cannot be read or release files cannot be written.
+    """
 
     missing = [name for name in RELEASE_FILES if not (run_root / name).is_file()]
     if missing:
@@ -157,7 +203,18 @@ def seal_run(*, run_root: Path, release_root: Path) -> ReleaseManifest:
 
 
 def verify_release(release_root: Path) -> ReleaseManifest:
-    """Verify a sealed release is complete, closed, and content-addressed."""
+    """Verifies the closed file set and all release content digests.
+
+    Args:
+        release_root: Directory containing a sealed release and its manifest.
+
+    Returns:
+        The validated release manifest.
+
+    Raises:
+        ValueError: If the file set, a file digest, or the aggregate digest differs.
+        OSError: If the release directory or one of its files cannot be read.
+    """
 
     manifest = ReleaseManifest.model_validate_json(
         (release_root / "manifest.json").read_text(encoding="utf-8")
