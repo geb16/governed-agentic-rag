@@ -16,6 +16,8 @@ from paired_agent_evaluation.adapters.storage.filesystem import atomic_json
 from paired_agent_evaluation.composition import EvaluationPaths, prepare_run
 from paired_agent_evaluation.domain.manifests import ExperimentManifest
 
+TEST_CLAIM_FILENAME = "test-claim.json"
+
 
 class _StubSettings:
     def __init__(self, **_: object) -> None:
@@ -34,7 +36,7 @@ def control_paths(tmp_path, monkeypatch) -> EvaluationPaths:
         release=tmp_path / "release",
         configs=real.configs,
     )
-    monkeypatch.setattr(composition_builder.EvaluationPaths, "discover", lambda: isolated_paths)
+    monkeypatch.setattr(EvaluationPaths, "discover", lambda: isolated_paths)
     monkeypatch.setattr(composition_builder, "Settings", _StubSettings)
     monkeypatch.setattr(
         composition_builder,
@@ -47,8 +49,9 @@ def control_paths(tmp_path, monkeypatch) -> EvaluationPaths:
         ),
     )
     monkeypatch.setattr(control_freeze, "HARNESS_MANIFEST", tmp_path / "harness-freeze.json")
-    monkeypatch.setattr(control_freeze, "TEST_EXECUTION_CLAIM", tmp_path / "test-claim.json")
-    monkeypatch.setattr(control_authorization, "TEST_EXECUTION_CLAIM", tmp_path / "test-claim.json")
+    claim_path = tmp_path / TEST_CLAIM_FILENAME
+    monkeypatch.setattr(control_freeze, "TEST_EXECUTION_CLAIM", claim_path)
+    monkeypatch.setattr(control_authorization, "TEST_EXECUTION_CLAIM", claim_path)
     monkeypatch.setattr(control_freeze, "verify_harness_readiness", lambda paths: None)
     return isolated_paths
 
@@ -130,9 +133,8 @@ def test_test_authorization_is_exact_and_consumed_once(control_paths) -> None:
         control.claim_test_execution(control_paths, run_id="run_test_different")
 
     claim = control.claim_test_execution(control_paths, run_id="run_test_once")
-    claim_payload = json.loads(
-        (control_paths.repository / control_authorization.TEST_EXECUTION_CLAIM).read_text()
-    )
+    claim_path = control_paths.artifacts.parent / TEST_CLAIM_FILENAME
+    claim_payload = json.loads(claim_path.read_text())
     assert claim_payload["test_run_id"] == claim.test_run_id
 
     with pytest.raises(ValueError, match="already been consumed"):
