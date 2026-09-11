@@ -68,7 +68,7 @@ def test_score_run_persists_derived_outputs_report_and_terminal_status(
         "paired-differences.json": [],
         "summary.json": summary,
     }
-    monkeypatch.setattr(reporting_scoring.EvaluationPaths, "discover", lambda: paths)
+    monkeypatch.setattr(EvaluationPaths, "discover", lambda: paths)
     monkeypatch.setattr(reporting_scoring, "derive_primary_artifacts", lambda **_: artifacts)
 
     assert reporting.score_run(run_id="run_reporting") == summary
