@@ -156,7 +156,7 @@ def prepare_run(
     )
     run_root = paths.run_root(run_id)
     settings = Settings(
-        _env_file=paths.repository / ".env",
+        _env_file=paths.repository / ".env", #pyright: ignore
         execution_profile="experiment",
         experiment_run_id=run_id,
         experiment_manifest_dir=run_root / "system-manifests",

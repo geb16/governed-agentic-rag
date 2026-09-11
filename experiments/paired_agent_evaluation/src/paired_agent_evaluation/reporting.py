@@ -341,7 +341,7 @@ async def _grade_ragas(run_id: str) -> list[SecondaryGrade]:
     run_root = paths.run_root(run_id)
     raw = RawFilesystemStore(run_root / "raw" / "observations").read_all()
     manifest = json.loads((run_root / "run-manifest.json").read_text(encoding="utf-8"))
-    settings = Settings(_env_file=paths.repository / ".env")
+    settings = Settings(_env_file=paths.repository / ".env") #pyright: ignore
     if settings.openai_api_key is None:
         raise ValueError("RAG_OPENAI_API_KEY is required for secondary Ragas grading")
     grader = RagasFaithfulnessGrader(
