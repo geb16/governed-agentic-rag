@@ -1,4 +1,16 @@
-# Composition root for the independently versioned Phase-6 harness.
+"""Wire the evaluation harness and establish reproducible run identity.
+
+The composition root binds application ports to concrete adapters, freezes runtime
+and input identities, and rejects path escapes or drift when resuming a run.
+
+References:
+    [1] Alistair Cockburn, "Hexagonal Architecture."
+        https://alistair.cockburn.us/hexagonal-architecture
+    [2] NIST, "AI Risk Management Framework Core," Measure 2.1.
+        https://airc.nist.gov/airmf-resources/airmf/5-sec-core/
+    [3] OWASP, "Input Validation Cheat Sheet."
+        https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html
+"""
 
 from __future__ import annotations
 
@@ -37,7 +49,7 @@ from paired_agent_evaluation.experiment_control import claim_test_execution
 
 @dataclass(frozen=True, slots=True)
 class EvaluationPaths:
-    """Resolve repository-owned inputs and isolated Phase 6 artifact roots."""
+    """Locates repository inputs and isolated evaluation artifact roots."""
 
     repository: Path
     project: Path
@@ -47,6 +59,7 @@ class EvaluationPaths:
 
     @classmethod
     def discover(cls) -> EvaluationPaths:
+        """Discovers evaluation paths relative to this installed source file."""
         repository = Path(__file__).resolve().parents[4]
         project = repository / "experiments" / "paired_agent_evaluation"
         return cls(
@@ -58,28 +71,39 @@ class EvaluationPaths:
         )
 
     def run_root(self, run_id: str) -> Path:
+        """Returns the artifact directory for a validated run identifier.
+
+        Raises:
+            ValueError: If the identifier could escape or alias the run namespace.
+        """
         validate_run_id(run_id)
         return self.artifacts / run_id
 
 
 def validate_run_id(run_id: str) -> None:
-    """Reject run identifiers that could escape the artifact directory."""
+    """Validates a run identifier against the artifact-name allowlist.
+
+    Raises:
+        ValueError: If the identifier is empty, malformed, or contains path syntax.
+    """
 
     if re.fullmatch(r"run_[A-Za-z0-9_-]+", run_id) is None:
         raise ValueError("run_id must match run_[A-Za-z0-9_-]+")
 
 
 def _json(path: Path) -> Any:
+    """Loads one UTF-8 JSON artifact."""
     return json.loads(path.read_text(encoding="utf-8"))
 
 
 def load_experiment_config(paths: EvaluationPaths) -> ExperimentConfig:
-    """Load and validate the preregistered experiment configuration."""
+    """Loads and validates the preregistered experiment configuration."""
 
     return ExperimentConfig.model_validate(_json(paths.configs / "experiment.json"))
 
 
 def _freeze(path: Path) -> dict[str, Any]:
+    """Loads a freeze manifest and requires a JSON object."""
     payload = _json(path)
     if not isinstance(payload, dict):
         raise ValueError(f"Freeze manifest must be an object: {path}")
@@ -87,6 +111,7 @@ def _freeze(path: Path) -> dict[str, Any]:
 
 
 def _schedule_hash(schedule: list[ScheduledExecution]) -> str:
+    """Returns the canonical digest of the serialized schedule."""
     return sha256_json([item.model_dump(mode="json") for item in schedule])
 
 
@@ -95,7 +120,26 @@ def prepare_run(
     run_id: str,
     split: DatasetSplit,
 ) -> tuple[EvaluationPaths, list[ScheduledExecution], ExperimentManifest, Settings]:
-    """Create or validate the immutable identity and schedule for one run."""
+    """Creates or validates the reproducibility boundary for one run.
+
+    Preparation resolves the frozen dataset and configuration, builds the paired
+    schedule, captures runtime and dependency identity, and persists a private
+    blinding plan. Resuming is idempotent only when immutable manifest fields,
+    schedule content, and blinding assignments still match current inputs.
+
+    Args:
+        run_id: Valid artifact identity beginning with run_.
+        split: Frozen dataset split to prepare.
+
+    Returns:
+        Paths, schedule, persisted manifest, and experiment settings.
+
+    Raises:
+        ValueError: If inputs violate the frozen configuration, an existing run is
+            unmanaged or incomplete, or any immutable identity has drifted.
+        OSError: If required inputs or run artifacts cannot be read or written.
+        importlib.metadata.PackageNotFoundError: If a tracked package is unavailable.
+    """
 
     paths = EvaluationPaths.discover()
     validate_run_id(run_id)
@@ -211,6 +255,23 @@ def _acquire(
     split: DatasetSplit,
     test_claim: TestExecutionClaim | None = None,
 ) -> ExperimentManifest:
+    """Runs acquisition through concrete adapters and records completion.
+
+    Test acquisition additionally requires a matching consumed execution claim,
+    which is persisted before either evaluated system is invoked.
+
+    Args:
+        run_id: Prepared run identity.
+        split: Dataset split to acquire.
+        test_claim: Consumed one-time claim required for the test split.
+
+    Returns:
+        The run manifest updated with acquisition counts.
+
+    Raises:
+        ValueError: If test acquisition lacks a matching claim or preparation fails.
+        RuntimeError: If acquisition cannot safely execute or resume an observation.
+    """
     paths, schedule, manifest, settings = prepare_run(run_id=run_id, split=split)
     config = load_experiment_config(paths)
     cases = EvaluationDataset(paths.repository).cases(split)
@@ -245,7 +306,11 @@ def _acquire(
 
 
 def acquire(*, run_id: str, split: DatasetSplit) -> ExperimentManifest:
-    """Acquire validation observations while reserving test access for the locked path."""
+    """Acquires non-test observations through the resumable harness.
+
+    Raises:
+        ValueError: If split is the protected test split.
+    """
 
     if split == DatasetSplit.TEST:
         raise ValueError("Test acquisition requires the preregistered one-time execution gate")
@@ -253,7 +318,7 @@ def acquire(*, run_id: str, split: DatasetSplit) -> ExperimentManifest:
 
 
 def acquire_preregistered_test(*, run_id: str) -> ExperimentManifest:
-    """Claim the single preregistered test execution before invoking either system."""
+    """Consumes the preregistered test claim, then acquires the test split."""
 
     paths = EvaluationPaths.discover()
     claim = claim_test_execution(paths, run_id=run_id)
