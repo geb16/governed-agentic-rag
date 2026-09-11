@@ -1,4 +1,14 @@
-"""Ports separating the experiment core from systems, graders, and storage."""
+"""Define structural ports between application policy and external adapters.
+
+The protocols keep acquisition independent of system and storage implementations,
+including the durable acceptance signal used to prevent unsafe invocation retries.
+
+References:
+    [1] Alistair Cockburn, "Hexagonal Architecture."
+        https://alistair.cockburn.us/hexagonal-architecture
+    [2] Python Enhancement Proposal 544, "Protocols: Structural subtyping."
+        https://peps.python.org/pep-0544/
+"""
 
 from __future__ import annotations
 
@@ -13,7 +23,7 @@ from paired_agent_evaluation.domain.observations import RawExecution
 
 
 class AcceptanceRecorder(Protocol):
-    """Durably record when rerunning an invocation becomes unsafe."""
+    """Records when provider acceptance makes an invocation unsafe to retry."""
 
     @property
     def accepted(self) -> bool: ...
@@ -22,7 +32,7 @@ class AcceptanceRecorder(Protocol):
 
 
 class AttemptJournal(AcceptanceRecorder, Protocol):
-    """Expose one durable attempt without binding policy to a storage adapter."""
+    """Exposes durable state and workspace for one acquisition attempt."""
 
     @property
     def workspace(self) -> Path: ...
@@ -36,7 +46,7 @@ class AttemptJournal(AcceptanceRecorder, Protocol):
 
 
 class AttemptJournalStore(Protocol):
-    """Create and enumerate journals for a scheduled observation."""
+    """Creates and enumerates attempt journals for an observation."""
 
     def list(self, observation_id: str) -> Sequence[AttemptJournal]: ...
 
@@ -44,6 +54,8 @@ class AttemptJournalStore(Protocol):
 
 
 class SystemRunner(Protocol):
+    """Executes scheduled cases against one experiment condition."""
+
     def execute(
         self,
         case: EvaluationCase,
@@ -51,12 +63,22 @@ class SystemRunner(Protocol):
         workspace: Path,
         *,
         acceptance: AcceptanceRecorder,
-    ) -> RawExecution: ...
+    ) -> RawExecution:
+        """Executes a case and records provider acceptance before risky work."""
+        ...
 
 
 class RawExecutionStore(Protocol):
-    def exists(self, observation_id: str) -> bool: ...
+    """Persists and retrieves raw executions by observation identity."""
 
-    def write(self, execution: RawExecution) -> Path: ...
+    def exists(self, observation_id: str) -> bool:
+        """Reports whether an observation has already been persisted."""
+        ...
 
-    def read_all(self) -> list[RawExecution]: ...
+    def write(self, execution: RawExecution) -> Path:
+        """Persists an execution and returns its artifact path."""
+        ...
+
+    def read_all(self) -> list[RawExecution]:
+        """Returns every persisted raw execution in stable adapter order."""
+        ...
