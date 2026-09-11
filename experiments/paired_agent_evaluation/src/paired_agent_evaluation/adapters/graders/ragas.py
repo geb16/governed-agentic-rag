@@ -1,8 +1,16 @@
-"""Provides secondary faithfulness grading through pinned Ragas 0.4 APIs.
+"""Provide secondary faithfulness grading through pinned Ragas 0.4 APIs.
 
-The adapter evaluates whether a response is supported by its retrieved
-contexts. Scores are diagnostic supplements to the registered human review and
-must not be used as replacements for primary adjudication.
+The adapter connects an asynchronous OpenAI client to Ragas and measures whether
+response claims are supported by retrieved context. Results are diagnostic and do
+not replace registered human adjudication.
+
+References:
+    [1] OpenAI, "OpenAI Python API library," Async usage.
+        https://github.com/openai/openai-python#async-usage
+    [2] Ragas, "LLMs," llm_factory.
+        https://docs.ragas.io/en/stable/references/llms/
+    [3] Ragas, "Faithfulness."
+        https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/faithfulness/
 """
 
 from __future__ import annotations
@@ -15,16 +23,16 @@ from ragas.metrics.collections import Faithfulness
 
 
 class RagasFaithfulnessGrader:
-    """Evaluates response faithfulness with a configured language model.
+    """Evaluates response faithfulness with an asynchronous OpenAI model.
 
-    The grader disables Ragas telemetry by default and delegates asynchronous
-    evaluation to the Ragas ``Faithfulness`` metric. Provider and metric errors
-    are allowed to propagate so callers cannot mistake a failed grade for a
-    valid score.
+    Unless already configured by the environment, construction disables Ragas
+    telemetry. The supplied client is wrapped by llm_factory and bound to one
+    Faithfulness metric instance. OpenAI and Ragas failures propagate so an
+    unavailable grade cannot be mistaken for a valid result.
 
     Args:
-        api_key: OpenAI API key used by the asynchronous model client.
-        model: Model identifier passed to the Ragas language-model factory.
+        api_key: Credential passed directly to AsyncOpenAI.
+        model: OpenAI model identifier passed to the Ragas LLM factory.
     """
 
     def __init__(self, *, api_key: str, model: str) -> None:
@@ -39,7 +47,7 @@ class RagasFaithfulnessGrader:
         response: str,
         contexts: list[str],
     ) -> tuple[float, str]:
-        """Scores how faithfully a response reflects its retrieved contexts.
+        """Scores whether response claims are supported by retrieved contexts.
 
         Args:
             query: User request that elicited the response.
@@ -47,8 +55,8 @@ class RagasFaithfulnessGrader:
             contexts: Retrieved passages offered as supporting evidence.
 
         Returns:
-            A pair containing the numeric faithfulness score and the grader's
-            rationale. The rationale is an empty string when Ragas omits it.
+            A (score, reason) pair. Score is the Ragas faithfulness value in the
+            range zero to one; reason is empty when Ragas provides none.
         """
         result = await self._metric.ascore(
             user_input=query,
