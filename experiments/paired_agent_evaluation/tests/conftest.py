@@ -13,6 +13,10 @@ from app.governance.contracts import (
     ClassificationDraft,
     GovernedFinalDraft,
     ProposedActionDraft,
+    ProposedActionKind,
+    Sensitivity,
+    TaskIntent,
+    TaskType,
 )
 from app.governance.llm import ModelResult
 
@@ -58,9 +62,9 @@ class GovernedAnswerModel:
     def classify(self, *_: Any, **__: Any) -> ModelResult[ClassificationDraft]:
         return ModelResult(
             ClassificationDraft(
-                intent="information",
-                task_type="read_only",
-                sensitivity="low",
+                intent=TaskIntent.INFORMATION,
+                task_type=TaskType.READ_ONLY,
+                sensitivity=Sensitivity.LOW,
                 confidence=1.0,
                 summary="Read-only policy question.",
             ),
@@ -71,7 +75,7 @@ class GovernedAnswerModel:
     def propose(self, *_: Any, **__: Any) -> ModelResult[ProposedActionDraft]:
         return ModelResult(
             ProposedActionDraft(
-                kind="respond",
+                kind=ProposedActionKind.RESPOND,
                 response_text="A supported response is available.",
                 confidence=1.0,
                 rationale="Retrieved policy answers the request.",
