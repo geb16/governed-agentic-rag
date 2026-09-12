@@ -49,3 +49,14 @@ significance claim, or selective reporting of metrics or strata.
 Stored scores, estimates, paired differences, and summaries are derived artifacts. Release sealing
 recomputes them from the raw observations, frozen schedule and rubric, private blinding plan, and
 resolved adjudications, then rejects any mismatch before sanitization and content-addressing.
+
+## Implementation ownership
+
+- `application/adjudication.py` defines blinding, review construction, and field-level resolution.
+- `application/scoring.py` produces frozen per-observation metric contributions.
+- `application/statistics.py` computes condition estimates and paired bootstrap differences.
+- `reporting/derivation.py` assembles primary artifacts from authoritative inputs.
+- `reporting/scoring.py` persists artifacts, renders HTML, and advances run status.
+- `reporting/secondary_grading.py` owns optional Ragas diagnostics, separate from primary results.
+- `release/verification.py` independently repeats primary derivation before sealing.
+- `release/sealing.py` enforces final test-run eligibility and writes the sanitized release.
