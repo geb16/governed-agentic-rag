@@ -1,6 +1,9 @@
+"""Verify composition builds reproducible runs and enforces execution gates."""
+
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pytest
 from app.evaluation.dataset.enums import DatasetSplit
@@ -11,7 +14,7 @@ from paired_agent_evaluation.composition import EvaluationPaths, acquire, prepar
 
 
 class _StubSettings:
-    """Stand in for the parts of ``app.core.config.Settings`` composition.py reads."""
+    """Provide the settings subset consumed by the composition builder."""
 
     def __init__(self, *, openai_model: str = "gpt-5.6", **_: object) -> None:
         self.retrieval_backend = "qdrant"
@@ -20,8 +23,8 @@ class _StubSettings:
 
 
 @pytest.fixture
-def isolated_paths(tmp_path) -> EvaluationPaths:
-    """Real repository, config, and dataset; artifacts confined to ``tmp_path``."""
+def isolated_paths(tmp_path: Path) -> EvaluationPaths:
+    """Use real inputs while confining generated artifacts to a temporary root."""
 
     real = EvaluationPaths.discover()
     return EvaluationPaths(
@@ -34,7 +37,11 @@ def isolated_paths(tmp_path) -> EvaluationPaths:
 
 
 @pytest.fixture(autouse=True)
-def _stub_settings(monkeypatch, isolated_paths) -> None:
+def _stub_settings(
+    monkeypatch: pytest.MonkeyPatch,
+    isolated_paths: EvaluationPaths,
+) -> None:
+    """Isolate external runtime identity and settings dependencies."""
     monkeypatch.setattr(EvaluationPaths, "discover", lambda: isolated_paths)
     monkeypatch.setattr(composition_builder, "Settings", _StubSettings)
     monkeypatch.setattr(
@@ -49,7 +56,10 @@ def _stub_settings(monkeypatch, isolated_paths) -> None:
     )
 
 
-def test_prepare_run_is_idempotent_for_an_unchanged_repeat(isolated_paths) -> None:
+def test_prepare_run_is_idempotent_for_an_unchanged_repeat(
+    isolated_paths: EvaluationPaths,
+) -> None:
+    """Reuse an unchanged run without regenerating its private blinding plan."""
     _, _, first, _ = prepare_run(run_id="run_composition_test", split=DatasetSplit.VALIDATION)
     plan_path = isolated_paths.run_root("run_composition_test") / "blinding-plan.json"
     original_plan = plan_path.read_bytes()
@@ -59,7 +69,8 @@ def test_prepare_run_is_idempotent_for_an_unchanged_repeat(isolated_paths) -> No
     assert plan_path.read_bytes() == original_plan
 
 
-def test_prepare_run_rejects_blinding_plan_drift(isolated_paths) -> None:
+def test_prepare_run_rejects_blinding_plan_drift(isolated_paths: EvaluationPaths) -> None:
+    """Reject reuse when persisted blinding assignments no longer match."""
     prepare_run(run_id="run_blinding_drift", split=DatasetSplit.VALIDATION)
     plan_path = isolated_paths.run_root("run_blinding_drift") / "blinding-plan.json"
     plan = json.loads(plan_path.read_text(encoding="utf-8"))
@@ -71,7 +82,11 @@ def test_prepare_run_rejects_blinding_plan_drift(isolated_paths) -> None:
         prepare_run(run_id="run_blinding_drift", split=DatasetSplit.VALIDATION)
 
 
-def test_prepare_run_rejects_drift_in_an_existing_run_manifest(monkeypatch, isolated_paths) -> None:
+def test_prepare_run_rejects_drift_in_an_existing_run_manifest(
+    monkeypatch: pytest.MonkeyPatch,
+    isolated_paths: EvaluationPaths,
+) -> None:
+    """Reject reuse when current configuration differs from the run manifest."""
     prepare_run(run_id="run_composition_drift", split=DatasetSplit.VALIDATION)
 
     monkeypatch.setattr(
@@ -84,8 +99,9 @@ def test_prepare_run_rejects_drift_in_an_existing_run_manifest(monkeypatch, isol
         prepare_run(run_id="run_composition_drift", split=DatasetSplit.VALIDATION)
 
 
-# Testing if drifts in visual report can be detected
-def test_prepare_run_rejects_runtime_identity_drift(monkeypatch) -> None:
+def test_prepare_run_rejects_runtime_identity_drift(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Prevent reuse after settings, tool schemas, or Qdrant content changes."""
 
     prepare_run(run_id="run_runtime_drift", split=DatasetSplit.VALIDATION)
@@ -105,5 +121,6 @@ def test_prepare_run_rejects_runtime_identity_drift(monkeypatch) -> None:
 
 
 def test_generic_acquisition_cannot_bypass_the_test_execution_gate() -> None:
+    """Require the preregistered one-time path for test-split acquisition."""
     with pytest.raises(ValueError, match="preregistered one-time execution gate"):
         acquire(run_id="run_unregistered_test", split=DatasetSplit.TEST)
