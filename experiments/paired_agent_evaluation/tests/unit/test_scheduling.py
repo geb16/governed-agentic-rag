@@ -1,3 +1,5 @@
+"""Verify deterministic counterbalancing of paired execution conditions."""
+
 import hashlib
 
 from paired_agent_evaluation.application.scheduling import condition_order
@@ -5,6 +7,7 @@ from paired_agent_evaluation.domain.executions import Condition
 
 
 def test_condition_order_matches_frozen_digest_rule() -> None:
+    """Alternate each case's seeded first condition across repetitions."""
     case_id = "case_eval_0001"
     expected_first = (
         (Condition.BASELINE, Condition.GOVERNED)
