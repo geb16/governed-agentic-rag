@@ -1,4 +1,10 @@
+"""Verify blinded review ordering and independent adjudication resolution."""
+
+from __future__ import annotations
+
 import secrets
+
+import pytest
 
 from paired_agent_evaluation.application.adjudication import (
     BlindingPlan,
@@ -12,11 +18,16 @@ from paired_agent_evaluation.domain.scores import Adjudication, ResolvedAdjudica
 
 
 class _ReverseRandom:
+    """Provide deterministic reverse ordering at the randomness boundary."""
+
     def shuffle(self, values: list[str]) -> None:
         values.reverse()
 
 
-def test_blinding_plan_uses_random_opaque_ids_and_an_independent_order(monkeypatch) -> None:
+def test_blinding_plan_uses_random_opaque_ids_and_an_independent_order(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Assign opaque tokens and randomize review order independently of identity."""
     tokens = iter(("1" * 32, "2" * 32))
     monkeypatch.setattr(secrets, "token_hex", lambda _: next(tokens))
     monkeypatch.setattr(secrets, "SystemRandom", _ReverseRandom)
@@ -32,6 +43,7 @@ def test_blinding_plan_uses_random_opaque_ids_and_an_independent_order(monkeypat
 
 
 def test_review_packet_follows_private_plan_order() -> None:
+    """Order reviewer-visible items using only the persisted private plan."""
     first = "case_eval_0001__r1__baseline"
     second = "case_eval_0001__r1__governed"
     plan = BlindingPlan(
@@ -63,9 +75,8 @@ def test_review_packet_follows_private_plan_order() -> None:
     ]
 
 
-# Testing that two independent reviews with the same blinded_id and the same
-# observed_route value resolve to that value.
 def test_two_independent_matching_reviews_resolve() -> None:
+    """Resolve a field when two distinct reviewers submit the same decision."""
     reviews = [
         Adjudication(
             blinded_id="blind_1",
@@ -78,6 +89,7 @@ def test_two_independent_matching_reviews_resolve() -> None:
             observed_route=ObservedRoute.ANSWER,
         ),
     ]
+
     assert resolve_reviews(reviews)["blind_1"].observed_route == ObservedRoute.ANSWER
 
 
@@ -96,6 +108,7 @@ def test_reviewers_must_independently_decide_each_resolved_field() -> None:
 
 
 def test_independently_dual_reviewed_fields_resolve_together() -> None:
+    """Combine fields independently supported by different reviewer pairs."""
     reviews = [
         Adjudication(
             blinded_id="blind_1",
@@ -118,14 +131,15 @@ def test_independently_dual_reviewed_fields_resolve_together() -> None:
     assert decision.reviewer_count == 3
 
 
-# Testing that two independent reviews with the same blinded_id but different observed_route values
-# do not resolve without an explicit resolution provided.
 def test_disagreement_requires_explicit_resolution() -> None:
+    """Leave disagreement unresolved until an explicit resolution is supplied."""
     reviews = [
         Adjudication(blinded_id="blind_1", reviewer_id="r1", claim_support_passed=True),
         Adjudication(blinded_id="blind_1", reviewer_id="r2", claim_support_passed=False),
     ]
+
     assert resolve_reviews(reviews) == {}
+
     resolution = ResolvedAdjudication(
         blinded_id="blind_1",
         claim_support_passed=False,
@@ -133,4 +147,5 @@ def test_disagreement_requires_explicit_resolution() -> None:
         disagreement_resolved=True,
         resolution_notes="Unsupported material claim.",
     )
+
     assert resolve_reviews(reviews, resolutions=[resolution])["blind_1"] == resolution
