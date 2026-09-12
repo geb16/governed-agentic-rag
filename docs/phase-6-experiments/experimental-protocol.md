@@ -44,6 +44,12 @@ Before sealing, the harness validates the exact scheduled observation identities
 rederives every primary result artifact. A stored count, status, or summary is never sufficient
 evidence of a valid result.
 
+The implementation separates these controls by lifecycle responsibility. `composition/` prepares
+run identity and wires acquisition; `experiment_control/` verifies readiness, freezes the harness,
+and consumes the one-time test authorization; `reporting/` derives primary artifacts and runs
+optional secondary grading; and `release/` independently verifies, sanitizes, and seals the final
+test result. Package `__init__.py` files provide stable APIs for the CLI scripts.
+
 ## Registered analysis rules
 
 - Report all 14 Phase 5 metrics separately; do not construct a post-hoc composite.
