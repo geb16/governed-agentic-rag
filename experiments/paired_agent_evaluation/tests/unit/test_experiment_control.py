@@ -1,8 +1,9 @@
-# Tests for Phase-6 freeze and one-time test-execution controls.
+"""Verify harness freezing and one-time authorization of test execution."""
 
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pytest
 from app.evaluation.dataset.enums import DatasetSplit
@@ -20,6 +21,8 @@ TEST_CLAIM_FILENAME = "test-claim.json"
 
 
 class _StubSettings:
+    """Provide deterministic settings used while preparing control fixtures."""
+
     def __init__(self, **_: object) -> None:
         self.retrieval_backend = "qdrant"
         self.qdrant_collection = "phase3_enterprise_kb"
@@ -27,7 +30,8 @@ class _StubSettings:
 
 
 @pytest.fixture
-def control_paths(tmp_path, monkeypatch) -> EvaluationPaths:
+def control_paths(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> EvaluationPaths:
+    """Isolate manifests, freezes, and claims from repository state."""
     real = EvaluationPaths.discover()
     isolated_paths = EvaluationPaths(
         repository=real.repository,
@@ -57,6 +61,7 @@ def control_paths(tmp_path, monkeypatch) -> EvaluationPaths:
 
 
 def _complete_validation(paths: EvaluationPaths, run_id: str) -> None:
+    """Persist the minimum finalized validation evidence required for freezing."""
     _, _, manifest, _ = prepare_run(run_id=run_id, split=DatasetSplit.VALIDATION)
     completed = manifest.model_copy(
         update={
@@ -78,9 +83,10 @@ def _complete_validation(paths: EvaluationPaths, run_id: str) -> None:
     )
 
 
-# Testing the harness freeze is written and verified correctly,
-# and that the test run ID is correctly recorded in the freeze.
-def test_harness_freeze_pins_validation_and_one_test_identity(control_paths) -> None:
+def test_harness_freeze_pins_validation_and_one_test_identity(
+    control_paths: EvaluationPaths,
+) -> None:
+    """Bind a verified harness freeze to validation and one test identity."""
     _complete_validation(control_paths, "run_validation_complete")
 
     written = control.write_harness_freeze(
@@ -95,7 +101,8 @@ def test_harness_freeze_pins_validation_and_one_test_identity(control_paths) -> 
     assert verified.validation_run_id == "run_validation_complete"
 
 
-def test_harness_freeze_requires_completed_validation(control_paths) -> None:
+def test_harness_freeze_requires_completed_validation(control_paths: EvaluationPaths) -> None:
+    """Reject harness freezing without finalized validation evidence."""
     with pytest.raises(ValueError, match="Validation must have"):
         control.write_harness_freeze(
             control_paths,
@@ -104,9 +111,11 @@ def test_harness_freeze_requires_completed_validation(control_paths) -> None:
         )
 
 
-# Testing that the harness freeze verification fails if the source code has
-# changed since the freeze was written.
-def test_harness_verification_rejects_source_drift(control_paths, monkeypatch) -> None:
+def test_harness_verification_rejects_source_drift(
+    control_paths: EvaluationPaths,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Reject a freeze after its committed source files change."""
     _complete_validation(control_paths, "run_validation_drift")
     control.write_harness_freeze(
         control_paths,
@@ -119,9 +128,10 @@ def test_harness_verification_rejects_source_drift(control_paths, monkeypatch) -
         control.verify_harness_freeze(control_paths)
 
 
-# checking if the test execution claim is only valid for the specific test run ID and
-# can only be consumed once.
-def test_test_authorization_is_exact_and_consumed_once(control_paths) -> None:
+def test_test_authorization_is_exact_and_consumed_once(
+    control_paths: EvaluationPaths,
+) -> None:
+    """Authorize only the preregistered test identity and consume it once."""
     _complete_validation(control_paths, "run_validation_gate")
     control.write_harness_freeze(
         control_paths,
@@ -141,8 +151,10 @@ def test_test_authorization_is_exact_and_consumed_once(control_paths) -> None:
         control.claim_test_execution(control_paths, run_id="run_test_once")
 
 
-# Checking that if a test run has already been executed and recorded in the manifest,
-def test_prior_test_manifest_blocks_the_preregistered_test_run(control_paths) -> None:
+def test_prior_test_manifest_blocks_the_preregistered_test_run(
+    control_paths: EvaluationPaths,
+) -> None:
+    """Block authorization when any prior test manifest proves execution occurred."""
     validation_id = "run_validation_prior"
     _complete_validation(control_paths, validation_id)
     control.write_harness_freeze(
