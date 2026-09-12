@@ -1,3 +1,8 @@
+"""Verify canonical observation projection from condition-specific executions."""
+
+from __future__ import annotations
+
+from collections.abc import Mapping
 from datetime import UTC, datetime
 
 import pytest
@@ -14,17 +19,18 @@ from paired_agent_evaluation.domain.observations import (
 )
 
 
-def _raw(condition: Condition, response: dict) -> RawExecution:
-    now = datetime.now(UTC)
+def _raw_execution(condition: Condition, response: Mapping[str, object]) -> RawExecution:
+    """Build an accepted execution for normalization tests."""
+    recorded_at = datetime(2025, 1, 1, tzinfo=UTC)
     return RawExecution(
         key=ExecutionKey(case_id="case_eval_0001", repetition=1, condition=condition),
         acceptance=AcceptanceStatus.ACCEPTED,
         request_accepted=True,
-        started_at=now,
-        completed_at=now,
+        started_at=recorded_at,
+        completed_at=recorded_at,
         latency_ms=1,
         request={"query": "question"},
-        response=response,
+        response=dict(response),
         retrieved=[
             RetrievedEvidence(
                 chunk_id="chunk-1",
@@ -41,13 +47,15 @@ def _raw(condition: Condition, response: dict) -> RawExecution:
 
 
 def test_normalization_preserves_chunk_level_context_and_trace_projection() -> None:
+    """Preserve retrieval provenance and trusted trace facts in canonical form."""
     response = {
         "status": "completed",
         "answer": "Evidence",
         "_evaluation_cited_evidence_ids": ["chunk-1"],
     }
     observation = normalize(
-        _raw(Condition.GOVERNED, response), trace_facts=["classification_recorded"]
+        _raw_execution(Condition.GOVERNED, response),
+        trace_facts=["classification_recorded"],
     )
     assert observation.observed_route == ObservedRoute.ANSWER
     assert observation.citation_membership_valid is True
@@ -56,7 +64,8 @@ def test_normalization_preserves_chunk_level_context_and_trace_projection() -> N
 
 
 def test_normalization_preserves_audit_integrity_and_requires_correlation() -> None:
-    raw = _raw(
+    """Expose audit integrity only when invocation identifiers correlate."""
+    raw = _raw_execution(
         Condition.GOVERNED,
         {
             "status": "completed",
@@ -104,7 +113,12 @@ def test_normalization_preserves_audit_integrity_and_requires_correlation() -> N
         ({"status": "completed", "answer": "Text"}, None, True),
     ],
 )
-def test_baseline_route_normalization(response, route, needs_review) -> None:
-    observation = normalize(_raw(Condition.BASELINE, response))
+def test_baseline_route_normalization(
+    response: dict[str, object],
+    route: ObservedRoute | None,
+    needs_review: bool,
+) -> None:
+    """Map explicit baseline outcomes and defer ambiguous answers to review."""
+    observation = normalize(_raw_execution(Condition.BASELINE, response))
     assert observation.observed_route == route
     assert observation.route_requires_adjudication is needs_review
