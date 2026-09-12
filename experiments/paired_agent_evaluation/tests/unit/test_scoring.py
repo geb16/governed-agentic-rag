@@ -1,23 +1,31 @@
+"""Verify metric eligibility and outcomes for canonical observations."""
+
+from __future__ import annotations
+
 from app.evaluation.dataset.enums import DatasetSplit
+from app.evaluation.dataset.models import EvaluationCase
 
 from paired_agent_evaluation.adapters.dataset import EvaluationDataset
 from paired_agent_evaluation.application.adjudication import BlindingPlan, blinded_id
 from paired_agent_evaluation.application.scoring import score_observation
+from paired_agent_evaluation.composition import EvaluationPaths
 from paired_agent_evaluation.domain.executions import Condition, ExecutionKey
 from paired_agent_evaluation.domain.observations import (
     AcceptanceStatus,
     NormalizedObservation,
     ObservedRoute,
 )
-from paired_agent_evaluation.domain.scores import ResolvedAdjudication
+from paired_agent_evaluation.domain.scores import MetricContribution, ResolvedAdjudication
 
 
-def _case(paths, case_id):
+def _case(paths: EvaluationPaths, case_id: str) -> EvaluationCase:
+    """Load one validation case by its stable identifier."""
     cases = EvaluationDataset(paths.repository).cases(DatasetSplit.VALIDATION)
     return next(case for case in cases if case.case_id == case_id)
 
 
-def _blinding_plan(observation) -> BlindingPlan:
+def _blinding_plan(observation: NormalizedObservation) -> BlindingPlan:
+    """Create a valid single-observation blinding plan."""
     observation_id = observation.key.observation_id
     return BlindingPlan(
         assignments={observation_id: f"blind_{'a' * 32}"},
@@ -25,7 +33,14 @@ def _blinding_plan(observation) -> BlindingPlan:
     )
 
 
-def _metrics(case, observation, reviews=None, *, plan=None):
+def _metrics(
+    case: EvaluationCase,
+    observation: NormalizedObservation,
+    reviews: dict[str, ResolvedAdjudication] | None = None,
+    *,
+    plan: BlindingPlan | None = None,
+) -> dict[str, MetricContribution]:
+    """Score an observation and index its contributions by metric."""
     return {
         item.metric_id: item
         for item in score_observation(
@@ -37,7 +52,10 @@ def _metrics(case, observation, reviews=None, *, plan=None):
     }
 
 
-def test_groundedness_requires_membership_and_human_claim_support(paths) -> None:
+def test_groundedness_requires_membership_and_human_claim_support(
+    paths: EvaluationPaths,
+) -> None:
+    """Keep groundedness pending until eligible citations pass human review."""
     case = _case(paths, "case_eval_0002")
     observation = NormalizedObservation(
         key=ExecutionKey(case_id=case.case_id, repetition=1, condition=Condition.BASELINE),
@@ -69,7 +87,10 @@ def test_groundedness_requires_membership_and_human_claim_support(paths) -> None
     assert scored["context_precision"].denominator == 2
 
 
-def test_governed_human_review_scores_approval_and_unsafe_prevention(paths) -> None:
+def test_governed_human_review_scores_approval_and_unsafe_prevention(
+    paths: EvaluationPaths,
+) -> None:
+    """Credit approved human routing and prevention of direct unsafe action."""
     case = _case(paths, "case_eval_0044")
     observation = NormalizedObservation(
         key=ExecutionKey(case_id=case.case_id, repetition=1, condition=Condition.GOVERNED),
