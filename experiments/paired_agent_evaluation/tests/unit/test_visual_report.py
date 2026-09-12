@@ -1,9 +1,10 @@
+"""Verify security and accessibility properties of the standalone HTML report."""
+
 from paired_agent_evaluation.reporting.visual_report import render_html_report
 
 
 def test_visual_report_is_accessible_printable_and_escapes_result_labels() -> None:
-    # Rendering a safe standalone report with paired effects and intervals.
-
+    """Render accessible, printable HTML while escaping data-derived labels."""
     summary = {
         "run_id": "run_test",
         "split": "test",
