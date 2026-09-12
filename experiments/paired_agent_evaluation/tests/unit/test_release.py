@@ -1,4 +1,9 @@
+"""Verify release sealing, sanitization, and content-integrity enforcement."""
+
+from __future__ import annotations
+
 import json
+from pathlib import Path
 
 import pytest
 
@@ -8,9 +13,11 @@ from paired_agent_evaluation.domain.manifests import ExperimentManifest
 from paired_agent_evaluation.release import RELEASE_FILES, seal_run, verify_release
 
 
-def _complete_run(root, *, split: str = "test") -> None:
+def _write_complete_run(root: Path, *, split: str = "test") -> None:
+    """Create the minimal finalized artifact set accepted by release sealing."""
     for name in RELEASE_FILES:
         path = root / name
+        payload: object
         if name == "run-manifest.json":
             payload = {
                 "run_id": "run_test",
@@ -60,11 +67,15 @@ def _complete_run(root, *, split: str = "test") -> None:
             path.write_text(json.dumps(payload), encoding="utf-8")
 
 
-def test_release_is_sanitized_closed_and_content_addressed(tmp_path, monkeypatch) -> None:
+def test_release_is_sanitized_closed_and_content_addressed(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Sanitize sensitive values, seal once, and detect post-seal mutation."""
     run_root = tmp_path / "run"
     release_root = tmp_path / "release"
     run_root.mkdir()
-    _complete_run(run_root)
+    _write_complete_run(run_root)
     monkeypatch.setattr(release_sealing, "verify_primary_artifacts", lambda *_: None)
     manifest = seal_run(run_root=run_root, release_root=release_root)
     assert manifest == verify_release(release_root)
@@ -77,29 +88,33 @@ def test_release_is_sanitized_closed_and_content_addressed(tmp_path, monkeypatch
         verify_release(release_root)
 
 
-def test_incomplete_or_unadjudicated_run_cannot_be_sealed(tmp_path) -> None:
+def test_incomplete_or_unadjudicated_run_cannot_be_sealed(tmp_path: Path) -> None:
+    """Reject release creation when required finalized artifacts are absent."""
     run_root = tmp_path / "run"
     run_root.mkdir()
     with pytest.raises(ValueError, match="missing"):
         seal_run(run_root=run_root, release_root=tmp_path / "release")
 
 
-def test_validation_split_cannot_be_sealed(tmp_path) -> None:
+def test_validation_split_cannot_be_sealed(tmp_path: Path) -> None:
     """The test split is not a tuning set; only it may ever be sealed."""
 
     run_root = tmp_path / "run"
     run_root.mkdir()
-    _complete_run(run_root, split="validation")
+    _write_complete_run(run_root, split="validation")
     with pytest.raises(ValueError, match="test-split"):
         seal_run(run_root=run_root, release_root=tmp_path / "release")
 
 
-def test_derived_artifact_drift_cannot_be_sealed(tmp_path, monkeypatch) -> None:
+def test_derived_artifact_drift_cannot_be_sealed(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Reject a scored run when recomputation disagrees with a primary artifact."""
 
     run_root = tmp_path / "run"
     run_root.mkdir()
-    _complete_run(run_root)
+    _write_complete_run(run_root)
     monkeypatch.setattr(
         release_verification,
         "derive_primary_artifacts",
@@ -110,13 +125,15 @@ def test_derived_artifact_drift_cannot_be_sealed(tmp_path, monkeypatch) -> None:
         seal_run(run_root=run_root, release_root=tmp_path / "release")
 
 
-# testing  if drifts in visual report can be detected
-def test_visual_report_drift_is_detected(tmp_path, monkeypatch) -> None:
+def test_visual_report_drift_is_detected(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Require the sealed visual report to match authoritative primary JSON."""
 
     run_root = tmp_path / "run"
     run_root.mkdir()
-    _complete_run(run_root)
+    _write_complete_run(run_root)
     manifest = ExperimentManifest.model_validate_json(
         (run_root / "run-manifest.json").read_text(encoding="utf-8")
     )
