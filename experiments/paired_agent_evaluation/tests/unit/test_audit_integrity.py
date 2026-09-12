@@ -1,3 +1,7 @@
+"""Verify that only integrity-checked audit data becomes evaluation evidence."""
+
+from __future__ import annotations
+
 from datetime import UTC, datetime
 
 import pytest
@@ -13,14 +17,19 @@ from paired_agent_evaluation.domain.observations import (
 )
 
 
-def _raw() -> RawExecution:
-    now = datetime.now(UTC)
+def _trusted_raw_execution() -> RawExecution:
+    """Build a governed execution with a valid, correlated audit envelope."""
+    recorded_at = datetime(2025, 1, 1, tzinfo=UTC)
     return RawExecution(
-        key=ExecutionKey(case_id="case_eval_0001", repetition=1, condition=Condition.GOVERNED),
+        key=ExecutionKey(
+            case_id="case_eval_0001",
+            repetition=1,
+            condition=Condition.GOVERNED,
+        ),
         acceptance=AcceptanceStatus.ACCEPTED,
         request_accepted=True,
-        started_at=now,
-        completed_at=now,
+        started_at=recorded_at,
+        completed_at=recorded_at,
         latency_ms=1,
         request={"request_id": "req-1", "query": "question"},
         response={
@@ -46,7 +55,7 @@ def _raw() -> RawExecution:
 
 def test_valid_audit_envelope_supports_trace_evidence() -> None:
     """Accept trace facts only when chain and invocation identities agree."""
-    raw = _raw()
+    raw = _trusted_raw_execution()
 
     assert has_trustworthy_audit(raw) is True
     assert normalize(raw).audit_correlation_valid is True
@@ -62,10 +71,20 @@ def test_valid_audit_envelope_supports_trace_evidence() -> None:
         ("audit_request_id", "req-other"),
         ("audit_trace_id", None),
     ],
+    ids=[
+        "invalid-chain",
+        "workflow-mismatch",
+        "trace-mismatch",
+        "request-mismatch",
+        "missing-trace-id",
+    ],
 )
-def test_untrusted_audit_envelope_cannot_claim_trace_facts(field, value) -> None:
+def test_untrusted_audit_envelope_cannot_claim_trace_facts(
+    field: str,
+    value: object,
+) -> None:
     """Fail closed for chain, correlation, and missing-identifier tampering."""
-    raw = _raw().model_copy(update={field: value})
+    raw = _trusted_raw_execution().model_copy(update={field: value})
 
     assert has_trustworthy_audit(raw) is False
     assert normalize(raw).audit_correlation_valid is False
