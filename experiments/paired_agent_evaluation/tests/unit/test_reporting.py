@@ -1,4 +1,11 @@
+"""Verify reporting orchestration persists a complete terminal run."""
+
+from __future__ import annotations
+
 import json
+from pathlib import Path
+
+import pytest
 
 import paired_agent_evaluation.reporting as reporting
 import paired_agent_evaluation.reporting.scoring as reporting_scoring
@@ -8,6 +15,7 @@ from paired_agent_evaluation.domain.manifests import ExperimentManifest
 
 
 def _manifest() -> ExperimentManifest:
+    """Build an acquired manifest ready for primary scoring."""
     return ExperimentManifest(
         run_id="run_reporting",
         split="validation",
@@ -35,7 +43,8 @@ def _manifest() -> ExperimentManifest:
 
 
 def test_score_run_persists_derived_outputs_report_and_terminal_status(
-    tmp_path, monkeypatch
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Cover reporting orchestration without duplicating pure scoring tests."""
 
