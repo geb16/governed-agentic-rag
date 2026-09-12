@@ -37,8 +37,9 @@ uses `baseline` and Phase 4 uses `governance` rather than phase numbers in code.
 
 ## Dependency and composition model
 
-The project follows the same feature-owned clean architecture as the frozen phases, scaled down to
-four layers under `src/paired_agent_evaluation/`:
+The project follows the same feature-owned clean architecture as the frozen phases. A three-layer
+core sits behind dedicated composition, experiment-control, reporting, and release boundaries under
+`src/paired_agent_evaluation/`:
 
 ```text
 domain/          Pydantic contracts: execution identities, the schedule, raw and normalized
@@ -52,10 +53,15 @@ adapters/        Concrete implementations of application ports:
                    storage/   — atomic, deterministic JSON/JSONL persistence
                    graders/   — RagasFaithfulnessGrader (secondary sensitivity analysis)
                    telemetry/ — trace-fact projection for audit-completeness scoring
-composition.py   The project's own composition root: path discovery, config loading, and
-                 prepare_run/acquire wiring. Independent of app.baseline_main/app.governed_main.
-release.py       Sanitization and content-addressed sealing of a completed run.
-reporting.py     Normalization, scoring, and release-packet generation over a run's raw results.
+composition/     Composition root: controlled paths, run identity, preparation, and acquisition
+                 wiring. Independent of app.baseline_main/app.governed_main.
+experiment_control/
+                 Harness readiness, provenance identity, freeze verification, and atomic
+                 authorization for the single preregistered test execution.
+reporting/       Primary artifact derivation, persistence and status transitions, optional
+                 secondary grading, and deterministic HTML rendering.
+release/         Release artifact policy, sanitization, independent verification, and
+                 content-addressed sealing of a completed test run.
 ```
 
 `tests/architecture/test_boundaries.py` enforces the two structural rules this implies:
@@ -85,9 +91,22 @@ without an internal decomposition mandate.
 | `adapters/storage` | Atomic JSON/JSONL persistence, canonical hashing, and the monotonic attempt journal | Retry policy or system execution |
 | `adapters/reproducibility.py` | Non-secret settings, tool-schema, and exact Qdrant point fingerprints | Acquisition or scoring policy |
 | `adapters/graders` | The pinned Ragas 0.4 secondary faithfulness call | Primary scoring |
-| `composition.py` | `EvaluationPaths`, config loading, `prepare_run`/`acquire` wiring | Reporting or sealing |
-| `release.py` | Independent rederivation checks, sanitization, content-addressed sealing and verification | Metric definitions or acquisition |
-| `scripts/*.py` | CLI entry points over `composition`/`reporting`/`release` | Business logic |
+| `composition/paths.py` | `EvaluationPaths` discovery and run-ID path policy | Run construction or acquisition |
+| `composition/identity.py` | Configuration, package, schedule, and manifest identities; resume-drift checks | Adapter execution |
+| `composition/builder.py` | `prepare_run` and reproducible run initialization | Observation acquisition |
+| `composition/acquisition.py` | Concrete runner/storage wiring and `acquire` entry points | Scoring or release policy |
+| `experiment_control/readiness.py` | Inherited freeze verification and schedule-cardinality gates | Harness persistence |
+| `experiment_control/identity.py` | Controlled source hashes and inherited/validation evidence identities | Test authorization |
+| `experiment_control/freeze.py` | Harness freeze creation and verification | Provider execution |
+| `experiment_control/authorization.py` | Atomic, one-time preregistered test claim | Harness identity derivation |
+| `reporting/derivation.py` | Normalization, blinded adjudication application, primary scoring, estimates, and summary derivation | Persistence or secondary grading |
+| `reporting/scoring.py` | Primary artifact persistence, HTML generation, and manifest status transitions | Metric formulas |
+| `reporting/secondary_grading.py` | Optional Ragas faithfulness diagnostics | Primary metrics or finality |
+| `reporting/visual_report.py` | Deterministic, escaped standalone HTML rendering | Statistical derivation |
+| `release/artifacts.py` | Closed release policy, redaction, deterministic serialization, and file hashing | Eligibility or verification |
+| `release/verification.py` | Independent primary rederivation and sealed-release integrity checks | Artifact mutation |
+| `release/sealing.py` | Test-run eligibility and content-addressed sealing orchestration | Primary scoring |
+| `scripts/*.py` | CLI entry points over `composition`, `experiment_control`, `reporting`, and `release` | Business logic |
 
 ## Acquisition, scoring, and sealing sequence
 
@@ -103,14 +122,14 @@ run_test.py
   -> atomically create the durable one-time execution claim before any provider call
   -> refuse every later attempt, including attempts under a different run ID
 
-prepare_run(run_id, split)
+composition.builder.prepare_run(run_id, split)
   -> load experiment.json, the frozen Phase 5 dataset and rubric, build the seeded schedule
   -> generate one cryptographically random blinding map and reviewer order before acquisition
   -> build content-addressed configuration and schedule digests
   -> first call: write run-manifest.json + schedule.json + private blinding-plan.json
   -> repeat call: compare every immutable field, schedule hash, and blinding-plan hash; raise on drift
 
-acquire(run_id, split)
+composition.acquisition.acquire(run_id, split)
   -> for each scheduled execution without a persisted observation:
        atomically journal STARTED before invoking the condition's SystemRunner
        mark ACCEPTED after the first successful provider response or deterministic local outcome
@@ -118,15 +137,17 @@ acquire(run_id, split)
        persist the raw observation atomically, then close the journal
   -> write the updated run manifest (accepted/invalid counts)
 
-reporting: normalize -> review packet -> adjudicate (blinded) -> score -> summarize
+reporting.derivation: normalize -> review packet -> adjudicate (blinded) -> score -> summarize
   -> normalize every raw observation into one route/evidence/tool vocabulary
   -> build the randomly ordered, condition-blinded review packet
   -> require two independent decisions for each applicable review field; resolve disagreements
   -> apply resolved labels and compute the 14 frozen Phase 5 metric contributions
   -> bootstrap condition estimates, category-macro estimates, paired differences, and the summary
+
+reporting.secondary_grading.grade_ragas(run_id)
   -> optionally run Ragas only after primary adjudication is final
 
-seal_run(run_root, release_root)
+release.sealing.seal_run(run_root, release_root)
   -> require every RELEASE_FILES entry, status == "scored", primary_results_final
   -> require split == "test"  (a validation run can never be sealed as the release)
   -> validate the exact scheduled observation identity set
