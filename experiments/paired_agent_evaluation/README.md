@@ -22,6 +22,23 @@ order come from that private plan; never give reviewers the run directory or bli
 plan is disclosed only in the sealed release after adjudication is final, preserving a verifiable
 mapping from reviews to observations without exposing conditions during review.
 
+## Source layout
+
+```text
+src/paired_agent_evaluation/
+├── domain/               Validated execution, observation, score, and manifest contracts
+├── application/          Provider-neutral acquisition, adjudication, scoring, and statistics
+├── adapters/             Dataset, system, storage, telemetry, and grader integrations
+├── composition/          Paths, run identity, preparation, and acquisition wiring
+├── experiment_control/   Readiness, harness freezing, provenance, and one-time authorization
+├── reporting/            Primary derivation, persistence, secondary grading, and HTML rendering
+└── release/              Artifact policy, independent verification, sanitization, and sealing
+```
+
+The package-level `composition`, `experiment_control`, `reporting`, and `release` APIs are stable
+entry points for scripts. Internal modules are organized by responsibility and should not be used
+as cross-package shortcuts.
+
 ## Prerequisites
 
 - Python 3.11–3.13 and [uv](https://docs.astral.sh/uv/).
@@ -148,8 +165,8 @@ blocks another local test acquisition. Preserve and commit that claim with the e
   the reviewed harness freeze. Never delete or replace the execution claim to obtain another run;
   a consumed claim means the test split has already started, even if acquisition was interrupted.
 - **`verify_release.py --seal-run` raises on the run's split.** Only a `test`-split run can be
-  sealed (`release.py::seal_run`); a `validation` run exists to correct the harness before the real
-  test-split run, not to be released.
+  sealed (`release.sealing.seal_run`); a `validation` run exists to correct the harness before the
+  real test-split run, not to be released.
 - **`uv` resolves the wrong dependencies or interpreter.** Confirm `--project
   experiments/paired_agent_evaluation` is present (or that you're `cd`'d into this directory) — the
   repository root and this project keep separate lockfiles and virtual environments.
