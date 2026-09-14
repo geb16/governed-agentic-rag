@@ -21,7 +21,7 @@ FROZEN_PATTERNS = (
     "pyproject.toml",
     "uv.lock",
     "data/knowledge_base/*",
-    "docs/architecture/baseline_architecture.md",
+    "docs/phase-3-baseline/architecture.md",
     "docs/phase-3-baseline.md",
     "scripts/ingest_kb.py",
     "scripts/run_smoke_tests.py",

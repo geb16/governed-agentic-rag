@@ -17,7 +17,7 @@ def test_freeze_scope_covers_clean_architecture_and_phase3_contracts() -> None:
         "scripts/ingest_kb.py",
         "scripts/run_smoke_tests.py",
         "scripts/verify_phase3_freeze.py",
-        "docs/architecture/baseline_architecture.md",
+        "docs/phase-3-baseline/architecture.md",
         "docs/phase-3-baseline.md",
         "src/app/baseline/experiments/manifest.py",
         "src/app/baseline/application/service.py",

@@ -12,7 +12,7 @@ or messaging systems.
 
 ## Architecture and baseline contract
 
-- [Phase 3 architecture](docs/architecture/baseline_architecture.md)
+- [Phase 3 architecture](docs/phase-3-baseline/architecture.md)
 - [Phase 3 behavioral, security, and reproducibility contract](docs/phase-3-baseline.md)
 - [Phase 3 cryptographic freeze identity](docs/phase-3-freeze-manifest.json)
 - [Test ownership and scope](tests/README.md)
