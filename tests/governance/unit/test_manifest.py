@@ -48,7 +48,7 @@ def test_manifest_resolves_the_repository_root() -> None:
 
     assert manifest_module._PROJECT_ROOT == project_root
     assert manifest_module._PHASE3_MANIFEST == (
-        project_root / "docs" / "phase-3-freeze-manifest.json"
+        project_root / "docs" / "phase-3-baseline" / "freeze-manifest.json"
     )
 
 

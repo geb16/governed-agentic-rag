@@ -31,7 +31,7 @@ from app.governance.version import (
 )
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[4]
-_PHASE3_MANIFEST = _PROJECT_ROOT / "docs" / "phase-3-freeze-manifest.json"
+_PHASE3_MANIFEST = _PROJECT_ROOT / "docs" / "phase-3-baseline" / "freeze-manifest.json"
 
 
 def _sha256_bytes(value: bytes) -> str:

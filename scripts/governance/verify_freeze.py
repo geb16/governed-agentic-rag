@@ -28,9 +28,9 @@ from app.governance.version import (
 )
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-4-freeze-manifest.json"
-PHASE3_MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-3-freeze-manifest.json"
-PHASE4_FREEZE_ID = "phase4-governance-v4"
+MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-4-baseline"/ "freeze-manifest.json"
+PHASE3_MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-3-baseline" / "freeze-manifest.json"
+PHASE4_FREEZE_ID = "phase4-governance-v5"
 MANIFEST_SCHEMA_VERSION = 1
 
 # Phase 5 evaluation assets must remain outside this treatment identity.
@@ -39,8 +39,8 @@ FROZEN_PATTERNS = (
     "docs/architecture/phase4_dependency_composition_diagram.svg",
     "docs/architecture/phase4_governance_architecture.md",
     "docs/phase-4-governance.md",
-    "scripts/run_phase4_smoke_tests.py",
-    "scripts/verify_phase4_freeze.py",
+    "scripts/governance/run_smoke_tests.py",
+    "scripts/governance/verify_freeze.py",
     "src/app/audit/*.py",
     "src/app/audit/**/*.py",
     "src/app/governance/*.py",

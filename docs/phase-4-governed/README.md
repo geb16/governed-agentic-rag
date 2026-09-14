@@ -64,7 +64,7 @@ content change even when Git considers the file logically unchanged.
 Run the provider-backed Phase 4 smoke check separately:
 
 ```bash
-uv run python scripts/run_phase4_smoke_tests.py
+uv run python scripts/governance/run_smoke_tests.py
 ```
 
 This command requires `RAG_OPENAI_API_KEY`, can make multiple provider requests, and can incur

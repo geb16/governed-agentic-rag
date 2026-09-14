@@ -15,14 +15,14 @@ from app.governance.version import (
     GOVERNED_APP_VERSION,
     WORKFLOW_SCHEMA_VERSION,
 )
-from scripts import verify_phase4_freeze as verifier
+from scripts.governance import verify_freeze as verifier
 
 
 def _configure_isolated_scope(monkeypatch: pytest.MonkeyPatch, directory: Path) -> Path:
     """Configure one-file Phase 4 and valid Phase 3 identities under a temporary root."""
     treatment_file = directory / "phase4.py"
     treatment_file.write_text("RELEASE = 1\n", encoding="utf-8")
-    baseline_manifest = directory / "phase-3-freeze-manifest.json"
+    baseline_manifest = directory / "phase-3-baseline" / "freeze-manifest.json"
     baseline_manifest.write_text(
         json.dumps(
             {
@@ -50,8 +50,8 @@ def test_freeze_scope_covers_phase4_release_and_excludes_phase5() -> None:
         "docs/architecture/phase4_dependency_composition_diagram.svg",
         "docs/architecture/phase4_governance_architecture.md",
         "docs/phase-4-governance.md",
-        "scripts/run_phase4_smoke_tests.py",
-        "scripts/verify_phase4_freeze.py",
+        "scripts/governance/run_smoke_tests.py",
+        "scripts/governance/verify_freeze.py",
         "src/app/audit/sqlite/repository.py",
         "src/app/governance/composition.py",
         "src/app/governance/orchestration/workflow.py",
@@ -62,7 +62,7 @@ def test_freeze_scope_covers_phase4_release_and_excludes_phase5() -> None:
         "tests/governance/unit/test_phase4_freeze_verifier.py",
     } <= source_files.keys()
     assert "docs/phase-4-freeze-manifest.json" not in source_files
-    assert "docs/phase-3-freeze-manifest.json" not in source_files
+    assert "docs/phase-3-baseline/freeze-manifest.json" not in source_files
     assert all(not path.startswith("src/app/baseline/") for path in source_files)
     assert all(not path.startswith("tests/baseline/") for path in source_files)
     assert all(not path.startswith("tests/evaluation/") for path in source_files)
@@ -163,13 +163,13 @@ def test_cli_writes_verifies_and_detects_tampering(
     """Exercise the operator workflow from atomic creation through drift failure."""
     treatment_file = _configure_isolated_scope(monkeypatch, tmp_path)
 
-    monkeypatch.setattr(sys, "argv", ["verify_phase4_freeze.py", "--write"])
+    monkeypatch.setattr(sys, "argv", ["verify_freeze.py", "--write"])
     assert verifier.main() == 0
     stored = json.loads(verifier.MANIFEST_PATH.read_text(encoding="utf-8"))
     assert set(stored) == verifier.STORED_KEYS
     assert stored["aggregate_sha256"] == verifier._canonical_aggregate(stored)
 
-    monkeypatch.setattr(sys, "argv", ["verify_phase4_freeze.py"])
+    monkeypatch.setattr(sys, "argv", ["verify_freeze.py"])
     assert verifier.main() == 0
     assert f"Verified {verifier.PHASE4_FREEZE_ID}" in capsys.readouterr().out
 
