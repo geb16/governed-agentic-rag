@@ -14,7 +14,7 @@ or messaging systems.
 
 - [Phase 3 architecture](docs/phase-3-baseline/architecture.md)
 - [Phase 3 behavioral, security, and reproducibility contract](docs/phase-3-baseline.md)
-- [Phase 3 cryptographic freeze identity](docs/phase-3-freeze-manifest.json)
+- [Phase 3 cryptographic freeze identity](docs/phase-3-baseline/freeze-manifest.json)
 - [Test ownership and scope](tests/README.md)
 
 The baseline is organized as a feature-owned clean architecture:
@@ -98,5 +98,5 @@ release branch:
 ```console
 uv run python scripts/verify_phase3_freeze.py --write
 uv run python scripts/verify_phase3_freeze.py
-git diff -- docs/phase-3-freeze-manifest.json
+git diff -- docs/phase-3-baseline/freeze-manifest.json
 ```

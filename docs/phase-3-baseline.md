@@ -184,7 +184,7 @@ Before writing the freeze manifest:
    contract;
 2. run Ruff formatting and linting, MyPy, Pyright, and the complete Pytest suite;
 3. confirm the Git worktree contains only reviewed Phase 3 changes;
-4. write `docs/phase-3-freeze-manifest.json` once with
+4. write `docs/phase-3-baseline/freeze-manifest.json` once with
    `uv run python scripts/verify_phase3_freeze.py --write`;
 5. immediately verify it with `uv run python scripts/verify_phase3_freeze.py`;
 6. review the generated file list and aggregate SHA-256 before committing and tagging.
