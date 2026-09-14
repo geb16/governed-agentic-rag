@@ -73,7 +73,7 @@ fails closed.
 Run the focused deterministic smoke suite:
 
 ```console
-uv run python scripts/phase-3-baseline/run_smoke_tests.py
+uv run python scripts/baseline/run_smoke_tests.py
 ```
 
 Run the complete local gate:
@@ -96,7 +96,7 @@ Only write a new manifest after all Phase 3 changes are reviewed and committed t
 release branch:
 
 ```console
-uv run python scripts/phase-3-baseline/verify_freeze.py --write
-uv run python scripts/phase-3-baseline/verify_freeze.py
+uv run python scripts/baseline/verify_freeze.py --write
+uv run python scripts/baseline/verify_freeze.py
 git diff -- docs/phase-3-baseline/freeze-manifest.json
 ```
