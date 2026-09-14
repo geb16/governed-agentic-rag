@@ -1,7 +1,7 @@
 {
   "aggregate_sha256": "e3d16bb50cf815fda5939a53223356ce96c6dbafec1c4e00e01cf9e6d51fb12e",
   "app_version": "0.2.1",
-  "freeze_id": "phase3-baseline-v3",
+  "freeze_id": "phase3-baseline-v4",
   "frozen_at": "2026-09-02T14:26:52.101955+00:00",
   "manifest_schema_version": 1,
   "source_files": {
@@ -11,8 +11,8 @@
     "data/knowledge_base/refund_policy.md": "8ee3b3c00c1cebe79c12285fc191b07552b917d966b5ffd3d1676e55cb9eb3c4",
     "data/knowledge_base/support_sop.md": "c212b9ec8dceb67134d4db912063186664f2948aaa475dd990357d1c741e7d71",
     "docker-compose.yml": "cc62756a5724fa37cf3d03fd3ef1a492a03a516fb76ba5e02110323368243107",
-    "docs/architecture/baseline_architecture.md": "ad74646b60309c69dfa3e57ac0d818fec8f7ca3eff2cfcc92976b14a3f8d1606",
-    "docs/phase-3-baseline.md": "ff082043705ee81f6b710ce10ec409a95b6a7be2a64f7b118c015b7899c32603",
+    "docs/phase-3-baseline/architecture.md": "ad74646b60309c69dfa3e57ac0d818fec8f7ca3eff2cfcc92976b14a3f8d1606",
+    "docs/phase-3-baseline/README.md": "ff082043705ee81f6b710ce10ec409a95b6a7be2a64f7b118c015b7899c32603",
     "pyproject.toml": "d7b74e98a5856bb19beb62dce666963eb08c031027796851338fb322c4089551",
     "scripts/ingest_kb.py": "71234cf60adeea8e4969a2f77dda669c941b8c50f4efb1a7cba2ffc96b1d9b3f",
     "scripts/run_smoke_tests.py": "28a1fa6e0d8bb5d7de763be10a540f848c69eb0961513cb852bffbc472405cd9",

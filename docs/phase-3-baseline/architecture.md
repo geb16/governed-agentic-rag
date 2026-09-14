@@ -31,7 +31,7 @@ Out of scope:
 - Phase 4 governed workflow implementation.
 
 The detailed behavioral, security, reproducibility, and reference contract is maintained in
-[Phase 3 baseline](../phase-3-baseline.md).
+[Phase 3 baseline](./README.md).
 
 ## Layer and dependency model
 
@@ -220,4 +220,4 @@ they threaten experimental validity, security, or maintainability.
 
 These static checks protect dependency direction. They do not replace code review, runtime tests,
 threat modeling, or the cryptographic freeze procedure described in
-[Phase 3 baseline](../phase-3-baseline.md).
+[Phase 3 baseline](./README.md).

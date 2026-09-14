@@ -22,7 +22,7 @@ FROZEN_PATTERNS = (
     "uv.lock",
     "data/knowledge_base/*",
     "docs/phase-3-baseline/architecture.md",
-    "docs/phase-3-baseline.md",
+    "docs/phase-3-baseline/README.md",
     "scripts/ingest_kb.py",
     "scripts/run_smoke_tests.py",
     "scripts/verify_phase3_freeze.py",
