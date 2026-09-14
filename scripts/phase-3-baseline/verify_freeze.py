@@ -12,8 +12,8 @@ from typing import Any
 
 from app.core.version import APP_VERSION, BASELINE_FREEZE_ID
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-3-baseline"/ "freeze-manifest.json"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-3-baseline" / "freeze-manifest.json"
 
 # Phase 4 governance tests must not alter the Phase 3 identity.
 FROZEN_PATTERNS = (
