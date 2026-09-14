@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from scripts.verify_phase3_freeze import (
+from scripts.phase_3_baseline.verify_freeze import (
     FROZEN_PATTERNS,
     build_freeze_payload,
     describe_freeze_differences,
@@ -15,8 +15,8 @@ def test_freeze_scope_covers_clean_architecture_and_phase3_contracts() -> None:
     assert {
         "docker-compose.yml",
         "scripts/ingest_kb.py",
-        "scripts/run_smoke_tests.py",
-        "scripts/verify_phase3_freeze.py",
+        "scripts/phase-3-baseline/run_smoke_tests.py",
+        "scripts/phase-3-baseline/verify_freeze.py",
         "docs/phase-3-baseline/architecture.md",
         "docs/phase-3-baseline/README.md",
         "src/app/baseline/experiments/manifest.py",
