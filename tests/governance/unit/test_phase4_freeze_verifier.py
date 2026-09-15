@@ -33,7 +33,7 @@ def _configure_isolated_scope(monkeypatch: pytest.MonkeyPatch, directory: Path) 
         encoding="utf-8",
     )
     monkeypatch.setattr(verifier, "PROJECT_ROOT", directory)
-    monkeypatch.setattr(verifier, "MANIFEST_PATH", directory / "phase-4-freeze-manifest.json")
+    monkeypatch.setattr(verifier, "MANIFEST_PATH", directory / "freeze-manifest.json")
     monkeypatch.setattr(verifier, "PHASE3_MANIFEST_PATH", baseline_manifest)
     monkeypatch.setattr(verifier, "FROZEN_PATTERNS", ("phase4.py",))
     return treatment_file
@@ -61,7 +61,7 @@ def test_freeze_scope_covers_phase4_release_and_excludes_phase5() -> None:
         "tests/governance/integration/test_workflow.py",
         "tests/governance/unit/test_phase4_freeze_verifier.py",
     } <= source_files.keys()
-    assert "docs/phase-4-freeze-manifest.json" not in source_files
+    assert "docs/phase-4-governed/freeze-manifest.json" not in source_files
     assert "docs/phase-3-baseline/freeze-manifest.json" not in source_files
     assert all(not path.startswith("src/app/baseline/") for path in source_files)
     assert all(not path.startswith("tests/baseline/") for path in source_files)
