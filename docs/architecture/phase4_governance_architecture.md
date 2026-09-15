@@ -11,8 +11,8 @@ The design is clean architecture with feature-owned adapters and domain-oriented
 architecture-description terminology is informed by [1]. It is not a distributed workflow
 platform, identity provider, production authorization service, or enterprise records-management
 system. The detailed runtime and verification contract is maintained in
-[Phase 4 governed treatment](../phase-4-governance.md); the frozen comparison boundary is defined by
-[Phase 3 baseline](../phase-3-baseline.md).
+[Phase 4 governed treatment](./README.md); the frozen comparison boundary is defined by
+[Phase 3 baseline](../phase-3-baseline/README.md).
 
 ## Dependency and composition model
 

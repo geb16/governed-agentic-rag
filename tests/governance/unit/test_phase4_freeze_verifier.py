@@ -49,7 +49,7 @@ def test_freeze_scope_covers_phase4_release_and_excludes_phase5() -> None:
         ".env.example",
         "docs/architecture/phase4_dependency_composition_diagram.svg",
         "docs/architecture/phase4_governance_architecture.md",
-        "docs/phase-4-governance.md",
+        "docs/phase-4-governed/README.md",
         "scripts/governance/run_smoke_tests.py",
         "scripts/governance/verify_freeze.py",
         "src/app/audit/sqlite/repository.py",
@@ -75,11 +75,11 @@ def test_freeze_payload_pins_release_schema_policy_and_baseline_identity() -> No
     phase3_manifest = verifier.PHASE3_MANIFEST_PATH.read_bytes()
 
     assert payload["manifest_schema_version"] == verifier.MANIFEST_SCHEMA_VERSION == 1
-    assert payload["freeze_id"] == verifier.PHASE4_FREEZE_ID == "phase4-governance-v4"
+    assert payload["freeze_id"] == verifier.PHASE4_FREEZE_ID == "phase4-governance-v5"
     assert payload["governed_app_version"] == GOVERNED_APP_VERSION
     assert payload["workflow_schema_version"] == WORKFLOW_SCHEMA_VERSION
     assert payload["governance_policy_version"] == GOVERNANCE_POLICY_VERSION
-    assert payload["baseline_freeze_id"] == BASELINE_FREEZE_ID == "phase3-baseline-v3"
+    assert payload["baseline_freeze_id"] == BASELINE_FREEZE_ID == "phase3-baseline-v4"
     assert payload["baseline_aggregate_sha256"] == BASELINE_CONTROL_SHA256
     assert payload["baseline_manifest_sha256"] == verifier._sha256(phase3_manifest)
     assert payload["aggregate_sha256"] == verifier._canonical_aggregate(payload)

@@ -57,7 +57,7 @@ def test_governed_control_identity_pins_the_reviewed_phase3_v2_manifest() -> Non
 
     payload = json.loads(manifest_module._PHASE3_MANIFEST.read_text(encoding="utf-8"))
 
-    assert payload["freeze_id"] == BASELINE_FREEZE_ID == "phase3-baseline-v3"
+    assert payload["freeze_id"] == BASELINE_FREEZE_ID == "phase3-baseline-v4"
     assert payload["aggregate_sha256"] == BASELINE_CONTROL_SHA256
 
 

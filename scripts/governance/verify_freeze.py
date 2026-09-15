@@ -38,7 +38,7 @@ FROZEN_PATTERNS = (
     ".env.example",
     "docs/architecture/phase4_dependency_composition_diagram.svg",
     "docs/architecture/phase4_governance_architecture.md",
-    "docs/phase-4-governance.md",
+    "docs/phase-4-governed/README.md",
     "scripts/governance/run_smoke_tests.py",
     "scripts/governance/verify_freeze.py",
     "src/app/audit/*.py",
