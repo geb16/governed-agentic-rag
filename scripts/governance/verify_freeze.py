@@ -27,8 +27,8 @@ from app.governance.version import (
     WORKFLOW_SCHEMA_VERSION,
 )
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-4-baseline"/ "freeze-manifest.json"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-4-governed" / "freeze-manifest.json"
 PHASE3_MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-3-baseline" / "freeze-manifest.json"
 PHASE4_FREEZE_ID = "phase4-governance-v5"
 MANIFEST_SCHEMA_VERSION = 1

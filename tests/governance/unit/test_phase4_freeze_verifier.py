@@ -23,6 +23,7 @@ def _configure_isolated_scope(monkeypatch: pytest.MonkeyPatch, directory: Path) 
     treatment_file = directory / "phase4.py"
     treatment_file.write_text("RELEASE = 1\n", encoding="utf-8")
     baseline_manifest = directory / "phase-3-baseline" / "freeze-manifest.json"
+    baseline_manifest.parent.mkdir(parents=True)
     baseline_manifest.write_text(
         json.dumps(
             {
