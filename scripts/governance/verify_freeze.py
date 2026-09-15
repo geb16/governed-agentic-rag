@@ -36,8 +36,8 @@ MANIFEST_SCHEMA_VERSION = 1
 # Phase 5 evaluation assets must remain outside this treatment identity.
 FROZEN_PATTERNS = (
     ".env.example",
-    "docs/architecture/phase4_dependency_composition_diagram.svg",
-    "docs/architecture/phase4_governance_architecture.md",
+    "docs/phase-4-governed/dependency_composition_diagram.svg",
+    "docs/phase-4-governed/architecture.md",
     "docs/phase-4-governed/README.md",
     "scripts/governance/run_smoke_tests.py",
     "scripts/governance/verify_freeze.py",

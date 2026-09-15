@@ -12,7 +12,7 @@ itself establish that governance improves those outcomes.
 
 The control contract is documented in [Phase 3 baseline](../phase-3-baseline/README.md). Phase 4 component
 ownership, trust boundaries, failure behavior, and architectural compromises are documented in
-[Phase 4 governance architecture](architecture/phase4_governance_architecture.md).
+[Phase 4 governance architecture](./architecture.md).
 
 ## 2. Runtime configuration
 

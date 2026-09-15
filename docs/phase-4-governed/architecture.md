@@ -17,7 +17,7 @@ system. The detailed runtime and verification contract is maintained in
 ## Dependency and composition model
 
 
-![Phase 4 dependency and composition model](./phase4_dependency_composition_diagram.svg)
+![Phase 4 dependency and composition model](./dependency_composition_diagram.svg)
 
 The diagram distinguishes composition and wiring, runtime invocation, and compile-time package
 dependencies. `governance/composition.py` is a bounded feature composer below the process-level
