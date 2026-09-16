@@ -161,8 +161,7 @@ def test_line_ending_policy_is_lf_and_phase5_scoped() -> None:
         "/data/evaluation/phase5/v1/*.jsonl text eol=lf",
         "/docs/phase-5-evaluation/*.md text eol=lf",
         "/docs/phase-5-evaluation/freeze-manifest.json text eol=lf",
-        "/scripts/evaluation/build_dataset.py text eol=lf",
-        "/scripts/evaluation/verify_freeze.py text eol=lf",
+        "/scripts/evaluation/** text eol=lf",
         "/src/app/evaluation/** text eol=lf",
         "/tests/evaluation/** text eol=lf",
     }
