@@ -1,8 +1,8 @@
 {
-  "aggregate_sha256": "1e4b31364496f692880aeb82e983133d10be5f66cc6125bf5c11454ca18012e3",
+  "aggregate_sha256": "02cc38a83da90d2ac2a5b835ac657183f2b085d30d56e6c5ec59603a7c131ac2",
   "app_version": "0.2.1",
   "freeze_id": "phase3-baseline-v4",
-  "frozen_at": "2026-09-14T12:46:54.567195+00:00",
+  "frozen_at": "2026-09-16T13:13:20.301040+00:00",
   "manifest_schema_version": 1,
   "source_files": {
     "data/knowledge_base/data_governance_policy.md": "a59bbec7c55c2e9949c62c58498bc80bc1f4e630f52c89d0f638f10054690b94",
@@ -13,7 +13,7 @@
     "docker-compose.yml": "cc62756a5724fa37cf3d03fd3ef1a492a03a516fb76ba5e02110323368243107",
     "docs/phase-3-baseline/README.md": "31f39953dfc34062eeeaa95e21e855145b2d512b38a623c18a12de3b453fa397",
     "docs/phase-3-baseline/architecture.md": "43638a3dfdaac09e065d0f5fcc6bc4dd67f0793c430b2927a2373b5f579eccc6",
-    "pyproject.toml": "d7b74e98a5856bb19beb62dce666963eb08c031027796851338fb322c4089551",
+    "pyproject.toml": "b93b851cc4aa24618354176fb7dc652a5cbe740dc1668dfa28d58e54e5f8dda3",
     "scripts/baseline/run_smoke_tests.py": "28a1fa6e0d8bb5d7de763be10a540f848c69eb0961513cb852bffbc472405cd9",
     "scripts/baseline/verify_freeze.py": "eb59188584d71eb0cf51e8e4e32576e0e05f9b1bab2d855be8f1b8dc3a8fcc65",
     "scripts/ingest_kb.py": "71234cf60adeea8e4969a2f77dda669c941b8c50f4efb1a7cba2ffc96b1d9b3f",
@@ -103,6 +103,6 @@
     "tests/shared/unit/test_config.py": "c1905d4236c70f9dd368901d0e94d6dcf0da83a18539a3eb8a9d47229d4cf997",
     "tests/shared/unit/test_dotenv_file.py": "f4838f5acb165bf7909f52b6cd15ad088e34511dcd1e65655b9736539d2bfbd3",
     "tests/shared/unit/test_security.py": "9ce8eb377af7abcb655007d0b33471a94b2e7328b31ce099f3dbf2bce489d195",
-    "uv.lock": "49a2989751b1266488357def803b339ed27e29aa73fa5b2bef997e91bba29deb"
+    "uv.lock": "d8b09adef1d6376c2e0ef7e93ee3cdf453b4af82135d9f91c61f94d654c63b29"
   }
 }

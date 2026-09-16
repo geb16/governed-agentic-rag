@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "governed-agentic-rag"
 version = "0.2.1"
-description = "design and evaluating a governed enterprise stle RAG workflow."
+description = "design and evaluating a governed enterprise style RAG workflow."
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
 dependencies = [
@@ -23,7 +23,7 @@ dev = [
   "httpx2>=2,<3",
   "mypy>=1.19,<2",
   "pre-commit>=4.4,<5",
-  "pyright>=1.1.411",
+  "pyright>=1.1.414",
   "pytest>=9.0,<10",
   "pytest-cov>=7,<8",
   "ruff>=0.15,<1",
