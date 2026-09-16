@@ -9,12 +9,12 @@
 
 # Phase 4 hashes exact governance, audit, test, script, and documentation bytes.
 /.env.example text eol=lf
-/docs/phase-4-governance.md text eol=lf
-/docs/phase-4-freeze-manifest.json text eol=lf
-/docs/architecture/phase4_governance_architecture.md text eol=lf
-/docs/architecture/phase4_dependency_composition_diagram.svg text eol=lf
-/scripts/run_phase4_smoke_tests.py text eol=lf
-/scripts/verify_phase4_freeze.py text eol=lf
+/docs/phase-4-governance/README.md text eol=lf
+/docs/phase-4-governance/freeze-manifest.json text eol=lf
+/docs/phase-4-governace/architecture.md text eol=lf
+/docs/phase-4-governance/dependency_composition_diagram.svg text eol=lf
+/scripts/governance/run_smoke_tests.py text eol=lf
+/scripts/governace/verify_freeze.py text eol=lf
 /src/app/audit/** text eol=lf
 /src/app/governance/** text eol=lf
 /src/app/governed_main.py text eol=lf
