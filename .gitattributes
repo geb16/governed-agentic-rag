@@ -25,6 +25,6 @@
 /data/evaluation/phase5/v1/*.jsonl text eol=lf
 /docs/phase-5-evaluation/*.md text eol=lf
 /docs/phase-5-evaluation/freeze-manifest.json text eol=lf
-/scripts/evaluation/*.py text eol=lf
+/scripts/evaluation/** text eol=lf
 /src/app/evaluation/** text eol=lf
 /tests/evaluation/** text eol=lf
