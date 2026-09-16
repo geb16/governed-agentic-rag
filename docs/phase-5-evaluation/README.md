@@ -74,13 +74,13 @@ data/evaluation/phase5/v1/
 Regenerate deterministically:
 
 ```bash
-uv run python scripts/build_phase5_dataset.py
+uv run python scripts/evaluation/build_dataset.py
 ```
 
 Verify that checked-in artifacts are current:
 
 ```bash
-uv run python scripts/build_phase5_dataset.py --check
+uv run python scripts/evaluation/build_dataset.py --check
 uv run pytest tests/evaluation
 ```
 

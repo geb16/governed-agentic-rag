@@ -14,7 +14,7 @@ import pytest
 from app.evaluation.dataset.generation.artifacts import check_artifacts as real_check_artifacts
 from app.evaluation.dataset.integrity import load_manifest as real_load_manifest
 from app.evaluation.dataset.integrity import verify_manifest as real_verify_manifest
-from scripts import verify_phase5_freeze as verifier
+from scripts.evaluation import verify_freeze as verifier
 
 REAL_DATASET_ROOT = Path("data/evaluation/phase5/v1")
 
@@ -91,8 +91,8 @@ def test_freeze_scope_covers_complete_phase5_release() -> None:
         "docs/phase-5-evaluation/README.md",
         "docs/phase-5-evaluation/schema.md",
         "docs/phase-5-evaluation/scoring-rubric.md",
-        "scripts/build_phase5_dataset.py",
-        "scripts/verify_phase5_freeze.py",
+        "scripts/evaluation/build_dataset.py",
+        "scripts/evaluation/verify_freeze.py",
         "src/app/evaluation/dataset/generation/artifacts.py",
         "src/app/evaluation/dataset/integrity.py",
         "src/app/evaluation/dataset/manifest.py",
@@ -161,8 +161,8 @@ def test_line_ending_policy_is_lf_and_phase5_scoped() -> None:
         "/data/evaluation/phase5/v1/*.jsonl text eol=lf",
         "/docs/phase-5-evaluation/*.md text eol=lf",
         "/docs/phase-5-evaluation/freeze-manifest.json text eol=lf",
-        "/scripts/build_phase5_dataset.py text eol=lf",
-        "/scripts/verify_phase5_freeze.py text eol=lf",
+        "/scripts/evaluation/build_dataset.py text eol=lf",
+        "/scripts/evaluation/verify_freeze.py text eol=lf",
         "/src/app/evaluation/** text eol=lf",
         "/tests/evaluation/** text eol=lf",
     }
