@@ -99,7 +99,7 @@ def test_freeze_scope_covers_complete_phase5_release() -> None:
         "tests/evaluation/dataset/test_integrity.py",
         "tests/evaluation/dataset/test_phase5_freeze_verifier.py",
     } <= source_files.keys()
-    assert "docs/phase-5-freeze-manifest.json" not in source_files
+    assert "docs/phase-5-evaluation/freeze-manifest.json" not in source_files
     assert all(not path.startswith("src/app/baseline/") for path in source_files)
     assert all(not path.startswith("src/app/governance/") for path in source_files)
     assert payload["baseline_aggregate_sha256"] == verifier.PHASE3_AGGREGATE_SHA256
@@ -160,7 +160,7 @@ def test_line_ending_policy_is_lf_and_phase5_scoped() -> None:
         "/data/evaluation/phase5/v1/*.json text eol=lf",
         "/data/evaluation/phase5/v1/*.jsonl text eol=lf",
         "/docs/phase-5-evaluation/*.md text eol=lf",
-        "/docs/phase-5-freeze-manifest.json text eol=lf",
+        "/docs/phase-5-evaluation/freeze-manifest.json text eol=lf",
         "/scripts/build_phase5_dataset.py text eol=lf",
         "/scripts/verify_phase5_freeze.py text eol=lf",
         "/src/app/evaluation/** text eol=lf",

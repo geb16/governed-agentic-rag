@@ -94,7 +94,7 @@ After the complete release surface has been reviewed, generate its identity once
 
 ```bash
 uv run python scripts/verify_phase5_freeze.py --write
-git diff -- docs/phase-5-freeze-manifest.json
+git diff -- docs/phase-5-evaluation/freeze-manifest.json
 ```
 
 Normal verification is read-only:
