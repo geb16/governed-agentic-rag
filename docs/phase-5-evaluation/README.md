@@ -93,16 +93,16 @@ manifest ancestry.
 After the complete release surface has been reviewed, generate its identity once:
 
 ```bash
-uv run python scripts/verify_phase5_freeze.py --write
+uv run python scripts/evaluation/verify_freeze.py --write
 git diff -- docs/phase-5-evaluation/freeze-manifest.json
 ```
 
 Normal verification is read-only:
 
 ```bash
-uv run python scripts/verify_phase3_freeze.py
-uv run python scripts/verify_phase4_freeze.py
-uv run python scripts/verify_phase5_freeze.py
+uv run python scripts/baseline/verify_freeze.py
+uv run python scripts/governance/verify_freeze.py
+uv run python scripts/evaluation/verify_freeze.py
 ```
 
 A released artifact change requires a new semantic dataset version and reviewed freeze identity.

@@ -244,11 +244,11 @@ def test_cli_writes_verifies_and_reports_file_drift(
         capsys: Fixture capturing CLI diagnostics.
     """
     source = _configure_isolated_scope(monkeypatch, tmp_path)
-    monkeypatch.setattr(sys, "argv", ["verify_phase5_freeze.py", "--write"])
+    monkeypatch.setattr(sys, "argv", ["verify_freeze.py", "--write"])
     assert verifier.main() == 0
     assert verifier.MANIFEST_PATH.is_file()
 
-    monkeypatch.setattr(sys, "argv", ["verify_phase5_freeze.py"])
+    monkeypatch.setattr(sys, "argv", ["verify_freeze.py"])
     assert verifier.main() == 0
     source.write_text("RELEASE = 2\n", encoding="utf-8")
     assert verifier.main() == 1

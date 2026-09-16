@@ -24,7 +24,7 @@ from app.evaluation.dataset.manifest import (
     PHASE4_FREEZE_ID,
 )
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-5-evaluation" / "freeze-manifest.json"
 PHASE3_MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-3-baseline" / "freeze-manifest.json"
 PHASE4_MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-4-governed" / "freeze-manifest.json"
