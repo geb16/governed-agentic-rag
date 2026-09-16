@@ -48,9 +48,9 @@ def test_freeze_scope_covers_phase4_release_and_excludes_phase5() -> None:
     assert isinstance(source_files, dict)
     assert {
         ".env.example",
-        "docs/phase-4-governed/dependency_composition_diagram.svg",
-        "docs/phase-4-governed/architecture.md",
-        "docs/phase-4-governed/README.md",
+        "docs/phase-4-governance/dependency_composition_diagram.svg",
+        "docs/phase-4-governance/architecture.md",
+        "docs/phase-4-governance/README.md",
         "scripts/governance/run_smoke_tests.py",
         "scripts/governance/verify_freeze.py",
         "src/app/audit/sqlite/repository.py",
@@ -62,7 +62,7 @@ def test_freeze_scope_covers_phase4_release_and_excludes_phase5() -> None:
         "tests/governance/integration/test_workflow.py",
         "tests/governance/unit/test_phase4_freeze_verifier.py",
     } <= source_files.keys()
-    assert "docs/phase-4-governed/freeze-manifest.json" not in source_files
+    assert "docs/phase-4-governance/freeze-manifest.json" not in source_files
     assert "docs/phase-3-baseline/freeze-manifest.json" not in source_files
     assert all(not path.startswith("src/app/baseline/") for path in source_files)
     assert all(not path.startswith("tests/baseline/") for path in source_files)
