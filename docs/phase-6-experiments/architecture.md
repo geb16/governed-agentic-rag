@@ -27,7 +27,7 @@ or `src/app/evaluation`.
 
 Phase 6's own tests stay under `experiments/paired_agent_evaluation/tests/`, not `tests/`. The root
 `tests/evaluation/**` tree is part of the frozen Phase 5 release surface (hashed by
-`scripts/verify_phase5_freeze.py`); adding Phase 6 test files there would silently expand what a
+`scripts/evaluation/verify_freeze.py`); adding Phase 6 test files there would silently expand what a
 Phase 5 refreeze certifies. Splitting the test tree this way keeps the frozen surface and the
 actively-developed harness independently verifiable and independently freezable.
 
@@ -220,7 +220,7 @@ invalid or mismatched envelope contribute no audit-completeness facts.
    labels are fixed") is a documented protocol step, not a code-enforced precondition; nothing stops
    `score_results.py --ragas` from running before adjudication is complete.
 4. This harness inherits every architectural compromise of the systems it evaluates (see
-   [Phase 4 governance architecture — known architectural compromises](./phase4_governance_architecture.md#known-architectural-compromises)):
+   [Phase 4 governance architecture — known architectural compromises](../phase-4-governance/architecture.md#known-architectural-compromises)):
    single-process SQLite durability, synchronous model/tool calls, and an unanchored (though
    tamper-evident) audit hash chain all bound what "governed" and "baseline" can mean in this pilot's
    results.
