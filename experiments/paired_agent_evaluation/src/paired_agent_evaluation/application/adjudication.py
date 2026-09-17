@@ -22,10 +22,21 @@ from typing import TypeVar
 from pydantic import Field, model_validator
 
 from paired_agent_evaluation.domain.executions import StrictModel
-from paired_agent_evaluation.domain.observations import NormalizedObservation
+from paired_agent_evaluation.domain.observations import NormalizedObservation, ObservedRoute
 from paired_agent_evaluation.domain.scores import Adjudication, ResolvedAdjudication
 
 DecisionT = TypeVar("DecisionT", bound=Hashable)
+
+_NEUTRAL_FAILURE_RESPONSE = "The system could not safely produce a response."
+_CONDITION_SPECIFIC_FAILURES = frozenset(
+    {
+        "The model output did not pass baseline safety validation.",
+        "I cannot process this request because it conflicts with baseline safety controls.",
+        "The governed workflow could not safely produce a response.",
+        "The governed workflow could not safely complete the request.",
+    }
+)
+_CONDITION_INDICATOR = re.compile(r"\b(?:baseline|governed)\b", re.IGNORECASE)
 
 
 class ReviewItem(StrictModel):
@@ -38,6 +49,14 @@ class ReviewItem(StrictModel):
     citation_ids: list[str] = Field(default_factory=list)
     route_review_required: bool
     groundedness_review_required: bool
+
+    @model_validator(mode="after")
+    def reject_condition_indicators(self) -> ReviewItem:
+        """Fail closed if reviewer-visible text discloses an experiment condition."""
+        visible_text = (self.query, self.response, *self.contexts, *self.citation_ids)
+        if any(_CONDITION_INDICATOR.search(value) for value in visible_text):
+            raise ValueError("review packet contains a condition indicator")
+        return self
 
 
 class BlindingPlan(StrictModel):
@@ -121,18 +140,26 @@ def build_review_item(
     Returns:
         A blinded review item, or ``None`` when no review is required.
     """
-    grounded = bool(observation.answer and not observation.route_requires_adjudication)
+    grounded = bool(
+        observation.answer
+        and observation.terminal_error_code is None
+        and observation.observed_route
+        not in {ObservedRoute.DENY, ObservedRoute.SAFE_TERMINATE}
+    )
     route = observation.route_requires_adjudication
     if not grounded and not route:
         return None
+    response = observation.answer or ""
+    if response in _CONDITION_SPECIFIC_FAILURES:
+        response = _NEUTRAL_FAILURE_RESPONSE
     return ReviewItem(
         blinded_id=blinded_id(observation.key.observation_id, plan=plan),
         query=query,
-        response=observation.answer or "",
+        response=response,
         contexts=contexts,
         citation_ids=observation.citations,
         route_review_required=route,
-        groundedness_review_required=bool(observation.answer),
+        groundedness_review_required=grounded,
     )
 
 
