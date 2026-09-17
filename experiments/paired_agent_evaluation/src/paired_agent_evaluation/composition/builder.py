@@ -93,6 +93,7 @@ def prepare_run(
         execution_profile="experiment",
         experiment_run_id=run_id,
         experiment_manifest_dir=run_root / "system-manifests",
+        knowledge_base_dir=paths.repository / "data" / "knowledge_base",
     )
     if settings.retrieval_backend != config.required_retrieval_backend:
         raise ValueError("Configured retrieval backend violates experiment.json")
