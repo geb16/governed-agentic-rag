@@ -23,14 +23,14 @@ from app.evaluation.dataset.models import EvaluationModel
 DATASET_ID = "enterprise-support-agent-eval"
 DATASET_VERSION = "1.0.0"
 DATASET_DISTRIBUTION_TYPE = "stratified_challenge_set_not_prevalence_sample"
-DATASET_RELEASED_AT = "2026-08-25T00:00:00Z"
+DATASET_RELEASED_AT = "2026-09-17T00:00:00Z"
 DATASET_CASE_COUNT = 100
 DATASET_VALIDATION_CASE_COUNT = 20
 DATASET_TEST_CASE_COUNT = 80
 PHASE3_FREEZE_ID = "phase3-baseline-v4"
-PHASE3_AGGREGATE_SHA256 = "02cc38a83da90d2ac2a5b835ac657183f2b085d30d56e6c5ec59603a7c131ac2"
+PHASE3_AGGREGATE_SHA256 = "a621d3ec273163b6250708addce22581e599f521bc59a471815d5b7e9b2ac224"
 PHASE4_FREEZE_ID = "phase4-governance-v5"
-PHASE4_AGGREGATE_SHA256 = "18f9b5c6f872834b9fa4f829eb1eadbf15308f85d0b1d246395505cb890639e5"
+PHASE4_AGGREGATE_SHA256 = "2fac34ee3970b8bbdbfd8a860347787d699376b7c845fac7c271f4aa3e638402"
 
 DATASET_ARTIFACT_NAMES = (
     "case.schema.json",
@@ -50,7 +50,7 @@ class DatasetManifest(EvaluationModel):
     dataset_id: Literal["enterprise-support-agent-eval"]
     dataset_version: Literal["1.0.0"]
     distribution_type: Literal["stratified_challenge_set_not_prevalence_sample"]
-    released_at: Literal["2026-08-25T00:00:00Z"]
+    released_at: Literal["2026-09-17T00:00:00Z"]
     case_count: Literal[100]
     validation_case_count: Literal[20]
     test_case_count: Literal[80]
