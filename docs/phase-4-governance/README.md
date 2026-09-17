@@ -53,8 +53,8 @@ uv run ruff format --check src tests scripts
 uv run mypy
 uv run pyright
 git diff --check
-uv run python scripts/run_smoke_tests.py
-uv run python scripts/verify_phase3_freeze.py
+uv run python scripts/baseline/run_smoke_tests.py
+uv run python scripts/baseline/verify_freeze.py
 ```
 
 The Phase 3 verifier hashes frozen files byte-for-byte. On Windows, `uv.lock` must retain the LF
