@@ -71,9 +71,9 @@ def source_hashes(paths: EvaluationControlPaths) -> dict[str, str]:
 
 def inherited_identities(paths: EvaluationControlPaths) -> InheritedIdentities:
     """Loads the freeze identities inherited from Phases 3 through 5."""
-    phase3 = load_json(paths.repository / "docs" / "phase-3-freeze-manifest.json")
-    phase4 = load_json(paths.repository / "docs" / "phase-4-freeze-manifest.json")
-    phase5 = load_json(paths.repository / "docs" / "phase-5-freeze-manifest.json")
+    phase3 = load_json(paths.repository / "docs" / "phase-3-baseline" / "freeze-manifest.json")
+    phase4 = load_json(paths.repository / "docs" / "phase-4-governance" / "freeze-manifest.json")
+    phase5 = load_json(paths.repository / "docs" / "phase-5-evaluation" / "freeze-manifest.json")
     return {
         "phase3_freeze_id": str(phase3["freeze_id"]),
         "phase3_aggregate_sha256": str(phase3["aggregate_sha256"]),
