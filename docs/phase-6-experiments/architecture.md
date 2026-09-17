@@ -2,8 +2,8 @@
 
 ## Purpose and declared scope
 
-Phase-6 is the paired evaluation harness that compares the frozen `phase3-baseline-v3` control and
-`phase4-governance-v4` treatment under the same `phase5-evaluation-v3` cases, model, Qdrant
+Phase-6 is the paired evaluation harness that compares the frozen `phase3-baseline-v4` control and
+`phase4-governance-v5` treatment under the same `phase5-evaluation-v4` cases, model, Qdrant
 collection, synthetic database fixture, simulated tools, and deterministic failure plan. It answers
 whether the governance-aware workflow layer measurably improves reliability, safety, traceability,
 and groundedness relative to the conventional baseline — it does not itself implement either
