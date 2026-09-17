@@ -2,7 +2,7 @@
 
 ## 1. Purpose and status
 
-Phase 4 is the governed treatment evaluated against the frozen `phase3-baseline-v2` control. It
+Phase 4 is the governed treatment evaluated against the frozen `phase3-baseline-v4` control. It
 adds explicit classification, risk assessment, approval routing, bounded recovery, durable workflow
 state, and tamper-evident audit events without changing the Phase 3 code or manifest.
 
@@ -53,12 +53,12 @@ uv run ruff format --check src tests scripts
 uv run mypy
 uv run pyright
 git diff --check
-uv run python scripts/run_smoke_tests.py
-uv run python scripts/verify_phase3_freeze.py
+uv run python scripts/baseline/run_smoke_tests.py
+uv run python scripts/baseline/verify_freeze.py
 ```
 
-The Phase 3 verifier hashes frozen files byte-for-byte. On Windows, `uv.lock` must retain the LF
-bytes recorded by the v2 manifest; automatic CRLF checkout conversion can otherwise report a
+The Phase-3 verifier hashes frozen files byte-for-byte. On Windows, `uv.lock` must retain the LF
+bytes recorded by the v4 manifest; automatic CRLF checkout conversion can otherwise report a
 content change even when Git considers the file logically unchanged.
 
 Run the provider-backed Phase 4 smoke check separately:

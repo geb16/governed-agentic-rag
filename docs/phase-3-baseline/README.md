@@ -3,7 +3,7 @@
 ## 1. Purpose and status
 
 Phase 3 is the conventional agentic retrieval-augmented generation (RAG) control condition for
-the later governed-agent comparison. Its freeze identifier is `phase3-baseline-v2`. The code uses
+the later governed-agent comparison. Its freeze identifier is `phase3-baseline-v4`. The code uses
 clean architecture (ports and adapters) with domain-owned contracts; it does not claim to be a
 complete domain-driven design or a production governance platform.
 
@@ -185,8 +185,8 @@ Before writing the freeze manifest:
 2. run Ruff formatting and linting, MyPy, Pyright, and the complete Pytest suite;
 3. confirm the Git worktree contains only reviewed Phase 3 changes;
 4. write `docs/phase-3-baseline/freeze-manifest.json` once with
-   `uv run python scripts/verify_phase3_freeze.py --write`;
-5. immediately verify it with `uv run python scripts/verify_phase3_freeze.py`;
+   `uv run python scripts/baseline/verify_freeze.py --write`;
+5. immediately verify it with `uv run python scripts/baseline/verify_freeze.py`;
 6. review the generated file list and aggregate SHA-256 before committing and tagging.
 
 The verifier freezes Phase-3 runtime code, normative architecture and baseline documents,

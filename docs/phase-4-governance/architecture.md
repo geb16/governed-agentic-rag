@@ -2,7 +2,7 @@
 
 ## Purpose and declared scope
 
-Phase 4 is the governed treatment layered outside the frozen `phase3-baseline-v2` control. It
+Phase 4 is the governed treatment layered outside the frozen `phase3-baseline-v4` control. It
 evaluates whether an explicit workflow improves reliability, safety, traceability, and groundedness
 while both conditions retain the same knowledge corpus, retrieval configuration, synthetic business
 state, model family, and simulated capability set.
@@ -28,7 +28,7 @@ orchestration, stages, provider ports, SQLite adapters, security policy, and HTT
 separate internal packages. `governed_main.py` is the sole process composition root and selects
 concrete adapters.
 
-The entire shared `app.infrastructure` tree belongs to the Phase 3 v2 cryptographic identity.
+The entire shared `app.infrastructure` tree belongs to the Phase-3 v4 cryptographic identity.
 Phase 4 therefore consumes its frozen model-independent SQLite adapter but keeps treatment-specific
 workflow and audit adapters under `governance/persistence` and `audit/sqlite`. Moving them into the
 shared infrastructure tree would invalidate the control condition.
