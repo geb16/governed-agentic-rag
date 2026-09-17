@@ -2,7 +2,6 @@ import ast
 
 
 def test_evaluation_is_outside_every_frozen_source_scope(paths) -> None:
-    
     assert paths.project == paths.repository / "experiments" / "paired_agent_evaluation"
     assert all(
         not paths.project.is_relative_to(frozen_root)
