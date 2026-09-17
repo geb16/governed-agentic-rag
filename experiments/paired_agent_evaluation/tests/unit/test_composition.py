@@ -16,10 +16,17 @@ from paired_agent_evaluation.composition import EvaluationPaths, acquire, prepar
 class _StubSettings:
     """Provide the settings subset consumed by the composition builder."""
 
-    def __init__(self, *, openai_model: str = "gpt-5.6", **_: object) -> None:
+    def __init__(
+        self,
+        *,
+        openai_model: str = "gpt-5.6",
+        knowledge_base_dir: Path,
+        **_: object,
+    ) -> None:
         self.retrieval_backend = "qdrant"
         self.qdrant_collection = "phase3_enterprise_kb"
         self.openai_model = openai_model
+        self.knowledge_base_dir = knowledge_base_dir
 
 
 @pytest.fixture
@@ -67,6 +74,20 @@ def test_prepare_run_is_idempotent_for_an_unchanged_repeat(
 
     assert second == first
     assert plan_path.read_bytes() == original_plan
+
+
+def test_prepare_run_binds_the_frozen_knowledge_base(
+    isolated_paths: EvaluationPaths,
+) -> None:
+    """Resolve experiment retrieval data independently of the working directory."""
+    _, _, _, settings = prepare_run(
+        run_id="run_knowledge_base_path",
+        split=DatasetSplit.VALIDATION,
+    )
+
+    expected = isolated_paths.repository / "data" / "knowledge_base"
+    assert settings.knowledge_base_dir == expected
+    assert settings.knowledge_base_dir.is_absolute()
 
 
 def test_prepare_run_rejects_blinding_plan_drift(isolated_paths: EvaluationPaths) -> None:
