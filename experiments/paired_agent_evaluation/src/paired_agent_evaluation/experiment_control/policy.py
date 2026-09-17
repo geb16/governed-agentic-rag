@@ -6,7 +6,7 @@ HARNESS_FREEZE_ID = "paired-agent-evaluation-harness-v1"
 HARNESS_MANIFEST = Path("docs/phase-6-experiments/harness-freeze-manifest.json")
 TEST_EXECUTION_CLAIM = Path("data/evaluation/paired_agent_evaluation/test-execution-claim.json")
 INHERITED_VERIFIERS = (
-    "scripts/verify_phase3_freeze.py",
-    "scripts/verify_phase4_freeze.py",
-    "scripts/verify_phase5_freeze.py",
+    "scripts/baseline/verify_freeze.py",
+    "scripts/governance/verify_freeze.py",
+    "scripts/evaluation/verify_freeze.py",
 )

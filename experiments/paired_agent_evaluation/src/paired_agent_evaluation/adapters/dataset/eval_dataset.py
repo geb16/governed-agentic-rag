@@ -30,7 +30,7 @@ class EvaluationDataset:
 
     def __init__(self, repository_root: Path) -> None:
         self.root = repository_root / "data" / "evaluation" / "phase5" / "v1"
-        self.freeze_path = repository_root / "docs" / "phase-5-freeze-manifest.json"
+        self.freeze_path = repository_root / "docs" / "phase-5-evaluation" / "freeze-manifest.json"
 
     def verify(self) -> None:
         """Verifies the dataset's membership, hashes, counts, and contracts.

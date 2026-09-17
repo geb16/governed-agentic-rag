@@ -97,8 +97,8 @@ def prepare_run(
     if settings.retrieval_backend != config.required_retrieval_backend:
         raise ValueError("Configured retrieval backend violates experiment.json")
 
-    phase3 = load_freeze(paths.repository / "docs" / "phase-3-freeze-manifest.json")
-    phase4 = load_freeze(paths.repository / "docs" / "phase-4-freeze-manifest.json")
+    phase3 = load_freeze(paths.repository / "docs" / "phase-3-baseline" / "freeze-manifest.json")
+    phase4 = load_freeze(paths.repository / "docs" / "phase-4-governance" / "freeze-manifest.json")
     phase5 = dataset.freeze_identity()
     manifest_path = run_root / "run-manifest.json"
     schedule_path = run_root / "schedule.json"
