@@ -5,15 +5,22 @@ from __future__ import annotations
 import secrets
 
 import pytest
+from pydantic import ValidationError
 
 from paired_agent_evaluation.application.adjudication import (
     BlindingPlan,
     ReviewItem,
+    build_review_item,
     create_blinding_plan,
     order_review_items,
     resolve_reviews,
 )
-from paired_agent_evaluation.domain.observations import ObservedRoute
+from paired_agent_evaluation.domain.executions import Condition, ExecutionKey
+from paired_agent_evaluation.domain.observations import (
+    AcceptanceStatus,
+    NormalizedObservation,
+    ObservedRoute,
+)
 from paired_agent_evaluation.domain.scores import Adjudication, ResolvedAdjudication
 
 
@@ -22,6 +29,40 @@ class _ReverseRandom:
 
     def shuffle(self, values: list[str]) -> None:
         values.reverse()
+
+
+def _observation(
+    *,
+    answer: str,
+    route: ObservedRoute | None,
+    route_review_required: bool = False,
+    terminal_error_code: str | None = None,
+) -> NormalizedObservation:
+    """Build a minimal accepted observation for reviewer-projection tests."""
+    return NormalizedObservation(
+        key=ExecutionKey(
+            case_id="case_eval_0001",
+            repetition=1,
+            condition=Condition.GOVERNED,
+        ),
+        acceptance=AcceptanceStatus.ACCEPTED,
+        observed_route=route,
+        route_requires_adjudication=route_review_required,
+        answer=answer,
+        terminal_error_code=terminal_error_code,
+        latency_ms=1,
+        input_tokens=1,
+        output_tokens=1,
+        raw_sha256="a" * 64,
+    )
+
+
+def _plan(observation: NormalizedObservation) -> BlindingPlan:
+    observation_id = observation.key.observation_id
+    return BlindingPlan(
+        assignments={observation_id: f"blind_{'1' * 32}"},
+        review_order=[observation_id],
+    )
 
 
 def test_blinding_plan_uses_random_opaque_ids_and_an_independent_order(
@@ -73,6 +114,64 @@ def test_review_packet_follows_private_plan_order() -> None:
         plan.identity_for(second),
         plan.identity_for(first),
     ]
+
+
+def test_review_projection_neutralizes_condition_specific_terminal_wording() -> None:
+    """Keep route review blinded without mutating the normalized observation."""
+    original = "The governed workflow could not safely produce a response."
+    observation = _observation(
+        answer=original,
+        route=None,
+        route_review_required=True,
+        terminal_error_code="missing_citation",
+    )
+
+    item = build_review_item(
+        observation,
+        plan=_plan(observation),
+        query="Help with this request.",
+        contexts=[],
+    )
+
+    assert item is not None
+    assert item.response == "The system could not safely produce a response."
+    assert item.route_review_required is True
+    assert item.groundedness_review_required is False
+    assert observation.answer == original
+
+
+@pytest.mark.parametrize("route", [ObservedRoute.DENY, ObservedRoute.SAFE_TERMINATE])
+def test_terminal_or_safety_failure_does_not_request_groundedness(
+    route: ObservedRoute,
+) -> None:
+    """Exclude terminal fallback text when no separate route decision is needed."""
+    observation = _observation(
+        answer="The model output did not pass baseline safety validation.",
+        route=route,
+    )
+
+    assert (
+        build_review_item(
+            observation,
+            plan=_plan(observation),
+            query="Help with this request.",
+            contexts=[],
+        )
+        is None
+    )
+
+
+@pytest.mark.parametrize("indicator", ["baseline", "governed", "GOVERNED"])
+def test_review_packet_rejects_condition_indicators(indicator: str) -> None:
+    """Fail closed when any reviewer-facing text can reveal the condition."""
+    with pytest.raises(ValidationError, match="condition indicator"):
+        ReviewItem(
+            blinded_id=f"blind_{'1' * 32}",
+            query="Help with this request.",
+            response=f"The {indicator} system returned a response.",
+            route_review_required=False,
+            groundedness_review_required=True,
+        )
 
 
 def test_two_independent_matching_reviews_resolve() -> None:
