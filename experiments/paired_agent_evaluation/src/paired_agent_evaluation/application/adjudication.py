@@ -1,8 +1,7 @@
-"""Prepare blinded review items and reconcile independent decisions.
+"""Prepare blinded review items and accept researcher adjudications.
 
 The module preserves opaque identities and randomized review order across a run,
-then accepts field-level outcomes only when distinct reviewers agree or an explicit
-resolution settles their disagreement.
+then validates one condition-blinded researcher's field-level decisions.
 
 References:
     [1] NIST, "AI Risk Management Framework Core," Measure 1.3 and Map 3.5.
@@ -16,8 +15,7 @@ from __future__ import annotations
 
 import re
 import secrets
-from collections.abc import Hashable, Iterable, Mapping
-from typing import TypeVar
+from collections.abc import Iterable, Mapping
 
 from pydantic import Field, model_validator
 
@@ -25,9 +23,8 @@ from paired_agent_evaluation.domain.executions import StrictModel
 from paired_agent_evaluation.domain.observations import NormalizedObservation, ObservedRoute
 from paired_agent_evaluation.domain.scores import Adjudication, ResolvedAdjudication
 
-DecisionT = TypeVar("DecisionT", bound=Hashable)
-
 _NEUTRAL_FAILURE_RESPONSE = "The system could not safely produce a response."
+RESEARCHER_ADJUDICATOR_ID = "researcher-adjudicator"
 _CONDITION_SPECIFIC_FAILURES = frozenset(
     {
         "The model output did not pass baseline safety validation.",
@@ -143,8 +140,7 @@ def build_review_item(
     grounded = bool(
         observation.answer
         and observation.terminal_error_code is None
-        and observation.observed_route
-        not in {ObservedRoute.DENY, ObservedRoute.SAFE_TERMINATE}
+        and observation.observed_route not in {ObservedRoute.DENY, ObservedRoute.SAFE_TERMINATE}
     )
     route = observation.route_requires_adjudication
     if not grounded and not route:
@@ -177,77 +173,33 @@ def order_review_items(items: Mapping[str, ReviewItem], *, plan: BlindingPlan) -
     ]
 
 
-def _resolve_field(
-    decisions: Iterable[tuple[str, DecisionT | None]],
-    *,
-    resolution: DecisionT | None,
-) -> tuple[DecisionT | None, set[str], bool]:
-    """Resolve one field only when at least two distinct reviewers decided it."""
-    provided = [(reviewer, value) for reviewer, value in decisions if value is not None]
-    reviewers = {reviewer for reviewer, _ in provided}
-    if len(reviewers) < 2:
-        return None, set(), False
-    values = {value for _, value in provided}
-    if len(values) == 1:
-        return next(iter(values)), reviewers, False
-    if resolution is not None:
-        return resolution, reviewers, True
-    return None, set(), False
+def resolve_reviews(reviews: list[Adjudication]) -> dict[str, ResolvedAdjudication]:
+    """Validates and indexes one researcher's blinded decisions.
 
-
-def resolve_reviews(
-    reviews: list[Adjudication],
-    *,
-    resolutions: list[ResolvedAdjudication] | None = None,
-) -> dict[str, ResolvedAdjudication]:
-    """Resolves each decision field from independent reviewer submissions.
-
-    A field is resolved only after two distinct reviewers provide it. Agreement is
-    accepted directly; disagreement requires a supplied resolution explicitly
-    marked as resolved. Fields without sufficient evidence remain unresolved.
+    Every record must use the same researcher identity and each blinded item may
+    occur only once. Missing required fields remain pending during scoring.
 
     Args:
-        reviews: Independent decisions grouped by blinded identity.
-        resolutions: Optional decisions that settle reviewer disagreements.
+        reviews: Condition-blinded decisions from the researcher-adjudicator.
 
     Returns:
-        Resolved records keyed by blinded identity. Identities with no resolvable
-        field are omitted.
+        Validated decisions keyed by blinded identity.
+
+    Raises:
+        ValueError: If multiple researcher identities or duplicate items occur.
     """
-    supplied = {item.blinded_id: item for item in resolutions or []}
-    grouped: dict[str, list[Adjudication]] = {}
-    for review in reviews:
-        grouped.setdefault(review.blinded_id, []).append(review)
+    reviewers = {item.reviewer_id for item in reviews}
+    if reviewers - {RESEARCHER_ADJUDICATOR_ID}:
+        raise ValueError(f"reviewer_id must be {RESEARCHER_ADJUDICATOR_ID!r}")
     resolved: dict[str, ResolvedAdjudication] = {}
-    for identity, items in grouped.items():
-        supplied_resolution = supplied.get(identity)
-        usable_resolution = (
-            supplied_resolution
-            if supplied_resolution is not None and supplied_resolution.disagreement_resolved
-            else None
-        )
-        route, route_reviewers, route_resolved = _resolve_field(
-            ((item.reviewer_id, item.observed_route) for item in items),
-            resolution=usable_resolution.observed_route if usable_resolution else None,
-        )
-        claim, claim_reviewers, claim_resolved = _resolve_field(
-            ((item.reviewer_id, item.claim_support_passed) for item in items),
-            resolution=usable_resolution.claim_support_passed if usable_resolution else None,
-        )
-        reviewers = route_reviewers | claim_reviewers
-        if not reviewers:
-            continue
-        resolved[identity] = ResolvedAdjudication(
-            blinded_id=identity,
-            observed_route=route,
-            claim_support_passed=claim,
-            reviewer_count=len(reviewers),
-            disagreement_resolved=route_resolved or claim_resolved,
-            resolution_notes=(
-                usable_resolution.resolution_notes
-                if usable_resolution and (route_resolved or claim_resolved)
-                else ""
-            ),
+    for item in reviews:
+        if item.blinded_id in resolved:
+            raise ValueError(f"duplicate adjudication for {item.blinded_id}")
+        resolved[item.blinded_id] = ResolvedAdjudication(
+            blinded_id=item.blinded_id,
+            reviewer_id=item.reviewer_id,
+            observed_route=item.observed_route,
+            claim_support_passed=item.claim_support_passed,
         )
     return resolved
 
@@ -261,7 +213,7 @@ def apply_route_review(
     """Applies a resolved route decision to an observation awaiting review.
 
     Returns the original observation when route review is unnecessary or remains
-    unresolved; otherwise returns a copy marked as decided by blinded dual review.
+    unresolved; otherwise returns a copy marked as researcher-adjudicated.
     """
     if not observation.route_requires_adjudication:
         return observation
@@ -271,7 +223,7 @@ def apply_route_review(
     return observation.model_copy(
         update={
             "observed_route": decision.observed_route,
-            "route_source": "blinded_dual_review",
+            "route_source": "blinded_researcher_adjudication",
             "route_requires_adjudication": False,
         }
     )
