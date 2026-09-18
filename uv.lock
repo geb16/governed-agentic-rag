@@ -181,7 +181,7 @@ wheels = [
 
 [[package]]
 name = "governed-agentic-rag"
-version = "0.2.1"
+version = "0.2.2"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
@@ -211,7 +211,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.13,<3" },
     { name = "pydantic-settings", specifier = ">=2.12,<3" },
     { name = "python-dotenv", specifier = ">=1.2.2" },
-    { name = "qdrant-client", specifier = ">=1.17,<2" },
+    { name = "qdrant-client", specifier = ">=1.18.0,<2" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.41,<1" },
 ]
 
