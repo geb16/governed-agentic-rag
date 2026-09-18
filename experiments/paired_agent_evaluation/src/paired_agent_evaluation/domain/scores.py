@@ -30,14 +30,12 @@ class Adjudication(StrictModel):
 
 
 class ResolvedAdjudication(StrictModel):
-    """Records the agreed or resolved outcome of independent reviews."""
+    """Records one blinded researcher's accepted adjudication outcome."""
 
     blinded_id: str
+    reviewer_id: str
     observed_route: ObservedRoute | None = None
     claim_support_passed: bool | None = None
-    reviewer_count: int = Field(ge=2)
-    disagreement_resolved: bool = False
-    resolution_notes: str = ""
 
 
 class MetricContribution(StrictModel):
