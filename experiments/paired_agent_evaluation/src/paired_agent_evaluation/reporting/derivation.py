@@ -51,22 +51,10 @@ from paired_agent_evaluation.domain.scores import (
 
 
 def _load_adjudications(run_root: Path) -> dict[str, ResolvedAdjudication]:
-    """Loads reviewer files and applies explicit disagreement resolutions."""
-    review_dir = run_root / "adjudication"
-    reviews = (
-        [
-            item
-            for path in sorted(review_dir.glob("reviewer-*.jsonl"))
-            for item in JsonlStore.read(path, Adjudication)
-        ]
-        if review_dir.exists()
-        else []
-    )
-    resolution_path = review_dir / "resolutions.jsonl"
-    resolutions = (
-        JsonlStore.read(resolution_path, ResolvedAdjudication) if resolution_path.is_file() else []
-    )
-    return resolve_reviews(reviews, resolutions=resolutions)
+    """Loads the condition-blinded researcher-adjudicator submission."""
+    review_path = run_root / "adjudication" / "researcher-adjudicator.jsonl"
+    reviews = JsonlStore.read(review_path, Adjudication) if review_path.is_file() else []
+    return resolve_reviews(reviews)
 
 
 def _validate_schedule(
