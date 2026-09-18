@@ -8,4 +8,4 @@ experiment startup verifies it instead of silently accepting control drift.
 
 GOVERNED_APP_VERSION = "0.6.1"
 WORKFLOW_SCHEMA_VERSION = 1
-BASELINE_CONTROL_SHA256 = "84039d82823c5d85f72b383e80605c4187c0f02f1f9473cb569c1f69dcffbdc6"
+BASELINE_CONTROL_SHA256 = "06eb0c9086b43f5581805c946b727ee5503abe6a3a293fabeed4dca0edad03dc"
