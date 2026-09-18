@@ -1,8 +1,8 @@
 {
-  "aggregate_sha256": "84039d82823c5d85f72b383e80605c4187c0f02f1f9473cb569c1f69dcffbdc6",
+  "aggregate_sha256": "06eb0c9086b43f5581805c946b727ee5503abe6a3a293fabeed4dca0edad03dc",
   "app_version": "0.2.2",
   "freeze_id": "phase3-baseline-v5",
-  "frozen_at": "2026-09-18T13:17:17.586583+00:00",
+  "frozen_at": "2026-09-18T17:59:39.152567+00:00",
   "manifest_schema_version": 1,
   "source_files": {
     "data/knowledge_base/data_governance_policy.md": "a59bbec7c55c2e9949c62c58498bc80bc1f4e630f52c89d0f638f10054690b94",
@@ -10,10 +10,10 @@
     "data/knowledge_base/manifest.json": "52a20aba792644f1990f421ed173999cc823c0ca7bf22c370eb47c54eb8ba86a",
     "data/knowledge_base/refund_policy.md": "8ee3b3c00c1cebe79c12285fc191b07552b917d966b5ffd3d1676e55cb9eb3c4",
     "data/knowledge_base/support_sop.md": "c212b9ec8dceb67134d4db912063186664f2948aaa475dd990357d1c741e7d71",
-    "docker-compose.yml": "cc62756a5724fa37cf3d03fd3ef1a492a03a516fb76ba5e02110323368243107",
+    "docker-compose.yml": "aaae21bae5c160eb394e1f32a6bd9f75df8523c16bf42bf5fbc2ebf5a0c943e2",
     "docs/phase-3-baseline/README.md": "17a7a8b950c369769c1bc692c449ffbf84c0ad69f75318bebf109c621d07bf6e",
     "docs/phase-3-baseline/architecture.md": "bb31f81c2b5f205f7622b4cee0f1ad7c0634c891b0bde48d6f684553775da2c1",
-    "pyproject.toml": "026d551b4e009f565537c30dea25332e099ebf7f9b87007f4698444965e3b7c2",
+    "pyproject.toml": "dc3367172d7e80fd12fa060421699ac6a1283f1941141ebb60e5586c91e030b2",
     "scripts/baseline/run_smoke_tests.py": "28a1fa6e0d8bb5d7de763be10a540f848c69eb0961513cb852bffbc472405cd9",
     "scripts/baseline/verify_freeze.py": "eb59188584d71eb0cf51e8e4e32576e0e05f9b1bab2d855be8f1b8dc3a8fcc65",
     "scripts/ingest_kb.py": "71234cf60adeea8e4969a2f77dda669c941b8c50f4efb1a7cba2ffc96b1d9b3f",
@@ -103,6 +103,6 @@
     "tests/shared/unit/test_config.py": "c1905d4236c70f9dd368901d0e94d6dcf0da83a18539a3eb8a9d47229d4cf997",
     "tests/shared/unit/test_dotenv_file.py": "f4838f5acb165bf7909f52b6cd15ad088e34511dcd1e65655b9736539d2bfbd3",
     "tests/shared/unit/test_security.py": "9ce8eb377af7abcb655007d0b33471a94b2e7328b31ce099f3dbf2bce489d195",
-    "uv.lock": "28fd916f8904d5a2419b6ad593d3823b5f4dd81d4def1df4ee70fb47f605ad87"
+    "uv.lock": "8edf37d6d754b5495f3474a4ad6aff8db4298ed0a3318503c1fb9f2343fc4d60"
   }
 }

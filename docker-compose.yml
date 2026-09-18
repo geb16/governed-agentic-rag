@@ -1,6 +1,6 @@
 services:
   qdrant:
-    image: qdrant/qdrant:v1.17.0-unprivileged
+    image: qdrant/qdrant:v1.19.0-unprivileged
     restart: unless-stopped
     read_only: true
     ports:
