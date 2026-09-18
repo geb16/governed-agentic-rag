@@ -1,4 +1,4 @@
-"""Verify blinded review ordering and independent adjudication resolution."""
+"""Verify blinded review ordering and researcher adjudication validation."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ from paired_agent_evaluation.domain.observations import (
     NormalizedObservation,
     ObservedRoute,
 )
-from paired_agent_evaluation.domain.scores import Adjudication, ResolvedAdjudication
+from paired_agent_evaluation.domain.scores import Adjudication
 
 
 class _ReverseRandom:
@@ -174,77 +174,47 @@ def test_review_packet_rejects_condition_indicators(indicator: str) -> None:
         )
 
 
-def test_two_independent_matching_reviews_resolve() -> None:
-    """Resolve a field when two distinct reviewers submit the same decision."""
-    reviews = [
-        Adjudication(
-            blinded_id="blind_1",
-            reviewer_id="r1",
-            observed_route=ObservedRoute.ANSWER,
-        ),
-        Adjudication(
-            blinded_id="blind_1",
-            reviewer_id="r2",
-            observed_route=ObservedRoute.ANSWER,
-        ),
-    ]
-
-    assert resolve_reviews(reviews)["blind_1"].observed_route == ObservedRoute.ANSWER
-
-
-def test_reviewers_must_independently_decide_each_resolved_field() -> None:
-    """Different single-reviewer fields do not constitute dual review."""
-    reviews = [
-        Adjudication(
-            blinded_id="blind_1",
-            reviewer_id="r1",
-            observed_route=ObservedRoute.ANSWER,
-        ),
-        Adjudication(blinded_id="blind_1", reviewer_id="r2", claim_support_passed=True),
-    ]
-
-    assert resolve_reviews(reviews) == {}
-
-
-def test_independently_dual_reviewed_fields_resolve_together() -> None:
-    """Combine fields independently supported by different reviewer pairs."""
-    reviews = [
-        Adjudication(
-            blinded_id="blind_1",
-            reviewer_id="r1",
-            observed_route=ObservedRoute.ANSWER,
-        ),
-        Adjudication(
-            blinded_id="blind_1",
-            reviewer_id="r2",
-            observed_route=ObservedRoute.ANSWER,
-            claim_support_passed=True,
-        ),
-        Adjudication(blinded_id="blind_1", reviewer_id="r3", claim_support_passed=True),
-    ]
-
-    decision = resolve_reviews(reviews)["blind_1"]
-
-    assert decision.observed_route == ObservedRoute.ANSWER
-    assert decision.claim_support_passed is True
-    assert decision.reviewer_count == 3
-
-
-def test_disagreement_requires_explicit_resolution() -> None:
-    """Leave disagreement unresolved until an explicit resolution is supplied."""
-    reviews = [
-        Adjudication(blinded_id="blind_1", reviewer_id="r1", claim_support_passed=True),
-        Adjudication(blinded_id="blind_1", reviewer_id="r2", claim_support_passed=False),
-    ]
-
-    assert resolve_reviews(reviews) == {}
-
-    resolution = ResolvedAdjudication(
+def test_single_researcher_decision_resolves_each_provided_field() -> None:
+    """Accept route and claim-support decisions from one blinded researcher."""
+    review = Adjudication(
         blinded_id="blind_1",
-        claim_support_passed=False,
-        reviewer_count=2,
-        disagreement_resolved=True,
-        resolution_notes="Unsupported material claim.",
+        reviewer_id="researcher-adjudicator",
+        observed_route=ObservedRoute.ANSWER,
+        claim_support_passed=True,
     )
 
-    assert resolve_reviews(reviews, resolutions=[resolution])["blind_1"] == resolution
+    decision = resolve_reviews([review])["blind_1"]
+
+    assert decision.reviewer_id == "researcher-adjudicator"
+    assert decision.observed_route == ObservedRoute.ANSWER
+    assert decision.claim_support_passed is True
+
+
+def test_multiple_researcher_identities_are_rejected() -> None:
+    """Reject identities outside the registered researcher-adjudicator role."""
+    reviews = [
+        Adjudication(blinded_id="blind_1", reviewer_id="researcher", claim_support_passed=True),
+        Adjudication(blinded_id="blind_2", reviewer_id="other", claim_support_passed=True),
+    ]
+
+    with pytest.raises(ValueError, match="researcher-adjudicator"):
+        resolve_reviews(reviews)
+
+
+def test_duplicate_researcher_decision_is_rejected() -> None:
+    """Require exactly one record per blinded item."""
+    reviews = [
+        Adjudication(
+            blinded_id="blind_1",
+            reviewer_id="researcher-adjudicator",
+            claim_support_passed=True,
+        ),
+        Adjudication(
+            blinded_id="blind_1",
+            reviewer_id="researcher-adjudicator",
+            claim_support_passed=False,
+        ),
+    ]
+
+    with pytest.raises(ValueError, match="duplicate adjudication"):
+        resolve_reviews(reviews)
