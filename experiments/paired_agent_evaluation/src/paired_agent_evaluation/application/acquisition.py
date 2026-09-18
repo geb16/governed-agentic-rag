@@ -10,6 +10,7 @@ from __future__ import annotations
 from app.evaluation.dataset.models import EvaluationCase
 
 from paired_agent_evaluation.application.ports import (
+    AttemptJournal,
     AttemptJournalStore,
     RawExecutionStore,
     SystemRunner,
@@ -85,6 +86,7 @@ class AcquisitionRunner:
             if len(prior_attempts) >= self._max_attempts:
                 raise RuntimeError(f"Pre-acceptance attempt limit reached for {identity}")
             first_attempt = len(prior_attempts) + 1
+            journal: AttemptJournal | None = None
             for attempt in range(first_attempt, self._max_attempts + 1):
                 journal = self._attempts.begin(identity, attempt)
                 execution = self._runners[scheduled.key.condition].execute(
@@ -98,7 +100,8 @@ class AcquisitionRunner:
                 if execution.acceptance == AcceptanceStatus.ACCEPTED:
                     break
                 journal.mark_pre_acceptance_failed(execution.error_type)
-            assert execution is not None
+            if execution is None or journal is None:
+                raise RuntimeError(f"No acquisition attempt was made for {identity}")
             self._store.write(execution)
             journal.mark_observation_persisted()
         return self._store.read_all()
