@@ -77,8 +77,8 @@ def test_groundedness_requires_membership_and_human_claim_support(
     reviews = {
         identity: ResolvedAdjudication(
             blinded_id=identity,
+            reviewer_id="researcher-adjudicator",
             claim_support_passed=True,
-            reviewer_count=2,
         )
     }
     scored = _metrics(case, observation, reviews, plan=plan)
