@@ -2,7 +2,7 @@
 
 This verifier hashes the bounded Phase 4 release surface and derives one canonical
 aggregate from its files and compatibility identities. It also pins the reviewed
-Phase-3 v4 control manifest without duplicating ownership of the Phase 3 file scope.
+Phase-3 v5 control manifest without duplicating ownership of the Phase 3 file scope.
 
 Note: `--write` is used only after the complete release tree and verification suite have been
      reviewed; normal execution if this file is read-only and fails closed on drift.
@@ -30,7 +30,7 @@ from app.governance.version import (
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-4-governance" / "freeze-manifest.json"
 PHASE3_MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-3-baseline" / "freeze-manifest.json"
-PHASE4_FREEZE_ID = "phase4-governance-v5"
+PHASE4_FREEZE_ID = "phase4-governance-v6"
 MANIFEST_SCHEMA_VERSION = 1
 
 # Phase 5 evaluation assets must remain outside this treatment identity.
@@ -107,7 +107,7 @@ def _phase3_identity() -> dict[str, str]:
 
     Raises:
         FreezeScopeError: If the manifest is unreadable, malformed, or not the
-            reviewed Phase-3 v4 control referenced by governance code.
+            reviewed Phase-3 v5 control referenced by governance code.
     """
     try:
         manifest_bytes = PHASE3_MANIFEST_PATH.read_bytes()
