@@ -28,8 +28,9 @@ is retained as a system outcome and scored under the frozen rubric.
    preregister exactly one test run ID.
 4. Atomically consume that authorization before any provider call, then run the untouched test
    split once. An interrupted test acquisition is not restarted under another run ID.
-5. Complete dual independent, condition-blinded human review for every applicable decision field
-   before opening comparative results. Resolve each disagreement explicitly.
+5. The researcher-adjudicator completes condition-blinded human review for every applicable
+   decision field before opening comparative results. Automated or LLM judgements cannot replace
+   the researcher's decision. The single-review limitation is reported in the final report.
 6. Run Ragas as a secondary sensitivity measure, compute the registered estimates, and seal the
    sanitized artifact set.
 
