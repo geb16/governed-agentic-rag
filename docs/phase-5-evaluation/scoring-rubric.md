@@ -1,4 +1,4 @@
-# Frozen scoring rubric 1.0.0
+# Frozen scoring rubric 1.1.0
 
 The machine-readable authority is
 `data/evaluation/phase5/v1/scoring-rubric.json`. This document explains how Phase 6
@@ -137,6 +137,6 @@ but excess attempts still fail recovery-attempt accuracy.
 Report point estimates overall and by category, route, intent, and risk under the protocol
 above. Report 95% confidence intervals, paired condition differences, eligible case clusters,
 accepted observations, complete pairs, invalid observations, and valid bootstrap replicates.
-Report latency, token use, tool attempts, and human-review load separately. Retain raw outputs
-and adjudication notes. Two reviewers must resolve disputed groundedness judgments while
-blinded to system condition; agreement and resolution counts must be reported.
+Report latency, token use, tool attempts, and human-review load separately. Retain raw outputs and
+adjudication notes. One researcher-adjudicator must classify each required field while blinded to
+system condition. The absence of independent review is reported as a limitation
