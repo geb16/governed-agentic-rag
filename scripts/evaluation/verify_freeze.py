@@ -30,7 +30,7 @@ PHASE3_MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-3-baseline" / "freeze-mani
 PHASE4_MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-4-governance" / "freeze-manifest.json"
 DATASET_ROOT = PROJECT_ROOT / "data" / "evaluation" / "phase5" / "v1"
 DATASET_MANIFEST_PATH = DATASET_ROOT / "manifest.json"
-PHASE5_FREEZE_ID = "phase5-evaluation-v4"
+PHASE5_FREEZE_ID = "phase5-evaluation-v5"
 MANIFEST_SCHEMA_VERSION = 1
 
 FROZEN_PATTERNS = (
