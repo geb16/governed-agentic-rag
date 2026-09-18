@@ -3,7 +3,7 @@
 ## Purpose and declared scope
 
 Phase-6 is the paired evaluation harness that compares the frozen `phase3-baseline-v4` control and
-`phase4-governance-v5` treatment under the same `phase5-evaluation-v4` cases, model, Qdrant
+`phase4-governance-v5` treatment under the same `phase5-evaluation-v5` cases and rubric, model, Qdrant
 collection, synthetic database fixture, simulated tools, and deterministic failure plan. It answers
 whether the governance-aware workflow layer measurably improves reliability, safety, traceability,
 and groundedness relative to the conventional baseline — it does not itself implement either
@@ -140,7 +140,7 @@ composition.acquisition.acquire(run_id, split)
 reporting.derivation: normalize -> review packet -> adjudicate (blinded) -> score -> summarize
   -> normalize every raw observation into one route/evidence/tool vocabulary
   -> build the randomly ordered, condition-blinded review packet
-  -> require two independent decisions for each applicable review field; resolve disagreements
+  -> validate one condition-blinded researcher decision for each applicable review field
   -> apply resolved labels and compute the 14 frozen Phase 5 metric contributions
   -> bootstrap condition estimates, category-macro estimates, paired differences, and the summary
 
@@ -195,7 +195,7 @@ invalid or mismatched envelope contribute no audit-completeness facts.
 | Raw and normalized observations | Internal, condition-labeled | Never part of the reviewer-facing packet |
 | The private blinding plan (`blinding-plan.json`) | Confidential until adjudication is final | Maps observations to cryptographically random opaque IDs and records a random reviewer order; its digest is pinned by the run manifest |
 | The review packet (`review-packet.jsonl`) | Reviewer-facing | Carries only opaque IDs in the private plan's random order; no `case_id`, `condition`, raw observation identity, or public derivation input |
-| Adjudication resolutions | Reviewer-authored, trusted after dual review | Consumed by scoring only after being written back under the real observation identity |
+| Researcher adjudications | Researcher-authored, condition-blinded | Consumed by scoring through opaque identities; the private plan supplies the observation mapping |
 | Secondary Ragas grades | Diagnostic only | Never merged into primary metric contributions |
 | Stored primary result artifacts and `report.html` | Derived, not authoritative | `seal_run` rederives and compares them from raw observations, the schedule, dataset, rubric, blinding plan, and adjudication inputs |
 | Harness freeze and test-execution claim | Preregistered control evidence | Bind reviewed source bytes and completed validation to one test ID; claim is created exclusively before provider access and copied into the sealed run |
@@ -219,12 +219,14 @@ invalid or mismatched envelope contribute no audit-completeness facts.
 3. The Ragas-after-adjudication ordering ("run secondary faithfulness only after primary human
    labels are fixed") is a documented protocol step, not a code-enforced precondition; nothing stops
    `score_results.py --ragas` from running before adjudication is complete.
-4. This harness inherits every architectural compromise of the systems it evaluates (see
+4. Route and claim-support judgements have one researcher-adjudicator. Condition blinding limits
+   bias, but independent replication and inter-rater reliability are unavailable.
+5. This harness inherits every architectural compromise of the systems it evaluates (see
    [Phase 4 governance architecture — known architectural compromises](../phase-4-governance/architecture.md#known-architectural-compromises)):
    single-process SQLite durability, synchronous model/tool calls, and an unanchored (though
    tamper-evident) audit hash chain all bound what "governed" and "baseline" can mean in this pilot's
    results.
-5. The one-time execution claim is durable repository evidence rather than an external append-only
+6. The one-time execution claim is durable repository evidence rather than an external append-only
    registry. Deleting both the claim and all test/release artifacts could bypass the local guard;
    repository permissions and review must therefore prevent removal. The harness still fails closed
    for normal operation, interruption, repeated commands, and alternative run IDs.
