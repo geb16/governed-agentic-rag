@@ -99,10 +99,22 @@ regenerate an inherited manifest from this project to force a pass.
    uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_validation_v1
    ```
 
-5. Two reviewers independently write
-   `adjudication/reviewer-<id>.jsonl`. Resolve disagreements in
-   `adjudication/resolutions.jsonl`, then rerun scoring. Do not inspect the condition mapping while
-   reviewing.
+5. The researcher named in the ethics protocol completes the condition-blinded, field-level
+   procedure in
+   [scoring and adjudication](../../docs/phase-6-experiments/scoring-and-adjudication.md). Neither an
+   LLM nor an automated grader can supply primary review-labels. `review-packet.jsonl` and 
+   the two cited guidance documents should only be used while adjudicating. 
+   The run directory, condition mapping, or the comparative results should not be inspected.
+
+   Confirm that the submission contains each packet `blinded_id` exactly once, then rerun primary
+   scoring without inspecting the condition mapping:
+
+   ```bash
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_validation_v1
+   ```
+
+   Continue only when `summary.json` records `pending_metric_contributions` as `0` and
+   `primary_results_final` as `true`.
 6. Run secondary Ragas faithfulness only after the primary human labels are fixed:
 
    ```bash
@@ -128,9 +140,8 @@ regenerate an inherited manifest from this project to force a pass.
    uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_test_v1
    ```
 
-   Complete the same blinded, field-level dual review and explicit disagreement resolution used for
-   validation, then rerun primary scoring. Only after `primary_results_final` is true may you run
-   the secondary Ragas analysis:
+   Complete the same condition-blinded researcher adjudication used for validation, then rerun
+   primary scoring. The secondary Ragas analysis is run only after the `primary_results_final` is true.
 
    ```bash
    uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_test_v1
