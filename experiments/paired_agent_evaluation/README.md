@@ -1,4 +1,4 @@
-# Paired Agent Evaluation — Phase 6 Experimental Harness
+# Paired Agent Evaluation(Phase-6 Experimental Harness)
 
 This isolated project compares the frozen conventional baseline and governance-aware workflow
 under identical Phase 5 cases, model, Qdrant collection, synthetic database fixture, simulated
