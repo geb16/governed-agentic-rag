@@ -1,10 +1,11 @@
-# Phase 6 Limitations
+# Evaluation and experiment Limitations in phase-6
 
 - The synthetic setting improves control and privacy but cannot establish production generalization.
 - Three stochastic repetitions estimate model variability only coarsely.
 - Sequential execution reduces interference but does not measure production concurrency behavior.
-- Human claim-support and route labels can disagree; dual review and explicit resolution reduce but
-  do not eliminate subjectivity.
+- Claim-support and ambiguous-route labels come from one condition-blinded researcher-adjudicator.
+  Blinding reduces condition bias, but the absence of independent review prevents inter-rater
+  reliability assessment and leaves residual researcher-judgement bias.
 - LLM-based Ragas grading is nondeterministic and is secondary only.
 - Audit completeness rewards the presence of registered facts, not their organizational usefulness.
 - Simulated tools, approvals, faults, and local SQLite state do not reproduce distributed identity,
