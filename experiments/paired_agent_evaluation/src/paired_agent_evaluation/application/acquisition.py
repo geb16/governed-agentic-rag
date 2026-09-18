@@ -73,15 +73,15 @@ class AcquisitionRunner:
                 continue
             execution: RawExecution | None = None
             prior_attempts = self._attempts.list(identity)
-            for expected_attempt, journal in enumerate(prior_attempts, start=1):
-                if journal.record.observation_id != identity:
+            for expected_attempt, prior_journal in enumerate(prior_attempts, start=1):
+                if prior_journal.record.observation_id != identity:
                     raise RuntimeError(f"Attempt journal identity mismatch for {identity}")
-                if journal.record.attempt != expected_attempt:
+                if prior_journal.record.attempt != expected_attempt:
                     raise RuntimeError(f"Attempt journal sequence mismatch for {identity}")
-                if journal.record.state != AttemptState.PRE_ACCEPTANCE_FAILED:
+                if prior_journal.record.state != AttemptState.PRE_ACCEPTANCE_FAILED:
                     raise RuntimeError(
                         f"Refusing to rerun indeterminate attempt for {identity}: "
-                        f"{journal.record.state.value}"
+                        f"{prior_journal.record.state.value}"
                     )
             if len(prior_attempts) >= self._max_attempts:
                 raise RuntimeError(f"Pre-acceptance attempt limit reached for {identity}")
