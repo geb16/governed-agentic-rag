@@ -1,8 +1,8 @@
 {
-  "aggregate_sha256": "a621d3ec273163b6250708addce22581e599f521bc59a471815d5b7e9b2ac224",
-  "app_version": "0.2.1",
-  "freeze_id": "phase3-baseline-v4",
-  "frozen_at": "2026-09-17T11:52:27.678315+00:00",
+  "aggregate_sha256": "84039d82823c5d85f72b383e80605c4187c0f02f1f9473cb569c1f69dcffbdc6",
+  "app_version": "0.2.2",
+  "freeze_id": "phase3-baseline-v5",
+  "frozen_at": "2026-09-18T13:17:17.586583+00:00",
   "manifest_schema_version": 1,
   "source_files": {
     "data/knowledge_base/data_governance_policy.md": "a59bbec7c55c2e9949c62c58498bc80bc1f4e630f52c89d0f638f10054690b94",
@@ -11,9 +11,9 @@
     "data/knowledge_base/refund_policy.md": "8ee3b3c00c1cebe79c12285fc191b07552b917d966b5ffd3d1676e55cb9eb3c4",
     "data/knowledge_base/support_sop.md": "c212b9ec8dceb67134d4db912063186664f2948aaa475dd990357d1c741e7d71",
     "docker-compose.yml": "cc62756a5724fa37cf3d03fd3ef1a492a03a516fb76ba5e02110323368243107",
-    "docs/phase-3-baseline/README.md": "d6aecf731e21cf4f0e37be03515136a4859510494d343248054547df1e6953ce",
-    "docs/phase-3-baseline/architecture.md": "df5c9420221e131a3968e45ffd6aebc793cc2304f2e2be86822e7f379acbd326",
-    "pyproject.toml": "b93b851cc4aa24618354176fb7dc652a5cbe740dc1668dfa28d58e54e5f8dda3",
+    "docs/phase-3-baseline/README.md": "17a7a8b950c369769c1bc692c449ffbf84c0ad69f75318bebf109c621d07bf6e",
+    "docs/phase-3-baseline/architecture.md": "bb31f81c2b5f205f7622b4cee0f1ad7c0634c891b0bde48d6f684553775da2c1",
+    "pyproject.toml": "026d551b4e009f565537c30dea25332e099ebf7f9b87007f4698444965e3b7c2",
     "scripts/baseline/run_smoke_tests.py": "28a1fa6e0d8bb5d7de763be10a540f848c69eb0961513cb852bffbc472405cd9",
     "scripts/baseline/verify_freeze.py": "eb59188584d71eb0cf51e8e4e32576e0e05f9b1bab2d855be8f1b8dc3a8fcc65",
     "scripts/ingest_kb.py": "71234cf60adeea8e4969a2f77dda669c941b8c50f4efb1a7cba2ffc96b1d9b3f",
@@ -43,7 +43,7 @@
     "src/app/core/config.py": "5ce68ca2757c708f5ac17c3021ebc0912f29e3f875aaa0b122508d74a0f34aef",
     "src/app/core/logging.py": "d5cb65b872016ef95cad077d6d7c9e5d8b827618a93add5a588d5d38725ef959",
     "src/app/core/security.py": "cf0296f615036084f58ed7c463174cbef1db95fc888d6ecad96513ed248f21e7",
-    "src/app/core/version.py": "6941c0984b5c277ba28b657f6f3ba117033804729f0c2afa5e984b50bff261f3",
+    "src/app/core/version.py": "e0eab06c760ff6501538ef6acec667b340cd0e3f3fa0d6cc160e978427a6cd2e",
     "src/app/domain/actions.py": "2795e7bd8b1c98a9a48e7afedbd19d5b144dcda374d55c8ec01e4d0132e1e675",
     "src/app/domain/contracts.py": "7edb58c6b307f3a02d390d2986d89690f9dd6d0af31075eb22e8d648518a626e",
     "src/app/domain/events.py": "c97281dda72681cbe4fde6d5b8b0411e63352446c69b880f387c48bdbd4efde1",
@@ -90,7 +90,7 @@
     "tests/baseline/integration/test_control_behavior.py": "84f9b00a62d6502ce0dfd11ef9da8044bad47e5073ceed7d1e0943ed401a641d",
     "tests/baseline/integration/test_experiment_manifest.py": "0f04c3b33edd14b5755ffea5c79524d535dcb88a75a0da185529063f1988b8e8",
     "tests/baseline/integration/test_fault_recovery.py": "94a14feceadf4ca4fe8d087a6366c1b5ef9199200f6fc14e2fd159f138edbffa",
-    "tests/baseline/integration/test_health.py": "bf79d916674ecac67ea2b1bf5d323a64be4fa54b20b7efd836cb025728f35cf9",
+    "tests/baseline/integration/test_health.py": "5346cc941ca4601fd20a83e2f340b635a881b78d35600aff7f58a4adf1f15ec8",
     "tests/baseline/integration/test_tool_outcomes.py": "29a65aeaa39f24eb144fa05ef616497c5dba5bfa9a18d9f447dab533263e5860",
     "tests/baseline/support.py": "621818e21566409f91b689005577565b7f38fefebdc2adc3bd27bea7a269e9b3",
     "tests/baseline/unit/test_facade.py": "43c897275b723d09552fb0eb1cbc2d1446885a48883e535fb4093bcace8581e6",
@@ -103,6 +103,6 @@
     "tests/shared/unit/test_config.py": "c1905d4236c70f9dd368901d0e94d6dcf0da83a18539a3eb8a9d47229d4cf997",
     "tests/shared/unit/test_dotenv_file.py": "f4838f5acb165bf7909f52b6cd15ad088e34511dcd1e65655b9736539d2bfbd3",
     "tests/shared/unit/test_security.py": "9ce8eb377af7abcb655007d0b33471a94b2e7328b31ce099f3dbf2bce489d195",
-    "uv.lock": "d8b09adef1d6376c2e0ef7e93ee3cdf453b4af82135d9f91c61f94d654c63b29"
+    "uv.lock": "28fd916f8904d5a2419b6ad593d3823b5f4dd81d4def1df4ee70fb47f605ad87"
   }
 }
