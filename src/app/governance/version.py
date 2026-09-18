@@ -2,10 +2,10 @@
 
 ``GOVERNED_APP_VERSION`` identifies the HTTP treatment, while
 ``WORKFLOW_SCHEMA_VERSION`` gates durable state compatibility.
-``BASELINE_CONTROL_SHA256`` is the reviewed aggregate digest of Phase 3 baseline v4;
+``BASELINE_CONTROL_SHA256`` is the reviewed aggregate digest of Phase 3 baseline v5;
 experiment startup verifies it instead of silently accepting control drift.
 """
 
-GOVERNED_APP_VERSION = "0.6.0"
+GOVERNED_APP_VERSION = "0.6.1"
 WORKFLOW_SCHEMA_VERSION = 1
-BASELINE_CONTROL_SHA256 = "a621d3ec273163b6250708addce22581e599f521bc59a471815d5b7e9b2ac224"
+BASELINE_CONTROL_SHA256 = "84039d82823c5d85f72b383e80605c4187c0f02f1f9473cb569c1f69dcffbdc6"

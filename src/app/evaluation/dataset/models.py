@@ -210,7 +210,7 @@ class ScoringRubric(EvaluationModel):
     """Frozen evaluation rules shared by baseline and governed conditions."""
 
     schema_version: Literal[1] = 1
-    rubric_version: Literal["1.0.0"] = "1.0.0"
+    rubric_version: Literal["1.1.0"] = "1.1.0"
     dataset_version: Literal["1.0.0"] = "1.0.0"
     unit_of_analysis: str
     repetitions_per_case: int = Field(ge=1, le=10)

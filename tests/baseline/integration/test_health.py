@@ -38,6 +38,7 @@ def test_production_disables_interactive_api_documentation(settings: Settings) -
         openai_api_key=SecretStr("provider-key"),
         safety_identifier_secret=SecretStr("safety-identifier-key"),
         allowed_hosts=["service.example.test"],
+        retrieval_backend="lexical",
         knowledge_base_dir=settings.knowledge_base_dir,
         synthetic_database_path=settings.synthetic_database_path,
     )

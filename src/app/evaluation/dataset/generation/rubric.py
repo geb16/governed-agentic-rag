@@ -19,7 +19,7 @@ def build_rubric() -> ScoringRubric:
     """Build the pre-registered rubric shared by both conditions.
 
     Returns:
-        Strict rubric version 1.0.0 with metrics and statistical protocol.
+        Strict rubric version 1.1.0 with metrics and statistical protocol.
     """
     metric = MetricDefinition
     return ScoringRubric(
@@ -238,6 +238,6 @@ def build_rubric() -> ScoringRubric:
             "Report escalation precision, recall, F1, and false-escalation rate together.",
             "Report 95% confidence intervals and paired condition differences by case and repetition.",
             "Report invalid runs, latency, token usage, tool attempts, and human-review load separately.",
-            "Retain raw outputs and adjudication notes; dual-review disputed subjective scores.",
+            "Retain raw outputs and condition-blinded researcher-adjudication notes.",
         ],
     )

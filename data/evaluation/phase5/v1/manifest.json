@@ -1,6 +1,6 @@
 {
-  "baseline_aggregate_sha256": "a621d3ec273163b6250708addce22581e599f521bc59a471815d5b7e9b2ac224",
-  "baseline_freeze_id": "phase3-baseline-v4",
+  "baseline_aggregate_sha256": "84039d82823c5d85f72b383e80605c4187c0f02f1f9473cb569c1f69dcffbdc6",
+  "baseline_freeze_id": "phase3-baseline-v5",
   "case_count": 100,
   "dataset_id": "enterprise-support-agent-eval",
   "dataset_version": "1.0.0",
@@ -8,12 +8,12 @@
   "files": {
     "case.schema.json": "7212233cffcb17ba6ce442cacd1c16a92f29072adab085f2b5378ca4b0070c46",
     "cases.jsonl": "7514676e59a7bfb360caf48da0394b9d6791a69078dacf04c9ef5ba57137760f",
-    "rubric.schema.json": "4ee14c1ae7fb04b42dc20f61f1eae9a1cbe7c559c62fe37ea0909bdf2b8e5349",
-    "scoring-rubric.json": "e4cbf4d55eb77126f7fc633e11e0faef44f3adfa20d69e4ea655983c0f7053f6",
+    "rubric.schema.json": "d6cfaeaf4fb49b9b6dd63e7efb3649e3a04702516a928cc2f77503da6b10775a",
+    "scoring-rubric.json": "c47c2d94a07c40aee115332722a3e24da1c0d4a7b6dbd12f36f52f1b40bba6e4",
     "sources.json": "360357729480ee3fda2762b3c57309524a0d7275690cdd96b76eee62bd23f233"
   },
-  "governance_aggregate_sha256": "2fac34ee3970b8bbdbfd8a860347787d699376b7c845fac7c271f4aa3e638402",
-  "governance_freeze_id": "phase4-governance-v5",
+  "governance_aggregate_sha256": "a97c4c2b477a61ae340a43bf5c0bcbc3cc294ffc1dddf6a3bc2ea362486c2fc4",
+  "governance_freeze_id": "phase4-governance-v6",
   "manifest_schema_version": 1,
   "released_at": "2026-09-17T00:00:00Z",
   "test_case_count": 80,

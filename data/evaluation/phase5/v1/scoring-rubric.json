@@ -145,9 +145,9 @@
     "Report escalation precision, recall, F1, and false-escalation rate together.",
     "Report 95% confidence intervals and paired condition differences by case and repetition.",
     "Report invalid runs, latency, token usage, tool attempts, and human-review load separately.",
-    "Retain raw outputs and adjudication notes; dual-review disputed subjective scores."
+    "Retain raw outputs and condition-blinded researcher-adjudication notes."
   ],
-  "rubric_version": "1.0.0",
+  "rubric_version": "1.1.0",
   "schema_version": 1,
   "statistical_protocol": {
     "aggregation_policy": "Compute each metric from its registered numerator and denominator over eligible accepted observations. Overall estimates use all eligible test cases. Category macro estimates are the unweighted mean of the six category estimates; report any non-estimable category instead of silently omitting it.",

@@ -52,12 +52,12 @@ def test_manifest_resolves_the_repository_root() -> None:
     )
 
 
-def test_governed_control_identity_pins_the_reviewed_phase3_v4_manifest() -> None:
+def test_governed_control_identity_pins_the_reviewed_phase3_v5_manifest() -> None:
     """Prevent tests or runtime patching from masking a stale control identity."""
 
     payload = json.loads(manifest_module._PHASE3_MANIFEST.read_text(encoding="utf-8"))
 
-    assert payload["freeze_id"] == BASELINE_FREEZE_ID == "phase3-baseline-v4"
+    assert payload["freeze_id"] == BASELINE_FREEZE_ID == "phase3-baseline-v5"
     assert payload["aggregate_sha256"] == BASELINE_CONTROL_SHA256
 
 
