@@ -16,10 +16,15 @@ References:
 from __future__ import annotations
 
 import os
+from typing import Any, Protocol, cast
 
 from openai import AsyncOpenAI
 from ragas.llms import llm_factory
 from ragas.metrics.collections import Faithfulness
+
+
+class _ConfigurableRagasLLM(Protocol):
+    model_args: dict[str, Any]
 
 
 class RagasFaithfulnessGrader:
@@ -35,11 +40,19 @@ class RagasFaithfulnessGrader:
         model: OpenAI model identifier passed to the Ragas LLM factory.
     """
 
+
     def __init__(self, *, api_key: str, model: str) -> None:
         os.environ.setdefault("RAGAS_DO_NOT_TRACK", "true")
         client = AsyncOpenAI(api_key=api_key)
-        self._metric = Faithfulness(llm=llm_factory(model, client=client))
+        llm = llm_factory(model, client=client)
 
+        configurable_llm = cast(_ConfigurableRagasLLM, llm)
+        configurable_llm.model_args["max_completion_tokens"] = (
+            configurable_llm.model_args.pop("max_tokens")
+        )
+
+        self._metric = Faithfulness(llm=llm)
+        
     async def grade(
         self,
         *,
