@@ -47,6 +47,8 @@ class RagasFaithfulnessGrader:
         llm = llm_factory(model, client=client)
 
         configurable_llm = cast(_ConfigurableRagasLLM, llm)
+        configurable_llm.model_args.pop("temperature", None)
+        configurable_llm.model_args.pop("top_p", None)
         configurable_llm.model_args["max_completion_tokens"] = (
             configurable_llm.model_args.pop("max_tokens")
         )
