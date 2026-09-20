@@ -29,6 +29,11 @@ from paired_agent_evaluation.domain.observations import RawExecution
 ModelT = TypeVar("ModelT", bound=BaseModel)
 
 
+def directory_has_payload(path: Path, *, ignored_names: frozenset[str]) -> bool:
+    """Return whether a directory contains an entry other than named placeholders."""
+    return path.exists() and any(item.name not in ignored_names for item in path.iterdir())
+
+
 def canonical_json(value: Any) -> bytes:
     """Serializes a JSON-compatible value into stable bytes.
 
