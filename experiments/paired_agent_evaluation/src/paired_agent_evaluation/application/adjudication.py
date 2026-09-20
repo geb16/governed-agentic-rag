@@ -16,7 +16,7 @@ from __future__ import annotations
 import json
 import re
 import secrets
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 
 from pydantic import Field, model_validator
 
@@ -248,11 +248,16 @@ def order_review_items(items: Mapping[str, ReviewItem], *, plan: BlindingPlan) -
     ]
 
 
-def resolve_reviews(reviews: list[Adjudication]) -> dict[str, ResolvedAdjudication]:
+def resolve_reviews(
+    reviews: list[Adjudication],
+    *,
+    review_items: Sequence[ReviewItem] | None = None,
+) -> dict[str, ResolvedAdjudication]:
     """Validates and indexes one researcher's blinded decisions.
 
     Every record must use the same researcher identity and each blinded item may
-    occur only once. Missing required fields remain pending during scoring.
+    occur only once. When the corresponding packet is supplied, the submission
+    must contain exactly its identities and only its requested decision fields.
 
     Args:
         reviews: Condition-blinded decisions from the researcher-adjudicator.
@@ -261,7 +266,7 @@ def resolve_reviews(reviews: list[Adjudication]) -> dict[str, ResolvedAdjudicati
         Validated decisions keyed by blinded identity.
 
     Raises:
-        ValueError: If multiple researcher identities or duplicate items occur.
+        ValueError: If identities, duplicates, or packet fields are invalid.
     """
     reviewers = {item.reviewer_id for item in reviews}
     if reviewers - {RESEARCHER_ADJUDICATOR_ID}:
@@ -276,6 +281,24 @@ def resolve_reviews(reviews: list[Adjudication]) -> dict[str, ResolvedAdjudicati
             observed_route=item.observed_route,
             claim_support_passed=item.claim_support_passed,
         )
+    if review_items is not None:
+        packet = {item.blinded_id: item for item in review_items}
+        submitted = set(resolved)
+        if submitted != set(packet):
+            raise ValueError("adjudication identities do not exactly match the review packet")
+        for blinded_identity, decision in resolved.items():
+            review_item = packet[blinded_identity]
+            if (decision.observed_route is not None) != review_item.route_review_required:
+                raise ValueError(
+                    f"observed_route does not match route_review_required for {blinded_identity}"
+                )
+            if (
+                decision.claim_support_passed is not None
+            ) != review_item.groundedness_review_required:
+                raise ValueError(
+                    "claim_support_passed does not match "
+                    f"groundedness_review_required for {blinded_identity}"
+                )
     return resolved
 
 
