@@ -88,6 +88,25 @@ def test_release_is_sanitized_closed_and_content_addressed(
         verify_release(release_root)
 
 
+def test_release_readme_placeholder_does_not_block_sealing(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Allow sealing into the versioned directory containing its tracked README."""
+    run_root = tmp_path / "run"
+    release_root = tmp_path / "release"
+    run_root.mkdir()
+    release_root.mkdir()
+    (release_root / "README.md").write_text("placeholder\n", encoding="utf-8")
+    _write_complete_run(run_root)
+    monkeypatch.setattr(release_sealing, "verify_primary_artifacts", lambda *_: None)
+
+    manifest = seal_run(run_root=run_root, release_root=release_root)
+
+    assert manifest.run_id == "run_test"
+    assert (release_root / "README.md").is_file()
+
+
 def test_incomplete_or_unadjudicated_run_cannot_be_sealed(tmp_path: Path) -> None:
     """Reject release creation when required finalized artifacts are absent."""
     run_root = tmp_path / "run"
