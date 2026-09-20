@@ -26,7 +26,7 @@ randomized order. The private blinding plan is withheld until primary adjudicati
 Primary route and claim-support labels are assigned by the researcher named in the ethics protocol,
 acting as the sole condition-blinded adjudicator. An LLM or automated grader cannot supply or revise
 these primary labels. Any AI assisted rveiwing is unacceptable and must be recorded as a protocol deviation.
-Any affects items must be reviewed and judged again by the researcher before results are final.
+Any affected items must be reviewed and judged again by the researcher before results are final.
 
 The researcher uses only:
 
