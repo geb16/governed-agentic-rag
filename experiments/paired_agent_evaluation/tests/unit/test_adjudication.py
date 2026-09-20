@@ -271,3 +271,41 @@ def test_duplicate_researcher_decision_is_rejected() -> None:
 
     with pytest.raises(ValueError, match="duplicate adjudication"):
         resolve_reviews(reviews)
+
+
+def test_submission_must_exactly_match_packet_fields() -> None:
+    """Reject surplus identities and decisions for fields not requested by the packet."""
+    packet = [
+        ReviewItem(
+            blinded_id="blind_1",
+            query="query",
+            response="response",
+            route_review_required=False,
+            groundedness_review_required=True,
+        )
+    ]
+    surplus = [
+        Adjudication(
+            blinded_id="blind_1",
+            reviewer_id="researcher-adjudicator",
+            claim_support_passed=True,
+        ),
+        Adjudication(
+            blinded_id="blind_2",
+            reviewer_id="researcher-adjudicator",
+            claim_support_passed=True,
+        ),
+    ]
+    with pytest.raises(ValueError, match="identities do not exactly match"):
+        resolve_reviews(surplus, review_items=packet)
+
+    unexpected_route = [
+        Adjudication(
+            blinded_id="blind_1",
+            reviewer_id="researcher-adjudicator",
+            observed_route=ObservedRoute.ANSWER,
+            claim_support_passed=True,
+        )
+    ]
+    with pytest.raises(ValueError, match="observed_route"):
+        resolve_reviews(unexpected_route, review_items=packet)
