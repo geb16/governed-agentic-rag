@@ -28,6 +28,7 @@ from paired_agent_evaluation.application.adjudication import (
     apply_route_review,
     build_review_item,
     order_review_items,
+    project_review_contexts,
     resolve_reviews,
 )
 from paired_agent_evaluation.application.normalization import normalize
@@ -221,7 +222,7 @@ def derive_primary_artifacts(
             observation,
             plan=blinding_plan,
             query=str(by_raw[observation_id].request["query"]),
-            contexts=[item.content for item in by_raw[observation_id].retrieved],
+            contexts=project_review_contexts(by_raw[observation_id]),
         )
         if review is not None:
             review_items_by_observation[observation_id] = review
