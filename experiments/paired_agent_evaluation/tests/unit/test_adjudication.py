@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import json
 import secrets
+from datetime import UTC, datetime
 
 import pytest
 from pydantic import ValidationError
@@ -13,13 +15,16 @@ from paired_agent_evaluation.application.adjudication import (
     build_review_item,
     create_blinding_plan,
     order_review_items,
+    project_review_contexts,
     resolve_reviews,
 )
 from paired_agent_evaluation.domain.executions import Condition, ExecutionKey
 from paired_agent_evaluation.domain.observations import (
     AcceptanceStatus,
+    BusinessState,
     NormalizedObservation,
     ObservedRoute,
+    RawExecution,
 )
 from paired_agent_evaluation.domain.scores import Adjudication
 
@@ -172,6 +177,54 @@ def test_review_packet_rejects_condition_indicators(indicator: str) -> None:
             route_review_required=False,
             groundedness_review_required=True,
         )
+
+
+def test_review_projection_includes_tool_outcome_and_business_state() -> None:
+    """Give reviewers retained operational evidence without exposing a condition."""
+    before = BusinessState(
+        tickets=[{"case_id": "case_eval_0001", "ticket_id": "TKT-1", "status": "open"}]
+    )
+    after = BusinessState(
+        tickets=[{"case_id": "case_eval_0001", "ticket_id": "TKT-1", "status": "closed"}]
+    )
+    raw = RawExecution(
+        key=ExecutionKey(
+            case_id="case_eval_0001",
+            repetition=1,
+            condition=Condition.GOVERNED,
+        ),
+        acceptance=AcceptanceStatus.ACCEPTED,
+        request_accepted=True,
+        completed_at=datetime.now(UTC),
+        latency_ms=1,
+        request={"query": "Close TKT-1."},
+        response={
+            "tool_calls": [
+                {
+                    "tool_name": "update_ticket_status",
+                    "arguments": {"ticket_id": "TKT-1", "new_status": "closed"},
+                    "status": "succeeded",
+                    "outcome": {
+                        "status": "executed",
+                        "message": "The ticket status was updated.",
+                        "state_changed": True,
+                    },
+                }
+            ]
+        },
+        state_before=before,
+        state_after=after,
+    )
+
+    contexts = [json.loads(item) for item in project_review_contexts(raw)]
+
+    assert contexts[0]["evidence_type"] == "tool_execution"
+    assert contexts[0]["outcome"]["state_changed"] is True
+    assert contexts[1] == {
+        "evidence_type": "business_state",
+        "before": before.business_projection(),
+        "after": after.business_projection(),
+    }
 
 
 def test_single_researcher_decision_resolves_each_provided_field() -> None:
