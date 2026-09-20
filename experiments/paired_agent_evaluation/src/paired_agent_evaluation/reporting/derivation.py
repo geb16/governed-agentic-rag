@@ -51,11 +51,13 @@ from paired_agent_evaluation.domain.scores import (
 )
 
 
-def _load_adjudications(run_root: Path) -> dict[str, ResolvedAdjudication]:
+def _load_adjudications(run_root: Path, review_items: list[Any]) -> dict[str, ResolvedAdjudication]:
     """Loads the condition-blinded researcher-adjudicator submission."""
     review_path = run_root / "adjudication" / "researcher-adjudicator.jsonl"
-    reviews = JsonlStore.read(review_path, Adjudication) if review_path.is_file() else []
-    return resolve_reviews(reviews)
+    if not review_path.is_file():
+        return {}
+    reviews = JsonlStore.read(review_path, Adjudication)
+    return resolve_reviews(reviews, review_items=review_items)
 
 
 def _validate_schedule(
@@ -210,10 +212,6 @@ def derive_primary_artifacts(
         expected_observations=manifest.expected_observations,
     )
     normalized = [normalize(item, trace_facts=project_trace_facts(item)) for item in raw]
-    resolved = _load_adjudications(run_root)
-    normalized = [
-        apply_route_review(item, plan=blinding_plan, resolved=resolved) for item in normalized
-    ]
     by_raw = {item.key.observation_id: item for item in raw}
     review_items_by_observation = {}
     for observation in normalized:
@@ -227,6 +225,10 @@ def derive_primary_artifacts(
         if review is not None:
             review_items_by_observation[observation_id] = review
     review_items = order_review_items(review_items_by_observation, plan=blinding_plan)
+    resolved = _load_adjudications(run_root, review_items)
+    normalized = [
+        apply_route_review(item, plan=blinding_plan, resolved=resolved) for item in normalized
+    ]
     contributions = score_all(
         cases,
         normalized,
