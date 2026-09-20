@@ -15,7 +15,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from paired_agent_evaluation.adapters.storage.filesystem import atomic_json, canonical_json
+from paired_agent_evaluation.adapters.storage.filesystem import (
+    atomic_json,
+    canonical_json,
+    directory_has_payload,
+)
 from paired_agent_evaluation.domain.manifests import (
     ExperimentManifest,
     ReleaseManifest,
@@ -61,7 +65,7 @@ def seal_run(*, run_root: Path, release_root: Path) -> ReleaseManifest:
     if claim.test_run_id != run_manifest.run_id:
         raise ValueError("Test execution claim does not match the sealed run")
     verify_primary_artifacts(run_root, run_manifest)
-    if release_root.exists() and any(release_root.iterdir()):
+    if directory_has_payload(release_root, ignored_names=frozenset({"README.md"})):
         raise ValueError("Release directory must be empty before sealing")
     release_root.mkdir(parents=True, exist_ok=True)
     for name in RELEASE_FILES:
