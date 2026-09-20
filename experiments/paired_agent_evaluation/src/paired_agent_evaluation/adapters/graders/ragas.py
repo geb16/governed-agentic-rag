@@ -40,7 +40,6 @@ class RagasFaithfulnessGrader:
         model: OpenAI model identifier passed to the Ragas LLM factory.
     """
 
-
     def __init__(self, *, api_key: str, model: str) -> None:
         os.environ.setdefault("RAGAS_DO_NOT_TRACK", "true")
         client = AsyncOpenAI(api_key=api_key)
@@ -53,7 +52,7 @@ class RagasFaithfulnessGrader:
         configurable_llm.model_args["max_completion_tokens"] = 4096
 
         self._metric = Faithfulness(llm=llm)
-        
+
     async def grade(
         self,
         *,
