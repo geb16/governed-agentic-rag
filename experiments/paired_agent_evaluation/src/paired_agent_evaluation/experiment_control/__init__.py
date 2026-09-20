@@ -8,6 +8,7 @@ from paired_agent_evaluation.experiment_control.freeze import (
 from paired_agent_evaluation.experiment_control.policy import (
     HARNESS_FREEZE_ID,
     HARNESS_MANIFEST,
+    RELEASE_PLACEHOLDERS,
     TEST_EXECUTION_CLAIM,
 )
 from paired_agent_evaluation.experiment_control.readiness import verify_harness_readiness
@@ -15,6 +16,7 @@ from paired_agent_evaluation.experiment_control.readiness import verify_harness_
 __all__ = [
     "HARNESS_FREEZE_ID",
     "HARNESS_MANIFEST",
+    "RELEASE_PLACEHOLDERS",
     "TEST_EXECUTION_CLAIM",
     "claim_test_execution",
     "verify_harness_freeze",
