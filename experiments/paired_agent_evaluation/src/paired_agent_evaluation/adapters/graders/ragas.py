@@ -49,9 +49,8 @@ class RagasFaithfulnessGrader:
         configurable_llm = cast(_ConfigurableRagasLLM, llm)
         configurable_llm.model_args.pop("temperature", None)
         configurable_llm.model_args.pop("top_p", None)
-        configurable_llm.model_args["max_completion_tokens"] = (
-            configurable_llm.model_args.pop("max_tokens")
-        )
+        configurable_llm.model_args.pop("max_tokens", None)
+        configurable_llm.model_args["max_completion_tokens"] = 4096
 
         self._metric = Faithfulness(llm=llm)
         
