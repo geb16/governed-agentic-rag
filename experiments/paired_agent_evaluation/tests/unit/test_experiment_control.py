@@ -101,6 +101,25 @@ def test_harness_freeze_pins_validation_and_one_test_identity(
     assert verified.validation_run_id == "run_validation_complete"
 
 
+def test_release_readme_does_not_block_freeze_or_test_authorization(
+    control_paths: EvaluationPaths,
+) -> None:
+    """Treat the tracked release README as a placeholder, not a sealed release."""
+    control_paths.release.mkdir(parents=True)
+    (control_paths.release / "README.md").write_text("placeholder\n", encoding="utf-8")
+    _complete_validation(control_paths, "run_validation_placeholder")
+
+    control.write_harness_freeze(
+        control_paths,
+        validation_run_id="run_validation_placeholder",
+        test_run_id="run_test_placeholder",
+    )
+
+    claim = control.claim_test_execution(control_paths, run_id="run_test_placeholder")
+
+    assert claim.test_run_id == "run_test_placeholder"
+
+
 def test_harness_freeze_requires_completed_validation(control_paths: EvaluationPaths) -> None:
     """Reject harness freezing without finalized validation evidence."""
     with pytest.raises(ValueError, match="Validation must have"):
