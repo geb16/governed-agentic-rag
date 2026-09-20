@@ -9,11 +9,17 @@ from __future__ import annotations
 
 from app.evaluation.dataset.enums import DatasetSplit
 
-from paired_agent_evaluation.adapters.storage.filesystem import exclusive_json
+from paired_agent_evaluation.adapters.storage.filesystem import (
+    directory_has_payload,
+    exclusive_json,
+)
 from paired_agent_evaluation.domain.manifests import ExperimentManifest, TestExecutionClaim
 from paired_agent_evaluation.experiment_control.contracts import EvaluationControlPaths
 from paired_agent_evaluation.experiment_control.freeze import verify_harness_freeze
-from paired_agent_evaluation.experiment_control.policy import TEST_EXECUTION_CLAIM
+from paired_agent_evaluation.experiment_control.policy import (
+    RELEASE_PLACEHOLDERS,
+    TEST_EXECUTION_CLAIM,
+)
 
 
 def _existing_test_runs(paths: EvaluationControlPaths) -> list[str]:
@@ -50,7 +56,7 @@ def claim_test_execution(
         raise ValueError(f"Test split was already executed: {', '.join(prior_runs)}")
     if paths.run_root(run_id).exists():
         raise ValueError("Preregistered test run directory already exists")
-    if paths.release.exists() and any(paths.release.iterdir()):
+    if directory_has_payload(paths.release, ignored_names=RELEASE_PLACEHOLDERS):
         raise ValueError("A sealed test release already exists")
     claim = TestExecutionClaim(
         test_run_id=run_id,
