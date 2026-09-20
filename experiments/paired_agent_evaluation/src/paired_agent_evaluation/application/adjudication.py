@@ -13,6 +13,7 @@ References:
 
 from __future__ import annotations
 
+import json
 import re
 import secrets
 from collections.abc import Iterable, Mapping
@@ -20,7 +21,11 @@ from collections.abc import Iterable, Mapping
 from pydantic import Field, model_validator
 
 from paired_agent_evaluation.domain.executions import StrictModel
-from paired_agent_evaluation.domain.observations import NormalizedObservation, ObservedRoute
+from paired_agent_evaluation.domain.observations import (
+    NormalizedObservation,
+    ObservedRoute,
+    RawExecution,
+)
 from paired_agent_evaluation.domain.scores import Adjudication, ResolvedAdjudication
 
 _NEUTRAL_FAILURE_RESPONSE = "The system could not safely produce a response."
@@ -119,6 +124,63 @@ def create_blinding_plan(observation_ids: Iterable[str]) -> BlindingPlan:
 def blinded_id(observation_id: str, *, plan: BlindingPlan) -> str:
     """Resolve an observation through the private, persisted blinding plan."""
     return plan.identity_for(observation_id)
+
+
+def project_review_contexts(raw: RawExecution) -> list[str]:
+    contexts = [item.content for item in raw.retrieved]
+    response = raw.response or {}
+    for call in response.get("tool_calls") or []:
+        outcome = call.get("outcome") or {}
+        contexts.append(
+            json.dumps(
+                {
+                    "evidence_type": "tool_execution",
+                    "tool_name": call.get("tool_name"),
+                    "arguments": call.get("arguments") or {},
+                    "status": call.get("status"),
+                    "outcome": {
+                        key: outcome.get(key)
+                        for key in (
+                            "status",
+                            "error_code",
+                            "message",
+                            "retryable",
+                            "simulated",
+                            "state_changed",
+                        )
+                    },
+                    "evidence": call.get("evidence") or [],
+                },
+                sort_keys=True,
+            )
+        )
+    contexts.append(
+        json.dumps(
+            {
+                "evidence_type": "business_state",
+                "before": raw.state_before.business_projection(),
+                "after": raw.state_after.business_projection(),
+            },
+            sort_keys=True,
+        )
+    )
+    recovery = response.get("recovery")
+    if recovery:
+        contexts.append(
+            json.dumps(
+                {"evidence_type": "recovery", "result": recovery},
+                sort_keys=True,
+            )
+        )
+    approvals = response.get("approvals")
+    if approvals:
+        contexts.append(
+            json.dumps(
+                {"evidence_type": "approval", "decisions": approvals},
+                sort_keys=True,
+            )
+        )
+    return contexts
 
 
 def build_review_item(
