@@ -127,6 +127,19 @@ def blinded_id(observation_id: str, *, plan: BlindingPlan) -> str:
 
 
 def project_review_contexts(raw: RawExecution) -> list[str]:
+    """Project reviewer-visible evidence from a raw execution.
+
+    Retrieved passages remain plain text. Tool executions, business state,
+    recovery results, and approval decisions are serialized as JSON records in
+    that order. Audit events are excluded because their structure can reveal the
+    experiment condition.
+
+    Args:
+        raw: Execution containing the retrieved and operational evidence.
+
+    Returns:
+        Context strings for the blinded review packet.
+    """
     contexts = [item.content for item in raw.retrieved]
     response = raw.response or {}
     for call in response.get("tool_calls") or []:
