@@ -9,7 +9,11 @@ References:
 
 from __future__ import annotations
 
-from paired_agent_evaluation.adapters.storage.filesystem import atomic_json, sha256_json
+from paired_agent_evaluation.adapters.storage.filesystem import (
+    atomic_json,
+    directory_has_payload,
+    sha256_json,
+)
 from paired_agent_evaluation.domain.manifests import HarnessFreezeManifest
 from paired_agent_evaluation.experiment_control.contracts import EvaluationControlPaths
 from paired_agent_evaluation.experiment_control.identity import (
@@ -21,6 +25,7 @@ from paired_agent_evaluation.experiment_control.identity import (
 from paired_agent_evaluation.experiment_control.policy import (
     HARNESS_FREEZE_ID,
     HARNESS_MANIFEST,
+    RELEASE_PLACEHOLDERS,
     TEST_EXECUTION_CLAIM,
 )
 from paired_agent_evaluation.experiment_control.readiness import verify_harness_readiness
@@ -47,7 +52,7 @@ def write_harness_freeze(
         raise ValueError("Test execution has already been claimed; harness cannot be refrozen")
     if paths.run_root(test_run_id).exists():
         raise ValueError("Preregistered test run directory already exists")
-    if paths.release.exists() and any(paths.release.iterdir()):
+    if directory_has_payload(paths.release, ignored_names=RELEASE_PLACEHOLDERS):
         raise ValueError("A sealed test release already exists")
     verify_harness_readiness(paths)
     validation_manifest_hash, validation_summary_hash = completed_validation(
