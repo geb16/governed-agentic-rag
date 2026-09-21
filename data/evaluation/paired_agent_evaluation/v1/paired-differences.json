@@ -1,0 +1,3782 @@
+[
+  {
+    "ci_lower": -0.033333333333333326,
+    "ci_upper": 0.2041666666666666,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": 0.08333333333333331,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "overall",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.1604814814814815,
+    "ci_upper": 0.5833333333333333,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": 0.3733333333333334,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "overall",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.07936507936507936,
+    "ci_upper": 0.16666666666666669,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": 0.03508771929824561,
+    "metric_id": "action_correctness_rate",
+    "stratum": "overall",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.030303030303030276,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": 0.012121212121212088,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "overall",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "overall",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "escalation_recall",
+    "stratum": "overall",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "overall",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "escalation_f1",
+    "stratum": "overall",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.052644291889142956,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": 0.01932367149758454,
+    "metric_id": "false_escalation_rate",
+    "stratum": "overall",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.5,
+    "ci_upper": 0.0,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": -0.20833333333333331,
+    "metric_id": "recovery_success_rate",
+    "stratum": "overall",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "safe_termination_rate",
+    "stratum": "overall",
+    "valid_bootstrap_replicates": 9981
+  },
+  {
+    "ci_lower": 0.040000000000000036,
+    "ci_upper": 0.5416666666666667,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": 0.2592592592592593,
+    "metric_id": "groundedness_rate",
+    "stratum": "overall",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "overall",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.2213290460878885,
+    "ci_upper": 0.2745751935234481,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": 0.2476964769647696,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "overall",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.027480158730158737,
+    "ci_upper": 0.20604395604395603,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": 0.08821733821733824,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "category_macro",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": null,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "category_macro",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": null,
+    "metric_id": "action_correctness_rate",
+    "stratum": "category_macro",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": null,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "category_macro",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": null,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "category_macro",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_recall",
+    "stratum": "category_macro",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "category_macro",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_f1",
+    "stratum": "category_macro",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.06060606060606061,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": 0.021717171717171718,
+    "metric_id": "false_escalation_rate",
+    "stratum": "category_macro",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": null,
+    "metric_id": "recovery_success_rate",
+    "stratum": "category_macro",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": null,
+    "metric_id": "safe_termination_rate",
+    "stratum": "category_macro",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": null,
+    "metric_id": "groundedness_rate",
+    "stratum": "category_macro",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "category_macro",
+    "valid_bootstrap_replicates": 9979
+  },
+  {
+    "ci_lower": 0.22940917077511022,
+    "ci_upper": 0.2801698068385457,
+    "complete_pairs": 240,
+    "eligible_case_clusters": 80,
+    "governed_minus_baseline": 0.25441110245031806,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "category_macro",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.07692307692307693,
+    "ci_upper": 0.41025641025641024,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.15384615384615385,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "category=ambiguous",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "category=ambiguous",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "action_correctness_rate",
+    "stratum": "category=ambiguous",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.07692307692307687,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.02564102564102566,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "category=ambiguous",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "category=ambiguous",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_recall",
+    "stratum": "category=ambiguous",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "category=ambiguous",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_f1",
+    "stratum": "category=ambiguous",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "false_escalation_rate",
+    "stratum": "category=ambiguous",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "recovery_success_rate",
+    "stratum": "category=ambiguous",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "safe_termination_rate",
+    "stratum": "category=ambiguous",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "groundedness_rate",
+    "stratum": "category=ambiguous",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "category=ambiguous",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.2637362637362637,
+    "ci_upper": 0.3772893772893772,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.3223443223443223,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "category=ambiguous",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.6428571428571429,
+    "ci_upper": 0.07142857142857145,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": -0.2857142857142857,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "category=high_risk",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": null,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "category=high_risk",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "action_correctness_rate",
+    "stratum": "category=high_risk",
+    "valid_bootstrap_replicates": 8855
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "category=high_risk",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "category=high_risk",
+    "valid_bootstrap_replicates": 9914
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "escalation_recall",
+    "stratum": "category=high_risk",
+    "valid_bootstrap_replicates": 9914
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "category=high_risk",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "escalation_f1",
+    "stratum": "category=high_risk",
+    "valid_bootstrap_replicates": 9914
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.3333333333333333,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": 0.1,
+    "metric_id": "false_escalation_rate",
+    "stratum": "category=high_risk",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": null,
+    "metric_id": "recovery_success_rate",
+    "stratum": "category=high_risk",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": null,
+    "metric_id": "safe_termination_rate",
+    "stratum": "category=high_risk",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": null,
+    "metric_id": "groundedness_rate",
+    "stratum": "category=high_risk",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "category=high_risk",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.12844036697247707,
+    "ci_upper": 0.25999999999999995,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": 0.1923076923076923,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "category=high_risk",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.23076923076923084,
+    "ci_upper": 0.1282051282051283,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": -0.05128205128205121,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "category=missing_information",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "category=missing_information",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "action_correctness_rate",
+    "stratum": "category=missing_information",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "category=missing_information",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "category=missing_information",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_recall",
+    "stratum": "category=missing_information",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "category=missing_information",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_f1",
+    "stratum": "category=missing_information",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "false_escalation_rate",
+    "stratum": "category=missing_information",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "recovery_success_rate",
+    "stratum": "category=missing_information",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "safe_termination_rate",
+    "stratum": "category=missing_information",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "groundedness_rate",
+    "stratum": "category=missing_information",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "category=missing_information",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.31868131868131866,
+    "ci_upper": 0.41758241758241754,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.3736263736263736,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "category=missing_information",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.07692307692307687,
+    "ci_upper": 0.7692307692307692,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.4358974358974359,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "category=normal",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.6923076923076923,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.3589743589743589,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "category=normal",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.8,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.25,
+    "metric_id": "action_correctness_rate",
+    "stratum": "category=normal",
+    "valid_bootstrap_replicates": 9907
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "category=normal",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "category=normal",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_recall",
+    "stratum": "category=normal",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "category=normal",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_f1",
+    "stratum": "category=normal",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "false_escalation_rate",
+    "stratum": "category=normal",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "recovery_success_rate",
+    "stratum": "category=normal",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "safe_termination_rate",
+    "stratum": "category=normal",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.4,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.11764705882352944,
+    "metric_id": "groundedness_rate",
+    "stratum": "category=normal",
+    "valid_bootstrap_replicates": 9995
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "category=normal",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.23432343234323427,
+    "ci_upper": 0.35069444444444453,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.28956228956228947,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "category=normal",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.14285714285714288,
+    "ci_upper": 0.2857142857142857,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": 0.0714285714285714,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "category=policy_sensitive",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.5,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": 0.2,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "category=policy_sensitive",
+    "valid_bootstrap_replicates": 9983
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.13333333333333333,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": 0.04166666666666667,
+    "metric_id": "action_correctness_rate",
+    "stratum": "category=policy_sensitive",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.11111111111111116,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": 0.03703703703703709,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "category=policy_sensitive",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "category=policy_sensitive",
+    "valid_bootstrap_replicates": 9984
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "escalation_recall",
+    "stratum": "category=policy_sensitive",
+    "valid_bootstrap_replicates": 9984
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "category=policy_sensitive",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "escalation_f1",
+    "stratum": "category=policy_sensitive",
+    "valid_bootstrap_replicates": 9984
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "false_escalation_rate",
+    "stratum": "category=policy_sensitive",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": null,
+    "metric_id": "recovery_success_rate",
+    "stratum": "category=policy_sensitive",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": null,
+    "metric_id": "safe_termination_rate",
+    "stratum": "category=policy_sensitive",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "groundedness_rate",
+    "stratum": "category=policy_sensitive",
+    "valid_bootstrap_replicates": 6477
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "category=policy_sensitive",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.07977207977207978,
+    "ci_upper": 0.22115384615384615,
+    "complete_pairs": 42,
+    "eligible_case_clusters": 14,
+    "governed_minus_baseline": 0.14414414414414412,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "category=policy_sensitive",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.1282051282051282,
+    "ci_upper": 0.5128205128205129,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.20512820512820512,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "category=tool_failure",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.16666666666666666,
+    "ci_upper": 0.8888888888888888,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.5238095238095237,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "category=tool_failure",
+    "valid_bootstrap_replicates": 9999
+  },
+  {
+    "ci_lower": -0.4444444444444444,
+    "ci_upper": 0.0,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": -0.13333333333333336,
+    "metric_id": "action_correctness_rate",
+    "stratum": "category=tool_failure",
+    "valid_bootstrap_replicates": 9983
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "category=tool_failure",
+    "valid_bootstrap_replicates": 9995
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "category=tool_failure",
+    "valid_bootstrap_replicates": 8854
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "escalation_recall",
+    "stratum": "category=tool_failure",
+    "valid_bootstrap_replicates": 8854
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "category=tool_failure",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "escalation_f1",
+    "stratum": "category=tool_failure",
+    "valid_bootstrap_replicates": 8854
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.09090909090909091,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.030303030303030304,
+    "metric_id": "false_escalation_rate",
+    "stratum": "category=tool_failure",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.5,
+    "ci_upper": 0.0,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": -0.20833333333333331,
+    "metric_id": "recovery_success_rate",
+    "stratum": "category=tool_failure",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "safe_termination_rate",
+    "stratum": "category=tool_failure",
+    "valid_bootstrap_replicates": 9976
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 1.0,
+    "metric_id": "groundedness_rate",
+    "stratum": "category=tool_failure",
+    "valid_bootstrap_replicates": 6419
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "category=tool_failure",
+    "valid_bootstrap_replicates": 9982
+  },
+  {
+    "ci_lower": 0.13498622589531684,
+    "ci_upper": 0.2706552706552706,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.20448179271708677,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "category=tool_failure",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.5555555555555556,
+    "ci_upper": 0.0,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": -0.2222222222222222,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "route=answer",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.5555555555555556,
+    "ci_upper": 0.0,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": -0.2222222222222222,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "route=answer",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "action_correctness_rate",
+    "stratum": "route=answer",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "route=answer",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "route=answer",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_recall",
+    "stratum": "route=answer",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "route=answer",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_f1",
+    "stratum": "route=answer",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "false_escalation_rate",
+    "stratum": "route=answer",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "recovery_success_rate",
+    "stratum": "route=answer",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "safe_termination_rate",
+    "stratum": "route=answer",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "groundedness_rate",
+    "stratum": "route=answer",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "route=answer",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.42857142857142855,
+    "ci_upper": 0.42857142857142855,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": 0.42857142857142855,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "route=answer",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.047619047619047616,
+    "ci_upper": 0.2976190476190476,
+    "complete_pairs": 84,
+    "eligible_case_clusters": 28,
+    "governed_minus_baseline": 0.11904761904761907,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "route=clarify",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 84,
+    "eligible_case_clusters": 28,
+    "governed_minus_baseline": null,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "route=clarify",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 84,
+    "eligible_case_clusters": 28,
+    "governed_minus_baseline": null,
+    "metric_id": "action_correctness_rate",
+    "stratum": "route=clarify",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.059523809523809534,
+    "complete_pairs": 84,
+    "eligible_case_clusters": 28,
+    "governed_minus_baseline": 0.023809523809523836,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "route=clarify",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 84,
+    "eligible_case_clusters": 28,
+    "governed_minus_baseline": null,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "route=clarify",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 84,
+    "eligible_case_clusters": 28,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_recall",
+    "stratum": "route=clarify",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 84,
+    "eligible_case_clusters": 28,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "route=clarify",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 84,
+    "eligible_case_clusters": 28,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_f1",
+    "stratum": "route=clarify",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 84,
+    "eligible_case_clusters": 28,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "false_escalation_rate",
+    "stratum": "route=clarify",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 84,
+    "eligible_case_clusters": 28,
+    "governed_minus_baseline": null,
+    "metric_id": "recovery_success_rate",
+    "stratum": "route=clarify",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 84,
+    "eligible_case_clusters": 28,
+    "governed_minus_baseline": null,
+    "metric_id": "safe_termination_rate",
+    "stratum": "route=clarify",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 84,
+    "eligible_case_clusters": 28,
+    "governed_minus_baseline": null,
+    "metric_id": "groundedness_rate",
+    "stratum": "route=clarify",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 84,
+    "eligible_case_clusters": 28,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "route=clarify",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.29931972789115646,
+    "ci_upper": 0.37755102040816324,
+    "complete_pairs": 84,
+    "eligible_case_clusters": 28,
+    "governed_minus_baseline": 0.34013605442176864,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "route=clarify",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.8333333333333334,
+    "ci_upper": -0.33333333333333337,
+    "complete_pairs": 36,
+    "eligible_case_clusters": 12,
+    "governed_minus_baseline": -0.5833333333333333,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "route=deny",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 36,
+    "eligible_case_clusters": 12,
+    "governed_minus_baseline": null,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "route=deny",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 36,
+    "eligible_case_clusters": 12,
+    "governed_minus_baseline": null,
+    "metric_id": "action_correctness_rate",
+    "stratum": "route=deny",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 36,
+    "eligible_case_clusters": 12,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "route=deny",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 36,
+    "eligible_case_clusters": 12,
+    "governed_minus_baseline": null,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "route=deny",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 36,
+    "eligible_case_clusters": 12,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_recall",
+    "stratum": "route=deny",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 36,
+    "eligible_case_clusters": 12,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "route=deny",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 36,
+    "eligible_case_clusters": 12,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_f1",
+    "stratum": "route=deny",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.25,
+    "complete_pairs": 36,
+    "eligible_case_clusters": 12,
+    "governed_minus_baseline": 0.08333333333333333,
+    "metric_id": "false_escalation_rate",
+    "stratum": "route=deny",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 36,
+    "eligible_case_clusters": 12,
+    "governed_minus_baseline": null,
+    "metric_id": "recovery_success_rate",
+    "stratum": "route=deny",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 36,
+    "eligible_case_clusters": 12,
+    "governed_minus_baseline": null,
+    "metric_id": "safe_termination_rate",
+    "stratum": "route=deny",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 36,
+    "eligible_case_clusters": 12,
+    "governed_minus_baseline": null,
+    "metric_id": "groundedness_rate",
+    "stratum": "route=deny",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 36,
+    "eligible_case_clusters": 12,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "route=deny",
+    "valid_bootstrap_replicates": 9987
+  },
+  {
+    "ci_lower": 0.20238095238095244,
+    "ci_upper": 0.3214285714285714,
+    "complete_pairs": 36,
+    "eligible_case_clusters": 12,
+    "governed_minus_baseline": 0.261904761904762,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "route=deny",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.5087719298245614,
+    "ci_upper": 0.8421052631578947,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": 0.6842105263157894,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "route=execute",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.3684210526315789,
+    "ci_upper": 0.7543859649122807,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": 0.5614035087719298,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "route=execute",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.14285714285714285,
+    "ci_upper": 0.2777777777777778,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": 0.055555555555555525,
+    "metric_id": "action_correctness_rate",
+    "stratum": "route=execute",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": null,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "route=execute",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": null,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "route=execute",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_recall",
+    "stratum": "route=execute",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "route=execute",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_f1",
+    "stratum": "route=execute",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.05263157894736842,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": 0.017543859649122806,
+    "metric_id": "false_escalation_rate",
+    "stratum": "route=execute",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.5714285714285714,
+    "ci_upper": 0.0,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": -0.23809523809523803,
+    "metric_id": "recovery_success_rate",
+    "stratum": "route=execute",
+    "valid_bootstrap_replicates": 9998
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": null,
+    "metric_id": "safe_termination_rate",
+    "stratum": "route=execute",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": 1.0,
+    "metric_id": "groundedness_rate",
+    "stratum": "route=execute",
+    "valid_bootstrap_replicates": 8816
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "route=execute",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.18279056229025406,
+    "ci_upper": 0.25514403292181076,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": 0.22012578616352196,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "route=execute",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "route=human_review",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": null,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "route=human_review",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "action_correctness_rate",
+    "stratum": "route=human_review",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "route=human_review",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "route=human_review",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "escalation_recall",
+    "stratum": "route=human_review",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "route=human_review",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "escalation_f1",
+    "stratum": "route=human_review",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": null,
+    "metric_id": "false_escalation_rate",
+    "stratum": "route=human_review",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "recovery_success_rate",
+    "stratum": "route=human_review",
+    "valid_bootstrap_replicates": 6491
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "safe_termination_rate",
+    "stratum": "route=human_review",
+    "valid_bootstrap_replicates": 6474
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": null,
+    "metric_id": "groundedness_rate",
+    "stratum": "route=human_review",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "route=human_review",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.009615384615384581,
+    "ci_upper": 0.06737588652482263,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": 0.0340136054421768,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "route=human_review",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.8333333333333334,
+    "ci_upper": 0.16666666666666663,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": -0.33333333333333326,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "route=safe_terminate",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": null,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "route=safe_terminate",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": null,
+    "metric_id": "action_correctness_rate",
+    "stratum": "route=safe_terminate",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "route=safe_terminate",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": null,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "route=safe_terminate",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_recall",
+    "stratum": "route=safe_terminate",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "route=safe_terminate",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_f1",
+    "stratum": "route=safe_terminate",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "false_escalation_rate",
+    "stratum": "route=safe_terminate",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": null,
+    "metric_id": "recovery_success_rate",
+    "stratum": "route=safe_terminate",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "safe_termination_rate",
+    "stratum": "route=safe_terminate",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": null,
+    "metric_id": "groundedness_rate",
+    "stratum": "route=safe_terminate",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "route=safe_terminate",
+    "valid_bootstrap_replicates": 6670
+  },
+  {
+    "ci_lower": 0.12962962962962965,
+    "ci_upper": 0.2962962962962963,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": 0.2037037037037036,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "route=safe_terminate",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.1777777777777778,
+    "ci_upper": 0.2,
+    "complete_pairs": 45,
+    "eligible_case_clusters": 15,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "intent=access_change",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 45,
+    "eligible_case_clusters": 15,
+    "governed_minus_baseline": null,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "intent=access_change",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 45,
+    "eligible_case_clusters": 15,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "action_correctness_rate",
+    "stratum": "intent=access_change",
+    "valid_bootstrap_replicates": 9649
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 45,
+    "eligible_case_clusters": 15,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "intent=access_change",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 45,
+    "eligible_case_clusters": 15,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "intent=access_change",
+    "valid_bootstrap_replicates": 9979
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 45,
+    "eligible_case_clusters": 15,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "escalation_recall",
+    "stratum": "intent=access_change",
+    "valid_bootstrap_replicates": 9979
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 45,
+    "eligible_case_clusters": 15,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "intent=access_change",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 45,
+    "eligible_case_clusters": 15,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "escalation_f1",
+    "stratum": "intent=access_change",
+    "valid_bootstrap_replicates": 9979
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 45,
+    "eligible_case_clusters": 15,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "false_escalation_rate",
+    "stratum": "intent=access_change",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 45,
+    "eligible_case_clusters": 15,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "recovery_success_rate",
+    "stratum": "intent=access_change",
+    "valid_bootstrap_replicates": 6431
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 45,
+    "eligible_case_clusters": 15,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "safe_termination_rate",
+    "stratum": "intent=access_change",
+    "valid_bootstrap_replicates": 6478
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 45,
+    "eligible_case_clusters": 15,
+    "governed_minus_baseline": null,
+    "metric_id": "groundedness_rate",
+    "stratum": "intent=access_change",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 45,
+    "eligible_case_clusters": 15,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "intent=access_change",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.14247311827956988,
+    "ci_upper": 0.33639143730886856,
+    "complete_pairs": 45,
+    "eligible_case_clusters": 15,
+    "governed_minus_baseline": 0.23563218390804597,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "intent=access_change",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "intent=data_deletion",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": null,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "intent=data_deletion",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": null,
+    "metric_id": "action_correctness_rate",
+    "stratum": "intent=data_deletion",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "intent=data_deletion",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": null,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "intent=data_deletion",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_recall",
+    "stratum": "intent=data_deletion",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "intent=data_deletion",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_f1",
+    "stratum": "intent=data_deletion",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "false_escalation_rate",
+    "stratum": "intent=data_deletion",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": null,
+    "metric_id": "recovery_success_rate",
+    "stratum": "intent=data_deletion",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": null,
+    "metric_id": "safe_termination_rate",
+    "stratum": "intent=data_deletion",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": null,
+    "metric_id": "groundedness_rate",
+    "stratum": "intent=data_deletion",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "intent=data_deletion",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.1428571428571428,
+    "ci_upper": 0.1428571428571428,
+    "complete_pairs": 12,
+    "eligible_case_clusters": 4,
+    "governed_minus_baseline": 0.1428571428571428,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "intent=data_deletion",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 1.0,
+    "complete_pairs": 9,
+    "eligible_case_clusters": 3,
+    "governed_minus_baseline": 0.6666666666666666,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "intent=human_escalation",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 9,
+    "eligible_case_clusters": 3,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "intent=human_escalation",
+    "valid_bootstrap_replicates": 9622
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 9,
+    "eligible_case_clusters": 3,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "action_correctness_rate",
+    "stratum": "intent=human_escalation",
+    "valid_bootstrap_replicates": 9622
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 9,
+    "eligible_case_clusters": 3,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "intent=human_escalation",
+    "valid_bootstrap_replicates": 7021
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 9,
+    "eligible_case_clusters": 3,
+    "governed_minus_baseline": null,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "intent=human_escalation",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 9,
+    "eligible_case_clusters": 3,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_recall",
+    "stratum": "intent=human_escalation",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 9,
+    "eligible_case_clusters": 3,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "intent=human_escalation",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 9,
+    "eligible_case_clusters": 3,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_f1",
+    "stratum": "intent=human_escalation",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 9,
+    "eligible_case_clusters": 3,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "false_escalation_rate",
+    "stratum": "intent=human_escalation",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 9,
+    "eligible_case_clusters": 3,
+    "governed_minus_baseline": null,
+    "metric_id": "recovery_success_rate",
+    "stratum": "intent=human_escalation",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 9,
+    "eligible_case_clusters": 3,
+    "governed_minus_baseline": null,
+    "metric_id": "safe_termination_rate",
+    "stratum": "intent=human_escalation",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 9,
+    "eligible_case_clusters": 3,
+    "governed_minus_baseline": null,
+    "metric_id": "groundedness_rate",
+    "stratum": "intent=human_escalation",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 9,
+    "eligible_case_clusters": 3,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "intent=human_escalation",
+    "valid_bootstrap_replicates": 7026
+  },
+  {
+    "ci_lower": 0.125,
+    "ci_upper": 0.1428571428571428,
+    "complete_pairs": 9,
+    "eligible_case_clusters": 3,
+    "governed_minus_baseline": 0.13043478260869568,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "intent=human_escalation",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.5555555555555556,
+    "ci_upper": 0.0,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": -0.2222222222222222,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "intent=information",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.5555555555555556,
+    "ci_upper": 0.0,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": -0.2222222222222222,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "intent=information",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "action_correctness_rate",
+    "stratum": "intent=information",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "intent=information",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "intent=information",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_recall",
+    "stratum": "intent=information",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "intent=information",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_f1",
+    "stratum": "intent=information",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "false_escalation_rate",
+    "stratum": "intent=information",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "recovery_success_rate",
+    "stratum": "intent=information",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "safe_termination_rate",
+    "stratum": "intent=information",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "groundedness_rate",
+    "stratum": "intent=information",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "intent=information",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.42857142857142855,
+    "ci_upper": 0.42857142857142855,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": 0.42857142857142855,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "intent=information",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 1.0,
+    "complete_pairs": 6,
+    "eligible_case_clusters": 2,
+    "governed_minus_baseline": 0.5,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "intent=other",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 6,
+    "eligible_case_clusters": 2,
+    "governed_minus_baseline": null,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "intent=other",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 6,
+    "eligible_case_clusters": 2,
+    "governed_minus_baseline": null,
+    "metric_id": "action_correctness_rate",
+    "stratum": "intent=other",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 6,
+    "eligible_case_clusters": 2,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "intent=other",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 6,
+    "eligible_case_clusters": 2,
+    "governed_minus_baseline": null,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "intent=other",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 6,
+    "eligible_case_clusters": 2,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_recall",
+    "stratum": "intent=other",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 6,
+    "eligible_case_clusters": 2,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "intent=other",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 6,
+    "eligible_case_clusters": 2,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_f1",
+    "stratum": "intent=other",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 6,
+    "eligible_case_clusters": 2,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "false_escalation_rate",
+    "stratum": "intent=other",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 6,
+    "eligible_case_clusters": 2,
+    "governed_minus_baseline": null,
+    "metric_id": "recovery_success_rate",
+    "stratum": "intent=other",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 6,
+    "eligible_case_clusters": 2,
+    "governed_minus_baseline": null,
+    "metric_id": "safe_termination_rate",
+    "stratum": "intent=other",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 6,
+    "eligible_case_clusters": 2,
+    "governed_minus_baseline": null,
+    "metric_id": "groundedness_rate",
+    "stratum": "intent=other",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 6,
+    "eligible_case_clusters": 2,
+    "governed_minus_baseline": null,
+    "metric_id": "context_precision",
+    "stratum": "intent=other",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.38095238095238093,
+    "ci_upper": 0.42857142857142855,
+    "complete_pairs": 6,
+    "eligible_case_clusters": 2,
+    "governed_minus_baseline": 0.4047619047619047,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "intent=other",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.053333333333333344,
+    "ci_upper": 0.37333333333333335,
+    "complete_pairs": 75,
+    "eligible_case_clusters": 25,
+    "governed_minus_baseline": 0.15999999999999998,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "intent=refund",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.18518518518518517,
+    "ci_upper": 0.8888888888888888,
+    "complete_pairs": 75,
+    "eligible_case_clusters": 25,
+    "governed_minus_baseline": 0.5555555555555556,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "intent=refund",
+    "valid_bootstrap_replicates": 9986
+  },
+  {
+    "ci_lower": -0.2222222222222222,
+    "ci_upper": 0.0,
+    "complete_pairs": 75,
+    "eligible_case_clusters": 25,
+    "governed_minus_baseline": -0.06666666666666671,
+    "metric_id": "action_correctness_rate",
+    "stratum": "intent=refund",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.055615942028984656,
+    "complete_pairs": 75,
+    "eligible_case_clusters": 25,
+    "governed_minus_baseline": 0.01754385964912286,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "intent=refund",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 75,
+    "eligible_case_clusters": 25,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "intent=refund",
+    "valid_bootstrap_replicates": 9990
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 75,
+    "eligible_case_clusters": 25,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "escalation_recall",
+    "stratum": "intent=refund",
+    "valid_bootstrap_replicates": 9990
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 75,
+    "eligible_case_clusters": 25,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "intent=refund",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 75,
+    "eligible_case_clusters": 25,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "escalation_f1",
+    "stratum": "intent=refund",
+    "valid_bootstrap_replicates": 9990
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.058823529411764705,
+    "complete_pairs": 75,
+    "eligible_case_clusters": 25,
+    "governed_minus_baseline": 0.017543859649122806,
+    "metric_id": "false_escalation_rate",
+    "stratum": "intent=refund",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 75,
+    "eligible_case_clusters": 25,
+    "governed_minus_baseline": -0.3333333333333333,
+    "metric_id": "recovery_success_rate",
+    "stratum": "intent=refund",
+    "valid_bootstrap_replicates": 8785
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 75,
+    "eligible_case_clusters": 25,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "safe_termination_rate",
+    "stratum": "intent=refund",
+    "valid_bootstrap_replicates": 6371
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 75,
+    "eligible_case_clusters": 25,
+    "governed_minus_baseline": 0.33333333333333337,
+    "metric_id": "groundedness_rate",
+    "stratum": "intent=refund",
+    "valid_bootstrap_replicates": 8741
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 75,
+    "eligible_case_clusters": 25,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "intent=refund",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.16176470588235292,
+    "ci_upper": 0.27336860670193996,
+    "complete_pairs": 75,
+    "eligible_case_clusters": 25,
+    "governed_minus_baseline": 0.217094017094017,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "intent=refund",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -1.0,
+    "ci_upper": -1.0,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": -1.0,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "intent=security_attack",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "intent=security_attack",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "action_correctness_rate",
+    "stratum": "intent=security_attack",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "intent=security_attack",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "intent=security_attack",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_recall",
+    "stratum": "intent=security_attack",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "intent=security_attack",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_f1",
+    "stratum": "intent=security_attack",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.5,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": 0.16666666666666666,
+    "metric_id": "false_escalation_rate",
+    "stratum": "intent=security_attack",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "recovery_success_rate",
+    "stratum": "intent=security_attack",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "safe_termination_rate",
+    "stratum": "intent=security_attack",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "groundedness_rate",
+    "stratum": "intent=security_attack",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": null,
+    "metric_id": "context_precision",
+    "stratum": "intent=security_attack",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.2857142857142857,
+    "ci_upper": 0.28571428571428575,
+    "complete_pairs": 18,
+    "eligible_case_clusters": 6,
+    "governed_minus_baseline": 0.28571428571428575,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "intent=security_attack",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.7916666666666666,
+    "complete_pairs": 24,
+    "eligible_case_clusters": 8,
+    "governed_minus_baseline": 0.4166666666666667,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "intent=ticket_lookup",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.33333333333333337,
+    "ci_upper": 0.9583333333333334,
+    "complete_pairs": 24,
+    "eligible_case_clusters": 8,
+    "governed_minus_baseline": 0.6666666666666666,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "intent=ticket_lookup",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 24,
+    "eligible_case_clusters": 8,
+    "governed_minus_baseline": null,
+    "metric_id": "action_correctness_rate",
+    "stratum": "intent=ticket_lookup",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 24,
+    "eligible_case_clusters": 8,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "intent=ticket_lookup",
+    "valid_bootstrap_replicates": 9011
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 24,
+    "eligible_case_clusters": 8,
+    "governed_minus_baseline": null,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "intent=ticket_lookup",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 24,
+    "eligible_case_clusters": 8,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_recall",
+    "stratum": "intent=ticket_lookup",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 24,
+    "eligible_case_clusters": 8,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "intent=ticket_lookup",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 24,
+    "eligible_case_clusters": 8,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_f1",
+    "stratum": "intent=ticket_lookup",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 24,
+    "eligible_case_clusters": 8,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "false_escalation_rate",
+    "stratum": "intent=ticket_lookup",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -1.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 24,
+    "eligible_case_clusters": 8,
+    "governed_minus_baseline": -0.33333333333333337,
+    "metric_id": "recovery_success_rate",
+    "stratum": "intent=ticket_lookup",
+    "valid_bootstrap_replicates": 9771
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 24,
+    "eligible_case_clusters": 8,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "safe_termination_rate",
+    "stratum": "intent=ticket_lookup",
+    "valid_bootstrap_replicates": 9011
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 24,
+    "eligible_case_clusters": 8,
+    "governed_minus_baseline": 1.0,
+    "metric_id": "groundedness_rate",
+    "stratum": "intent=ticket_lookup",
+    "valid_bootstrap_replicates": 8928
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 24,
+    "eligible_case_clusters": 8,
+    "governed_minus_baseline": null,
+    "metric_id": "context_precision",
+    "stratum": "intent=ticket_lookup",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.2125603864734299,
+    "ci_upper": 0.31924882629107976,
+    "complete_pairs": 24,
+    "eligible_case_clusters": 8,
+    "governed_minus_baseline": 0.27053140096618356,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "intent=ticket_lookup",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.09090909090909091,
+    "ci_upper": 0.606060606060606,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": 0.3333333333333333,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "intent=ticket_update",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.25,
+    "ci_upper": 1.0,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": 0.6666666666666666,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "intent=ticket_update",
+    "valid_bootstrap_replicates": 9987
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.8666666666666667,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": 0.33333333333333337,
+    "metric_id": "action_correctness_rate",
+    "stratum": "intent=ticket_update",
+    "valid_bootstrap_replicates": 9934
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.16666666666666663,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": 0.05555555555555558,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "intent=ticket_update",
+    "valid_bootstrap_replicates": 9996
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": null,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "intent=ticket_update",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_recall",
+    "stratum": "intent=ticket_update",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "intent=ticket_update",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_f1",
+    "stratum": "intent=ticket_update",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "false_escalation_rate",
+    "stratum": "intent=ticket_update",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "recovery_success_rate",
+    "stratum": "intent=ticket_update",
+    "valid_bootstrap_replicates": 8905
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "safe_termination_rate",
+    "stratum": "intent=ticket_update",
+    "valid_bootstrap_replicates": 6474
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": null,
+    "metric_id": "groundedness_rate",
+    "stratum": "intent=ticket_update",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "intent=ticket_update",
+    "valid_bootstrap_replicates": 6414
+  },
+  {
+    "ci_lower": 0.17803030303030298,
+    "ci_upper": 0.3252032520325203,
+    "complete_pairs": 33,
+    "eligible_case_clusters": 11,
+    "governed_minus_baseline": 0.24806201550387597,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "intent=ticket_update",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.4736842105263158,
+    "ci_upper": 0.052631578947368474,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": -0.21052631578947373,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "risk_level=critical",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": null,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "risk_level=critical",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "action_correctness_rate",
+    "stratum": "risk_level=critical",
+    "valid_bootstrap_replicates": 9575
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "risk_level=critical",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "risk_level=critical",
+    "valid_bootstrap_replicates": 9991
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "escalation_recall",
+    "stratum": "risk_level=critical",
+    "valid_bootstrap_replicates": 9991
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "risk_level=critical",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "escalation_f1",
+    "stratum": "risk_level=critical",
+    "valid_bootstrap_replicates": 9991
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.25,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": 0.07692307692307693,
+    "metric_id": "false_escalation_rate",
+    "stratum": "risk_level=critical",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": null,
+    "metric_id": "recovery_success_rate",
+    "stratum": "risk_level=critical",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": null,
+    "metric_id": "safe_termination_rate",
+    "stratum": "risk_level=critical",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": null,
+    "metric_id": "groundedness_rate",
+    "stratum": "risk_level=critical",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "risk_level=critical",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.11564625850340138,
+    "ci_upper": 0.22389952411853756,
+    "complete_pairs": 57,
+    "eligible_case_clusters": 19,
+    "governed_minus_baseline": 0.16901408450704225,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "risk_level=critical",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.125,
+    "ci_upper": 0.15625,
+    "complete_pairs": 96,
+    "eligible_case_clusters": 32,
+    "governed_minus_baseline": 0.01041666666666663,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "risk_level=high",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 96,
+    "eligible_case_clusters": 32,
+    "governed_minus_baseline": null,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "risk_level=high",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 96,
+    "eligible_case_clusters": 32,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "action_correctness_rate",
+    "stratum": "risk_level=high",
+    "valid_bootstrap_replicates": 9862
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.05208333333333337,
+    "complete_pairs": 96,
+    "eligible_case_clusters": 32,
+    "governed_minus_baseline": 0.02083333333333337,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "risk_level=high",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 96,
+    "eligible_case_clusters": 32,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "risk_level=high",
+    "valid_bootstrap_replicates": 9949
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 96,
+    "eligible_case_clusters": 32,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "escalation_recall",
+    "stratum": "risk_level=high",
+    "valid_bootstrap_replicates": 9949
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 96,
+    "eligible_case_clusters": 32,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "risk_level=high",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 96,
+    "eligible_case_clusters": 32,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "escalation_f1",
+    "stratum": "risk_level=high",
+    "valid_bootstrap_replicates": 9949
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 96,
+    "eligible_case_clusters": 32,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "false_escalation_rate",
+    "stratum": "risk_level=high",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 96,
+    "eligible_case_clusters": 32,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "recovery_success_rate",
+    "stratum": "risk_level=high",
+    "valid_bootstrap_replicates": 6350
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 96,
+    "eligible_case_clusters": 32,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "safe_termination_rate",
+    "stratum": "risk_level=high",
+    "valid_bootstrap_replicates": 6299
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 96,
+    "eligible_case_clusters": 32,
+    "governed_minus_baseline": 0.5,
+    "metric_id": "groundedness_rate",
+    "stratum": "risk_level=high",
+    "valid_bootstrap_replicates": 6196
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 96,
+    "eligible_case_clusters": 32,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "risk_level=high",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.22628603846279421,
+    "ci_upper": 0.3480192455134952,
+    "complete_pairs": 96,
+    "eligible_case_clusters": 32,
+    "governed_minus_baseline": 0.288135593220339,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "risk_level=high",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.0625,
+    "ci_upper": 0.5416666666666667,
+    "complete_pairs": 48,
+    "eligible_case_clusters": 16,
+    "governed_minus_baseline": 0.25,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "risk_level=low",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.10256410256410264,
+    "ci_upper": 0.47619047619047616,
+    "complete_pairs": 48,
+    "eligible_case_clusters": 16,
+    "governed_minus_baseline": 0.19047619047619047,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "risk_level=low",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 48,
+    "eligible_case_clusters": 16,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "action_correctness_rate",
+    "stratum": "risk_level=low",
+    "valid_bootstrap_replicates": 8853
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 48,
+    "eligible_case_clusters": 16,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "risk_level=low",
+    "valid_bootstrap_replicates": 8753
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 48,
+    "eligible_case_clusters": 16,
+    "governed_minus_baseline": null,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "risk_level=low",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 48,
+    "eligible_case_clusters": 16,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_recall",
+    "stratum": "risk_level=low",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 48,
+    "eligible_case_clusters": 16,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "risk_level=low",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 48,
+    "eligible_case_clusters": 16,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_f1",
+    "stratum": "risk_level=low",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 48,
+    "eligible_case_clusters": 16,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "false_escalation_rate",
+    "stratum": "risk_level=low",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -1.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 48,
+    "eligible_case_clusters": 16,
+    "governed_minus_baseline": -0.33333333333333337,
+    "metric_id": "recovery_success_rate",
+    "stratum": "risk_level=low",
+    "valid_bootstrap_replicates": 9637
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 48,
+    "eligible_case_clusters": 16,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "safe_termination_rate",
+    "stratum": "risk_level=low",
+    "valid_bootstrap_replicates": 8753
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.55,
+    "complete_pairs": 48,
+    "eligible_case_clusters": 16,
+    "governed_minus_baseline": 0.21739130434782605,
+    "metric_id": "groundedness_rate",
+    "stratum": "risk_level=low",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 48,
+    "eligible_case_clusters": 16,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "risk_level=low",
+    "valid_bootstrap_replicates": 9999
+  },
+  {
+    "ci_lower": 0.24739583333333337,
+    "ci_upper": 0.36,
+    "complete_pairs": 48,
+    "eligible_case_clusters": 16,
+    "governed_minus_baseline": 0.3044619422572178,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "risk_level=low",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.15384615384615385,
+    "ci_upper": 0.7692307692307692,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.4871794871794872,
+    "metric_id": "appropriate_route_rate",
+    "stratum": "risk_level=medium",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.3611111111111111,
+    "ci_upper": 0.8461538461538461,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.6060606060606061,
+    "metric_id": "workflow_completion_rate",
+    "stratum": "risk_level=medium",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.16666666666666663,
+    "ci_upper": 0.3333333333333333,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.06666666666666665,
+    "metric_id": "action_correctness_rate",
+    "stratum": "risk_level=medium",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "unsafe_action_prevention_rate",
+    "stratum": "risk_level=medium",
+    "valid_bootstrap_replicates": 8815
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "approval_control_accuracy",
+    "stratum": "risk_level=medium",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_recall",
+    "stratum": "risk_level=medium",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_precision",
+    "stratum": "risk_level=medium",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "escalation_f1",
+    "stratum": "risk_level=medium",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.07692307692307693,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.02564102564102564,
+    "metric_id": "false_escalation_rate",
+    "stratum": "risk_level=medium",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": -0.5333333333333333,
+    "ci_upper": 0.0,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": -0.16666666666666669,
+    "metric_id": "recovery_success_rate",
+    "stratum": "risk_level=medium",
+    "valid_bootstrap_replicates": 9918
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "safe_termination_rate",
+    "stratum": "risk_level=medium",
+    "valid_bootstrap_replicates": 8815
+  },
+  {
+    "ci_lower": null,
+    "ci_upper": null,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": null,
+    "metric_id": "groundedness_rate",
+    "stratum": "risk_level=medium",
+    "valid_bootstrap_replicates": 0
+  },
+  {
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.0,
+    "metric_id": "context_precision",
+    "stratum": "risk_level=medium",
+    "valid_bootstrap_replicates": 10000
+  },
+  {
+    "ci_lower": 0.161993769470405,
+    "ci_upper": 0.2314814814814815,
+    "complete_pairs": 39,
+    "eligible_case_clusters": 13,
+    "governed_minus_baseline": 0.19696969696969702,
+    "metric_id": "audit_trace_completeness",
+    "stratum": "risk_level=medium",
+    "valid_bootstrap_replicates": 10000
+  }
+]
