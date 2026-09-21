@@ -138,7 +138,9 @@ def score_observation(
     }
     review = adjudications.get(blinded_id(observation.key.observation_id, plan=blinding_plan))
     grounded_eligible = bool(
-        observation.answer and observed in {ObservedRoute.ANSWER, ObservedRoute.EXECUTE}
+        observation.answer
+        and observation.terminal_error_code is None
+        and observed in {ObservedRoute.ANSWER, ObservedRoute.EXECUTE}
     )
     grounded_pending = grounded_eligible and (review is None or review.claim_support_passed is None)
     grounded = bool(
