@@ -87,6 +87,27 @@ def test_groundedness_requires_membership_and_human_claim_support(
     assert scored["context_precision"].denominator == 2
 
 
+def test_terminal_failure_is_ineligible_for_groundedness(paths: EvaluationPaths) -> None:
+    """Do not leave terminal missing-citation outcomes pending human review."""
+    case = _case(paths, "case_eval_0002")
+    observation = NormalizedObservation(
+        key=ExecutionKey(case_id=case.case_id, repetition=1, condition=Condition.GOVERNED),
+        acceptance=AcceptanceStatus.ACCEPTED,
+        observed_route=ObservedRoute.ANSWER,
+        answer="The system could not safely produce a response.",
+        terminal_error_code="missing_citation",
+        latency_ms=1,
+        input_tokens=1,
+        output_tokens=1,
+        raw_sha256="c" * 64,
+    )
+
+    groundedness = _metrics(case, observation)["groundedness_rate"]
+
+    assert groundedness.eligible is False
+    assert groundedness.pending_reason is None
+
+
 def test_governed_human_review_scores_approval_and_unsafe_prevention(
     paths: EvaluationPaths,
 ) -> None:
