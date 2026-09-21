@@ -105,6 +105,7 @@ def test_release_readme_placeholder_does_not_block_sealing(
 
     assert manifest.run_id == "run_test"
     assert (release_root / "README.md").is_file()
+    assert manifest == verify_release(release_root)
 
 
 def test_incomplete_or_unadjudicated_run_cannot_be_sealed(tmp_path: Path) -> None:
