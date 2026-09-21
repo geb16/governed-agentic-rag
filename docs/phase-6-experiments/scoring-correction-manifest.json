@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "correction_id": "paired-agent-evaluation-scoring-correction-v1",
+  "correction_scope": "scoring-and-release-verification-only",
+  "base_harness_freeze_id": "paired-agent-evaluation-harness-v1",
+  "base_harness_aggregate_sha256": "52b04baaeabdddccb93581b2280bb272fbc56eb9562f7d746d13eb09744128ad",
+  "base_harness_manifest_sha256": "73d79a9371297a87e1fe3beb78c2a1e026a59a6366002c05c479143da8c6f5a4",
+  "test_run_id": "run_test_v1",
+  "test_execution_claim_sha256": "cb25400a163cddbcaad4b3c217e20135066b05eefdc09aabcde763686242f733",
+  "reason": "Six accepted governed observations terminating with missing_citation were incorrectly marked groundedness-pending; final release verification also counted its permitted tracked README placeholder as an unmanifested artifact.",
+  "disposition": {
+    "test_reacquired": false,
+    "adjudication_changed": false,
+    "raw_observations_changed": false,
+    "normalized_observations_changed": false
+  },
+  "corrected_source_files": {
+    "experiments/paired_agent_evaluation/src/paired_agent_evaluation/application/scoring.py": {
+      "frozen_sha256": "4c2bf20b55b08b99d0731d4f4a31a0f4bd32c7ca927a76b9364b231b4196f2f1",
+      "corrected_sha256": "daac4f6f3707b3cf85b37b7fb9e91e5a3bdd10724a765bf97734ef68960a4a5a"
+    },
+    "experiments/paired_agent_evaluation/tests/unit/test_scoring.py": {
+      "frozen_sha256": "bfb7053d3c462091ece99763ef953db6d25d4f3b4d30f7c538be8a16082b6561",
+      "corrected_sha256": "cbe8751ad788f0c7edc8a7d0cf35e5a06d12f493ce52c46811ebbedd63678e50"
+    },
+    "docs/phase-6-experiments/results.md": {
+      "frozen_sha256": "d8ccca1798156172861de5846288e16d81e5e37fc386195cea895346e5a47bb3",
+      "corrected_sha256": "ee308e326320c0199b931f472c45994a0e0290c716b1a07fd2a95e7624f26887"
+    },
+    "experiments/paired_agent_evaluation/src/paired_agent_evaluation/release/verification.py": {
+      "frozen_sha256": "9f579f004fab9ab7bd6a84a3be3238d738ca5912536c35b451b5891e9cf34b5e",
+      "corrected_sha256": "691efc69a53dd3e29bc21522c0293d32ba9e7817cecfaea9bcb427ea9deae998"
+    },
+    "experiments/paired_agent_evaluation/tests/unit/test_release.py": {
+      "frozen_sha256": "2ff4d2bc68eac0800fe16d1691708ce57ac34fb888ad697739122ae8aa72359b",
+      "corrected_sha256": "a7daf0a31979607723487d01a415a1d13782f8494426b297fba6bbf0e879982f"
+    }
+  },
+  "authoritative_input_files": {
+    "artifacts/paired_agent_evaluation/run_test_v1/run-manifest.json": "85782601e8265881954e76cbfd67458e62e40925c51756f15de722c4c5dfbbc8",
+    "artifacts/paired_agent_evaluation/run_test_v1/test-execution-claim.json": "cb25400a163cddbcaad4b3c217e20135066b05eefdc09aabcde763686242f733",
+    "artifacts/paired_agent_evaluation/run_test_v1/raw-results.jsonl": "a6b1002eace81cc68cbc9e3c980b4948e39ee329b8d83cbfe670f9ff379a3641",
+    "artifacts/paired_agent_evaluation/run_test_v1/normalized.jsonl": "5dbe88298b38c00842ab8d142f37f3534fccd5d6a47b07726033592443067735",
+    "artifacts/paired_agent_evaluation/run_test_v1/blinding-plan.json": "95fd61521027b05b591d48318a33bbce02c4c33e61930d62d5cb8367ea7d5f62",
+    "artifacts/paired_agent_evaluation/run_test_v1/review-packet.jsonl": "50babfaa3afb66e0ec3d22ba3846c3d2e2e37629eb70ada7740fb581165cdf1a",
+    "artifacts/paired_agent_evaluation/run_test_v1/resolved-adjudications.jsonl": "bfdcc5d67dd75dc4a6f91d7ac24b438159f85259ef6e6aeaa6f6d5520a773299"
+  },
+  "corrected_output_files": {
+    "artifacts/paired_agent_evaluation/run_test_v1/scores.jsonl": "309d210947d42efadda70651d2090b8003dcd4647dd3247d45d8cc1ae2d84eab",
+    "artifacts/paired_agent_evaluation/run_test_v1/estimates.json": "f28ff7d23d5aacc2db176a565ff04e7a0214be13dcbf0c2243f6f6e67b9e4e47",
+    "artifacts/paired_agent_evaluation/run_test_v1/paired-differences.json": "e937a1d882027bfa481809040ffe875a4b9ded6cd87ba90567599f5322a67f1d",
+    "artifacts/paired_agent_evaluation/run_test_v1/summary.json": "7d537dc5e85f9ede70af2037425391137b204975f03b6d8f3ca8a810de48f868",
+    "artifacts/paired_agent_evaluation/run_test_v1/report.html": "7c421358226801ad434d2d56a9fed9b4ecc6e2b3cc62ff4d9aa879e9bca9c900",
+    "artifacts/paired_agent_evaluation/run_test_v1/secondary-ragas.jsonl": "eceb687bb2fd81f564d3b75645d500a012f83e88077d614553803c968c2d36bb"
+  },
+  "verification": {
+    "full_test_suite": "passed",
+    "release_regression_tests": "passed",
+    "ruff_check": "passed",
+    "ruff_format_check": "passed",
+    "mypy": "passed",
+    "pending_metric_contributions": 0,
+    "primary_results_final": true,
+    "secondary_ragas_grades": 446
+  },
+  "aggregate_sha256": "f13ad4a5d497943e7925319f01039bc98f874401deaa7885a9029f1355214848"
+}
