@@ -1,6 +1,11 @@
 # Phase-6 Results
 
-No experimental result is recorded yet.
+The canonical Phase 6 results are sealed under
+[`data/evaluation/paired_agent_evaluation/v1/`](../../data/evaluation/paired_agent_evaluation/v1/).
+The [HTML report](../../data/evaluation/paired_agent_evaluation/v1/report.html) presents the final
+primary estimates, paired differences, confidence intervals, and secondary Ragas grades. The
+release identity is `paired-agent-evaluation-v1`, with aggregate SHA-256
+`150be865736eb274751ddec24f0a084e2d2942c119a25e164600907f492165ea`.
 
 ## Protocol deviations
 
