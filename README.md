@@ -1,82 +1,97 @@
 # Governed Agentic RAG
-> Design and Evaluation of Governance-Aware Workflow layer for Reliable Enterprise Agentic RAG Systems
 
-Research AI agent for designing and evaluating a governance-aware workflow layer for reliable
-enterprise agentic retrieval-augmented generation (RAG). Phase 3 is the conventional agentic RAG
-control condition. Later phases compare it with a governed workflow using the same knowledge,
-model configuration, simulated tools, and synthetic support state.
+> Design and evaluation of a governance-aware workflow layer for reliable enterprise agentic RAG
 
-The evaluation focuses on reliability, safety, traceability, and groundedness. All supplied action
-tools are simulated; the project does not connect to production customer, payment, IAM, ticketing,
-or messaging systems.
+This research project compares a conventional agentic retrieval-augmented generation (RAG)
+baseline with a governance-aware workflow under the same knowledge, model configuration,
+simulated tools, and synthetic support state. It evaluates reliability, safety, traceability,
+groundedness, and recovery without connecting to production enterprise systems.
 
-## Architecture and baseline contract
+## Project phases
 
-- [Phase 3 architecture](docs/phase-3-baseline/architecture.md)
-- [Phase 3 behavioral, security, and reproducibility contract](docs/phase-3-baseline/README.md)
-- [Phase 3 cryptographic freeze identity](docs/phase-3-baseline/freeze-manifest.json)
-- [Test ownership and scope](tests/README.md)
+Each phase has one authoritative guide containing its architecture, operating procedure, tests,
+and reproducibility requirements.
 
-The baseline is organized as a feature-owned clean architecture:
+| Phase | Purpose | Documentation | Frozen identity |
+| --- | --- | --- | --- |
+| 3 — Baseline | Conventional agentic RAG control condition | [Phase 3 guide](docs/phase-3-baseline/README.md) | [`phase3-baseline-v5`](docs/phase-3-baseline/freeze-manifest.json) |
+| 4 — Governance | Governance-aware workflow condition | [Phase 4 guide](docs/phase-4-governance/README.md) | [`phase4-governance-v6`](docs/phase-4-governance/freeze-manifest.json) |
+| 5 — Evaluation | Frozen dataset, schemas, and scoring rubric | [Phase 5 guide](docs/phase-5-evaluation/README.md) | [`phase5-evaluation-v5`](docs/phase-5-evaluation/freeze-manifest.json) |
+| 6 — Experiment | Paired, blinded experimental evaluation | [Phase 6 guide](experiments/paired_agent_evaluation/README.md) | [`paired-agent-evaluation-harness-v1`](docs/phase-6-experiments/harness-freeze-manifest.json) |
 
-```text
-src/app/
-|-- baseline/          Phase 3 API, application, experiments, façade, and composition
-|-- core/              Shared configuration, logging, security, and versions
-|-- domain/            Shared task, action, evidence, model, repository, and support contracts
-|-- infrastructure/    Shared OpenAI and SQLite adapters
-|-- rag/               Shared lexical and Qdrant retrieval
-|-- tools/             Shared allowlisted simulated capabilities
-`-- baseline_main.py   Phase 3 FastAPI entry point
-```
+Supporting design documents are available under [`docs/`](docs/). Test ownership and scope are
+described in [`tests/README.md`](tests/README.md).
 
-## Local setup
+## Setup
 
-Python 3.11–3.13 and [uv](https://docs.astral.sh/uv/) are required.
+Python 3.11–3.13, [uv](https://docs.astral.sh/uv/), and Docker are required for complete local
+execution.
+
+Install the baseline application environment:
 
 ```console
 uv sync --frozen
+```
+
+Install the independently locked Phase 6 environment:
+
+```console
+uv sync --project experiments/paired_agent_evaluation --group dev --frozen
+```
+
+The default development profile uses lexical retrieval and an isolated SQLite database. Start it
+with:
+
+```console
 uv run uvicorn app.baseline_main:app --app-dir src
 ```
 
-The default development profile uses lexical retrieval and an isolated local SQLite database.
-Open `http://127.0.0.1:8000/api/v1/health/live` to verify liveness. Model-backed invocation requires
-`RAG_OPENAI_API_KEY`; production and experiment profiles additionally require
-`RAG_SAFETY_IDENTIFIER_SECRET`.
+Model-backed execution requires `RAG_OPENAI_API_KEY`. Production and experiment profiles also
+require `RAG_SAFETY_IDENTIFIER_SECRET`. Full experiment reproduction requires the pinned Qdrant
+service and configuration described in the [Phase 6 guide](experiments/paired_agent_evaluation/README.md#prerequisites).
 
-## Qdrant experiment setup
+## Verify the Phase 6 evidence
 
-The experiment profile requires the pinned local Qdrant service and a named immutable run.
+From the repository root, verify the inherited Phase 3–5 identities and frozen harness:
 
 ```console
-docker compose up -d qdrant
-uv run python scripts/ingest_kb.py
+uv run --project experiments/paired_agent_evaluation \
+  python experiments/paired_agent_evaluation/scripts/verify_harness.py
 ```
 
-Configure:
+Verify the sealed release independently:
+
+```console
+uv run --project experiments/paired_agent_evaluation \
+  python experiments/paired_agent_evaluation/scripts/verify_release.py
+```
+
+Expected release identity:
 
 ```text
-RAG_EXECUTION_PROFILE=experiment
-RAG_RETRIEVAL_BACKEND=qdrant
-RAG_QDRANT_URL=http://127.0.0.1:6333
-RAG_OPENAI_API_KEY=<provider credential>
-RAG_SAFETY_IDENTIFIER_SECRET=<independent pseudonymization secret>
-RAG_EXPERIMENT_RUN_ID=run_<unique identifier>
+paired-agent-evaluation-v1
+150be865736eb274751ddec24f0a084e2d2942c119a25e164600907f492165ea
 ```
 
-Application startup automatically records the experiment manifest under
-`artifacts/runs/<run-id>/manifest.json`. Reusing a run identifier with different configuration
-fails closed.
+These verification commands use repository-local evidence. They do not repeat provider calls,
+Ragas grading, human adjudication, or experimental acquisition.
 
-## Verification
+## Evidence locations
 
-Run the focused deterministic smoke suite:
+- [`data/evaluation/paired_agent_evaluation/v1/`](data/evaluation/paired_agent_evaluation/v1/) is
+  the canonical, content-addressed Phase 6 release. Its
+  [HTML report](data/evaluation/paired_agent_evaluation/v1/report.html), scores, adjudications,
+  secondary grades, manifests, and execution claim are sealed and must remain unchanged.
+- [`artifacts/paired_agent_evaluation/`](artifacts/paired_agent_evaluation/) is the supporting audit
+  trail containing validation runs, the preregistered test run, blinded researcher work,
+  schedules, journals, and intermediate execution state.
 
-```console
-uv run python scripts/baseline/run_smoke_tests.py
-```
+The sealed release remains bound to the exact Phase 3–6 identities recorded in its manifests.
+Working artifacts support inspection but do not replace the canonical release.
 
-Run the complete local gate:
+## Quality gates
+
+Run the repository-level checks with:
 
 ```console
 uv run ruff check src tests scripts
@@ -88,15 +103,5 @@ uv run pre-commit run --all-files --hook-stage manual
 git diff --check
 ```
 
-The pre-commit hooks are intentionally manual and execute the same locked local tools directly;
-
-## Freeze procedure
-
-Only write a new manifest after all Phase 3 changes are reviewed and committed to the intended
-release branch:
-
-```console
-uv run python scripts/baseline/verify_freeze.py --write
-uv run python scripts/baseline/verify_freeze.py
-git diff -- docs/phase-3-baseline/freeze-manifest.json
-```
+The Phase 6 package has its own locked environment and quality gates, documented in its
+[readiness section](experiments/paired_agent_evaluation/README.md#readiness-gates).
