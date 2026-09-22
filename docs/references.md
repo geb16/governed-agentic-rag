@@ -1,5 +1,19 @@
 # Project References
 
+This bibliography consolidates the primary research, standards, security guidance, and official
+technical documentation that inform Phases 3–6. Phase-specific documents explain how individual
+sources apply to particular design decisions; this file provides one reviewer-facing index.
+
+Sources were last checked on **22 September 2026**. Version-sensitive implementation behaviour is
+governed by the repository's `uv.lock` files and frozen manifests, not by whatever version an
+external documentation site displays later. References to NIST, OWASP, ISO, and SLSA describe
+design guidance only and do not claim certification or formal conformity.
+
+At the review date, NIST identifies AI RMF 1.0 as under revision, while FIPS 180-4 remains the
+published Secure Hash Standard with a revision planned. The project therefore cites the specific
+versions against which it was designed rather than silently substituting future revisions. SLSA
+v1.2 is the current approved SLSA specification.
+
 ## Foundations: RAG and agentic architecture
 
 1. P. Lewis *et al.*, “Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks,”
@@ -95,3 +109,4 @@ not replace the project's frozen scoring rubric.
     *ARIA Authoring Practices Guide*. [Guidance](https://www.w3.org/WAI/ARIA/apg/practices/names-and-descriptions/).
 50. Mozilla, “`<table>`: The Table element,” *MDN Web Docs*. [Documentation](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/table).
 51. Mozilla, “`<svg>`,” *MDN Web Docs*. [Documentation](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/svg).
+
