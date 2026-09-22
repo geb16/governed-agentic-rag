@@ -1,0 +1,859 @@
+{
+  "acceptance": "accepted",
+  "audit_chain_valid": true,
+  "audit_events": [
+    {
+      "actor_id": null,
+      "actor_type": "system",
+      "details": {
+        "case_id": "case_eval_0099",
+        "request_id": "req_eval_0099"
+      },
+      "event_hash": "ad6693dacdd7d07e5ca719cc444960999e4658c93a46e942a17dc01f987ee9d9",
+      "event_id": "evt_657077b520ac4db88f630b0e70ad09f2",
+      "event_type": "workflow_started",
+      "input_digest": "b9716a858fb1bc2ac4da95ff5d5fac93d40771ceec9f54f06a06d9017ca19677",
+      "occurred_at": "2026-09-20T17:02:53.477374Z",
+      "output_digest": null,
+      "previous_event_hash": null,
+      "schema_version": 2,
+      "sequence_number": 1,
+      "stage": "task_classification",
+      "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+      "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+    },
+    {
+      "actor_id": null,
+      "actor_type": "system",
+      "details": {
+        "stage_index": 1
+      },
+      "event_hash": "fc6a5d3de1319d0cb5c1911227de1a650ac1fa33bb5664c6c35b55c6abd68fac",
+      "event_id": "evt_25ba1663583d4d849525dff6b65ad780",
+      "event_type": "stage_started",
+      "input_digest": null,
+      "occurred_at": "2026-09-20T17:02:53.485407Z",
+      "output_digest": null,
+      "previous_event_hash": "ad6693dacdd7d07e5ca719cc444960999e4658c93a46e942a17dc01f987ee9d9",
+      "schema_version": 2,
+      "sequence_number": 2,
+      "stage": "task_classification",
+      "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+      "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+    },
+    {
+      "actor_id": null,
+      "actor_type": "model",
+      "details": {
+        "confidence": 0.99,
+        "intent": "ticket_lookup",
+        "sensitivity": "moderate",
+        "task_type": "read_only"
+      },
+      "event_hash": "2067b941e457e9058db876474caa26dae95e05261e97bcd547c0f6a6542e2e77",
+      "event_id": "evt_7cb4ceafa35141eabf0106ec1cf14f01",
+      "event_type": "stage_completed",
+      "input_digest": null,
+      "occurred_at": "2026-09-20T17:02:56.526388Z",
+      "output_digest": "d9192faa445da4986528293f7cf0cec30053e246c36a8f3e54857ff78c113f0a",
+      "previous_event_hash": "fc6a5d3de1319d0cb5c1911227de1a650ac1fa33bb5664c6c35b55c6abd68fac",
+      "schema_version": 2,
+      "sequence_number": 3,
+      "stage": "task_classification",
+      "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+      "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+    },
+    {
+      "actor_id": null,
+      "actor_type": "system",
+      "details": {
+        "stage_index": 2
+      },
+      "event_hash": "958acc2176493ac50511c9a1e1737e83ff78161b2ea890b70a51c1265a36781c",
+      "event_id": "evt_b35465f735c34f4992f61eeb4e9cbcf4",
+      "event_type": "stage_started",
+      "input_digest": null,
+      "occurred_at": "2026-09-20T17:02:56.541007Z",
+      "output_digest": null,
+      "previous_event_hash": "2067b941e457e9058db876474caa26dae95e05261e97bcd547c0f6a6542e2e77",
+      "schema_version": 2,
+      "sequence_number": 4,
+      "stage": "knowledge_retrieval",
+      "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+      "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+    },
+    {
+      "actor_id": null,
+      "actor_type": "system",
+      "details": {
+        "evidence_ids": [
+          "support_sop:1:37c8cbd0776d",
+          "refund_policy:1:2e298c00ff8b",
+          "iam_change_policy:1:1b44a4365c82",
+          "data_governance_policy:1:3b3678054db5"
+        ],
+        "result_count": 4,
+        "route": "general_support"
+      },
+      "event_hash": "dd810b6b3fd86095e77601efebdbf6654c6380688ef8160c635677f34c3d4040",
+      "event_id": "evt_42ba83384ff447109378f935c07ab063",
+      "event_type": "stage_completed",
+      "input_digest": null,
+      "occurred_at": "2026-09-20T17:02:56.783133Z",
+      "output_digest": "80e0811bdb84fa48786d7464a7b3d1d7bead0f37d01d7316bb36b230b846c167",
+      "previous_event_hash": "958acc2176493ac50511c9a1e1737e83ff78161b2ea890b70a51c1265a36781c",
+      "schema_version": 2,
+      "sequence_number": 5,
+      "stage": "knowledge_retrieval",
+      "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+      "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+    },
+    {
+      "actor_id": null,
+      "actor_type": "system",
+      "details": {
+        "stage_index": 3
+      },
+      "event_hash": "28bb698d2fd06884daa924bdce938977f5e6df5aac30bd3e82cd40389ec6f010",
+      "event_id": "evt_2e0dd388c6f14c5cac3000b46946dd5d",
+      "event_type": "stage_started",
+      "input_digest": null,
+      "occurred_at": "2026-09-20T17:02:56.797464Z",
+      "output_digest": null,
+      "previous_event_hash": "dd810b6b3fd86095e77601efebdbf6654c6380688ef8160c635677f34c3d4040",
+      "schema_version": 2,
+      "sequence_number": 6,
+      "stage": "proposed_action_generation",
+      "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+      "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+    },
+    {
+      "actor_id": null,
+      "actor_type": "model",
+      "details": {
+        "kind": "tool",
+        "tool_name": "ticket_lookup",
+        "validation_error": null
+      },
+      "event_hash": "81a87004e02cfa83008ab2d7323f100067410179ffdab1705a083faa1c693a2d",
+      "event_id": "evt_f9b436d6a3a9402d9bf37a0626d6dd1c",
+      "event_type": "stage_completed",
+      "input_digest": null,
+      "occurred_at": "2026-09-20T17:03:00.215434Z",
+      "output_digest": "54e5fd147b5a56f2b2add75c10cf3790de11b0c9e0c42f50cd18100b5bdb6a15",
+      "previous_event_hash": "28bb698d2fd06884daa924bdce938977f5e6df5aac30bd3e82cd40389ec6f010",
+      "schema_version": 2,
+      "sequence_number": 7,
+      "stage": "proposed_action_generation",
+      "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+      "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+    },
+    {
+      "actor_id": null,
+      "actor_type": "system",
+      "details": {
+        "stage_index": 4
+      },
+      "event_hash": "3e7a99decb2331c7124618b3676c9e58ae5636c9a40230993eac5989e378a6f6",
+      "event_id": "evt_d400090df73b44ea86957424ca88d9db",
+      "event_type": "stage_started",
+      "input_digest": null,
+      "occurred_at": "2026-09-20T17:03:00.239305Z",
+      "output_digest": null,
+      "previous_event_hash": "81a87004e02cfa83008ab2d7323f100067410179ffdab1705a083faa1c693a2d",
+      "schema_version": 2,
+      "sequence_number": 8,
+      "stage": "risk_checking",
+      "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+      "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+    },
+    {
+      "actor_id": null,
+      "actor_type": "system",
+      "details": {
+        "flags": [
+          "read_only_tool"
+        ],
+        "level": "low",
+        "policy_version": "phase4-governance-policy-v1",
+        "required_roles": [],
+        "score": 20
+      },
+      "event_hash": "14f095bf0f3d59ab5448e86a598b6d4df8a3687557cabcd62ff6f1a34cc54197",
+      "event_id": "evt_2eebde5d491b4f51b20920cebc819249",
+      "event_type": "stage_completed",
+      "input_digest": null,
+      "occurred_at": "2026-09-20T17:03:00.252483Z",
+      "output_digest": "3bb5d8a96ed393fd0407f728d23fd6969cae22447e4dbda77f456a018c95a396",
+      "previous_event_hash": "3e7a99decb2331c7124618b3676c9e58ae5636c9a40230993eac5989e378a6f6",
+      "schema_version": 2,
+      "sequence_number": 9,
+      "stage": "risk_checking",
+      "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+      "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+    },
+    {
+      "actor_id": null,
+      "actor_type": "system",
+      "details": {
+        "stage_index": 5
+      },
+      "event_hash": "90d034c277b9c856b3ae4badd368a0c9de8f6b77353f8604df17ce71086fd9f6",
+      "event_id": "evt_6c1d8aed3f054a89b98b99ca18c0e645",
+      "event_type": "stage_started",
+      "input_digest": null,
+      "occurred_at": "2026-09-20T17:03:00.263545Z",
+      "output_digest": null,
+      "previous_event_hash": "14f095bf0f3d59ab5448e86a598b6d4df8a3687557cabcd62ff6f1a34cc54197",
+      "schema_version": 2,
+      "sequence_number": 10,
+      "stage": "approval_routing",
+      "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+      "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+    },
+    {
+      "actor_id": null,
+      "actor_type": "system",
+      "details": {
+        "decision": "auto_continue",
+        "proposal_digest": "7d2064f4068446d98eae5df402c7e8cba252c9dccc7f9167eeee5ae220422800",
+        "required_roles": []
+      },
+      "event_hash": "932c56f5ed27212a116b9ce0d0fd0944b87fc7d0ad34ec4030bc770ee85eb7e1",
+      "event_id": "evt_98b31bc665f04df8a73ac689b0a7304a",
+      "event_type": "decision_recorded",
+      "input_digest": null,
+      "occurred_at": "2026-09-20T17:03:00.275207Z",
+      "output_digest": "7060a689239c897bea20f377c464ecce9ce1bf34ffa85196f8b5c4892c332330",
+      "previous_event_hash": "90d034c277b9c856b3ae4badd368a0c9de8f6b77353f8604df17ce71086fd9f6",
+      "schema_version": 2,
+      "sequence_number": 11,
+      "stage": "approval_routing",
+      "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+      "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+    },
+    {
+      "actor_id": null,
+      "actor_type": "system",
+      "details": {
+        "stage_index": 6
+      },
+      "event_hash": "86d6d93186f424f3343dc2e3457222cd2a09d907e974ea120ddedca214485499",
+      "event_id": "evt_c303ca85c0ea4b79ae3c12f677d6713f",
+      "event_type": "stage_started",
+      "input_digest": null,
+      "occurred_at": "2026-09-20T17:03:00.285621Z",
+      "output_digest": null,
+      "previous_event_hash": "932c56f5ed27212a116b9ce0d0fd0944b87fc7d0ad34ec4030bc770ee85eb7e1",
+      "schema_version": 2,
+      "sequence_number": 12,
+      "stage": "retry_recovery",
+      "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+      "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+    },
+    {
+      "actor_id": null,
+      "actor_type": "tool",
+      "details": {
+        "attempt": 1,
+        "error_code": "ticket_timeout",
+        "retryable": true,
+        "status": "failed",
+        "tool_name": "ticket_lookup"
+      },
+      "event_hash": "99715e8a02fbe88cfd01670dbd3a52b6f9c4df8913e4077a87b33b0b2f43035a",
+      "event_id": "evt_93c59f1809cb46c1bfa2d34babb0bb3a",
+      "event_type": "tool_attempted",
+      "input_digest": "bac83d8788380e54ebf8aba9780db60b2b2c35d494c8725f984d4ed0a5e31c82",
+      "occurred_at": "2026-09-20T17:03:00.314827Z",
+      "output_digest": "bf313f74bc138d80052aa580e14d93bcb02fb18fdcaf2973efe46f4d0f6dfee5",
+      "previous_event_hash": "86d6d93186f424f3343dc2e3457222cd2a09d907e974ea120ddedca214485499",
+      "schema_version": 2,
+      "sequence_number": 13,
+      "stage": "retry_recovery",
+      "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+      "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+    },
+    {
+      "actor_id": null,
+      "actor_type": "system",
+      "details": {
+        "completed_attempt": 1,
+        "next_attempt": 2
+      },
+      "event_hash": "c82e63fcb27bb4e307d2b2ea57415c70b49423251dc3c6e2e63c5321f4490d3d",
+      "event_id": "evt_b2c17267e13d42e2945e5638e7e47671",
+      "event_type": "retry_scheduled",
+      "input_digest": null,
+      "occurred_at": "2026-09-20T17:03:00.315366Z",
+      "output_digest": null,
+      "previous_event_hash": "99715e8a02fbe88cfd01670dbd3a52b6f9c4df8913e4077a87b33b0b2f43035a",
+      "schema_version": 2,
+      "sequence_number": 14,
+      "stage": "retry_recovery",
+      "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+      "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+    },
+    {
+      "actor_id": null,
+      "actor_type": "tool",
+      "details": {
+        "attempt": 2,
+        "error_code": null,
+        "retryable": false,
+        "status": "succeeded",
+        "tool_name": "ticket_lookup"
+      },
+      "event_hash": "6456f7a7a83a3d5f8db5e344679beb25f5fee6381f16154ce202cf4a884bcba8",
+      "event_id": "evt_a4a749c388204804bbf3fc81b2664ec2",
+      "event_type": "tool_attempted",
+      "input_digest": "eb62d9bad63b8bdfc0e7fbddd41cc04049cc673ecde97e029eb075d7bd539d83",
+      "occurred_at": "2026-09-20T17:03:00.315550Z",
+      "output_digest": "e2c4cb0a84ab4ab2620656f16493af4513ff75c58388ea967ea6e6566b176f3e",
+      "previous_event_hash": "c82e63fcb27bb4e307d2b2ea57415c70b49423251dc3c6e2e63c5321f4490d3d",
+      "schema_version": 2,
+      "sequence_number": 15,
+      "stage": "retry_recovery",
+      "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+      "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+    },
+    {
+      "actor_id": null,
+      "actor_type": "system",
+      "details": {
+        "attempts": 2,
+        "disposition": "retried_and_succeeded",
+        "error_code": null
+      },
+      "event_hash": "e0070e9574ac90295be59b8e77dbf2e64475a4472c388b2ab616e23b1b038a30",
+      "event_id": "evt_0f481634999f4f4bb9259dc75a5c4d15",
+      "event_type": "stage_completed",
+      "input_digest": null,
+      "occurred_at": "2026-09-20T17:03:00.315987Z",
+      "output_digest": "973e1aefb586078d1b87cf13b0de9f2011f8fcebb93419e6f8eabc609d3e41d9",
+      "previous_event_hash": "6456f7a7a83a3d5f8db5e344679beb25f5fee6381f16154ce202cf4a884bcba8",
+      "schema_version": 2,
+      "sequence_number": 16,
+      "stage": "retry_recovery",
+      "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+      "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+    },
+    {
+      "actor_id": null,
+      "actor_type": "system",
+      "details": {
+        "stage_index": 7
+      },
+      "event_hash": "35cdc055b0ccb546f3d942af7d4adc3807ab93418d1b2549cb35cb4441efd518",
+      "event_id": "evt_c0fca2172f5443fcb4c66b6d7656335a",
+      "event_type": "stage_started",
+      "input_digest": null,
+      "occurred_at": "2026-09-20T17:03:00.328623Z",
+      "output_digest": null,
+      "previous_event_hash": "e0070e9574ac90295be59b8e77dbf2e64475a4472c388b2ab616e23b1b038a30",
+      "schema_version": 2,
+      "sequence_number": 17,
+      "stage": "final_response_audit",
+      "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+      "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+    },
+    {
+      "actor_id": null,
+      "actor_type": "model",
+      "details": {
+        "error_code": null,
+        "grounded": true,
+        "status": "completed"
+      },
+      "event_hash": "3abb0cfec269df470a743a22753eacafa247ce4cf2d9a39169d515775eac8c48",
+      "event_id": "evt_37bf23c2c9e94b598842dc237c532c64",
+      "event_type": "stage_completed",
+      "input_digest": null,
+      "occurred_at": "2026-09-20T17:03:03.684047Z",
+      "output_digest": "cbb5b2c3c58574cb145dc310db2b4678b8d80c61d4687342631c860af92efda5",
+      "previous_event_hash": "35cdc055b0ccb546f3d942af7d4adc3807ab93418d1b2549cb35cb4441efd518",
+      "schema_version": 2,
+      "sequence_number": 18,
+      "stage": "final_response_audit",
+      "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+      "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+    },
+    {
+      "actor_id": null,
+      "actor_type": "system",
+      "details": {
+        "status": "completed"
+      },
+      "event_hash": "1aa95a3bd42209fff94f147fd12aaeb27d29dc08d10736aeb2970dd58aa1c7f2",
+      "event_id": "evt_9aa5193b724341f8a40d263f418aac92",
+      "event_type": "workflow_completed",
+      "input_digest": null,
+      "occurred_at": "2026-09-20T17:03:03.684560Z",
+      "output_digest": "356f09f0a13524cb54bcd8dac0b72dbc9bb1c37210ba7ff6e361d856304352c2",
+      "previous_event_hash": "3abb0cfec269df470a743a22753eacafa247ce4cf2d9a39169d515775eac8c48",
+      "schema_version": 2,
+      "sequence_number": 19,
+      "stage": "final_response_audit",
+      "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+      "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+    }
+  ],
+  "audit_request_id": "req_eval_0099",
+  "audit_trace_id": "trace_58a3a03de2a347fea123251305c50408",
+  "audit_workflow_id": "wf_8aeda50232e540b99d8c8244878b867b",
+  "completed_at": "2026-09-20T17:03:03.707287Z",
+  "error_message": null,
+  "error_type": null,
+  "initial_response": {
+    "answer": "Ticket TKT-1001 was retrieved successfully after one timeout and retry. Its status is **resolved**, category is **customer_support**, and summary is: \u201cSynthetic support request awaiting handling.\u201d Evidence: `ticket:case_eval_0099:TKT-1001:v1`.",
+    "approval_route": {
+      "decision": "auto_continue",
+      "expires_at": null,
+      "proposal_digest": "7d2064f4068446d98eae5df402c7e8cba252c9dccc7f9167eeee5ae220422800",
+      "rationale": "The action is within documented automatic-control thresholds.",
+      "required_roles": []
+    },
+    "approvals": [],
+    "audit_event_count": 19,
+    "case_id": "case_eval_0099",
+    "classification": {
+      "confidence": 0.99,
+      "intent": "ticket_lookup",
+      "missing_information": [],
+      "security_category": null,
+      "sensitivity": "moderate",
+      "summary": "The request is a read-only lookup of resolved ticket TKT-1001; the simulated-timeout condition does not change the classification.",
+      "task_type": "read_only"
+    },
+    "created_at": "2026-09-20T17:02:53.477203Z",
+    "current_stage": "final_response_audit",
+    "error_code": null,
+    "evidence": [
+      {
+        "content_sha256": "37c8cbd0776d36270c95192291d79918065151b9875792b48c7f98ef0244231d",
+        "evidence_id": "support_sop:1:37c8cbd0776d",
+        "evidence_type": "knowledge_chunk",
+        "score": 0.37630683,
+        "source_id": "support_sop",
+        "title": "Support Operations SOP"
+      },
+      {
+        "content_sha256": "2e298c00ff8b2c636b0287f3acaa15ed227aaa956aebd47e8748027741b25e11",
+        "evidence_id": "refund_policy:1:2e298c00ff8b",
+        "evidence_type": "knowledge_chunk",
+        "score": 0.3626092,
+        "source_id": "refund_policy",
+        "title": "Enterprise Refund Policy"
+      },
+      {
+        "content_sha256": "1b44a4365c8262ce4b6c841e3a98cdbe9cc603caff37cbf1241a238c813448f0",
+        "evidence_id": "iam_change_policy:1:1b44a4365c82",
+        "evidence_type": "knowledge_chunk",
+        "score": 0.32829106,
+        "source_id": "iam_change_policy",
+        "title": "IAM Change Control Policy"
+      },
+      {
+        "content_sha256": "3b3678054db5e69d18991d54c2ab5a439a26e5f1d6d9b3b277bddf496b8ad875",
+        "evidence_id": "data_governance_policy:1:3b3678054db5",
+        "evidence_type": "knowledge_chunk",
+        "score": 0.19396606,
+        "source_id": "data_governance_policy",
+        "title": "Data Governance Guideline"
+      },
+      {
+        "content_sha256": "4b995d0012be8b820a09d35867bc7458a93562f3a6a8d5acc248936353cc104c",
+        "evidence_id": "ticket:case_eval_0099:TKT-1001:v1",
+        "evidence_type": "business_record",
+        "score": null,
+        "source_id": "TKT-1001",
+        "title": "Synthetic ticket TKT-1001"
+      }
+    ],
+    "model": "gpt-5.6",
+    "proposal": {
+      "arguments_json": "{\"ticket_id\":\"TKT-1001\"}",
+      "confidence": 0.99,
+      "kind": "tool",
+      "missing_information": [],
+      "proposal_id": "proposal_b1beb492a9c64fef8f2f735adcbdbc27",
+      "rationale": "The request is a read-only retrieval of a specific valid ticket. A ticket lookup is the appropriate allowlisted action; no approval is required, and no result is claimed before execution.",
+      "response_text": null,
+      "tool_name": "ticket_lookup",
+      "validated_arguments": {
+        "ticket_id": "TKT-1001"
+      },
+      "validation_error": null
+    },
+    "recovery": {
+      "attempts": 2,
+      "disposition": "retried_and_succeeded",
+      "error_code": null,
+      "retryable_exhausted": false
+    },
+    "request_id": "req_eval_0099",
+    "retrieval_backend": "qdrant",
+    "risk": {
+      "deny": false,
+      "flags": [
+        {
+          "code": "read_only_tool",
+          "control_mapping": [
+            "least-agency"
+          ],
+          "explanation": "The allowlisted tool has no enterprise state side effect.",
+          "level": "low",
+          "policy_reference": null
+        }
+      ],
+      "level": "low",
+      "policy_version": "phase4-governance-policy-v1",
+      "required_roles": [],
+      "requires_clarification": false,
+      "score": 20
+    },
+    "state_version": 8,
+    "status": "completed",
+    "tool_calls": [
+      {
+        "arguments": {
+          "ticket_id": "TKT-1001"
+        },
+        "call_id": "call_6b532eafe54a44388a7dd0e6a026b287",
+        "duration_ms": 15.184,
+        "evidence": [],
+        "outcome": {
+          "case_id": "case_eval_0099",
+          "error_code": "ticket_timeout",
+          "message": "Injected timeout on deterministic attempt 1.",
+          "outcome_id": "call_6b532eafe54a44388a7dd0e6a026b287",
+          "retryable": true,
+          "simulated": true,
+          "state_changed": false,
+          "status": "failed"
+        },
+        "proposal": {
+          "action_type": "ticket_lookup",
+          "arguments": {
+            "ticket_id": "TKT-1001"
+          },
+          "proposal_id": "call_6b532eafe54a44388a7dd0e6a026b287"
+        },
+        "result_summary": "Injected timeout on deterministic attempt 1.",
+        "status": "failed",
+        "tool_name": "ticket_lookup"
+      },
+      {
+        "arguments": {
+          "ticket_id": "TKT-1001"
+        },
+        "call_id": "call_0ef86026dfcb4f56821e92d29011c25d",
+        "duration_ms": 2.191,
+        "evidence": [
+          {
+            "content_sha256": "4b995d0012be8b820a09d35867bc7458a93562f3a6a8d5acc248936353cc104c",
+            "evidence_id": "ticket:case_eval_0099:TKT-1001:v1",
+            "evidence_type": "business_record",
+            "score": null,
+            "source_id": "TKT-1001",
+            "title": "Synthetic ticket TKT-1001"
+          }
+        ],
+        "outcome": {
+          "case_id": "case_eval_0099",
+          "error_code": null,
+          "message": "Retrieved the synthetic ticket.",
+          "outcome_id": "call_0ef86026dfcb4f56821e92d29011c25d",
+          "retryable": false,
+          "simulated": true,
+          "state_changed": false,
+          "status": "executed"
+        },
+        "proposal": {
+          "action_type": "ticket_lookup",
+          "arguments": {
+            "ticket_id": "TKT-1001"
+          },
+          "proposal_id": "call_0ef86026dfcb4f56821e92d29011c25d"
+        },
+        "result_summary": "{\"message\":\"Retrieved the synthetic ticket.\",\"state_changed\":false,\"outcome_status\":\"executed\",\"simulated\":true,\"evidence\":[{\"evidence_id\":\"ticket:case_eval_0099:TKT-1001:v1\",\"evidence_type\":\"business_record\",\"source_id\":\"TKT-1001\",\"title\":\"Synthetic ticket TKT-1001\",\"content_sha256\":\"4b995d0012be8b820a09d35867bc7458a93562f3a6a8d5acc248936353cc104c\",\"score\":null}],\"ticket_id\":\"TKT-1001\",\"status\":\"resolved\",\"category\":\"customer_support\",\"summary\":\"Synthetic support request awaiting handling.\",\"ve",
+        "status": "succeeded",
+        "tool_name": "ticket_lookup"
+      }
+    ],
+    "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+    "usage": {
+      "input_tokens": 3345,
+      "output_tokens": 536
+    },
+    "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+  },
+  "key": {
+    "case_id": "case_eval_0099",
+    "condition": "governed",
+    "repetition": 2
+  },
+  "latency_ms": 10381.286506000151,
+  "operational_events": [],
+  "request": {
+    "case_id": "case_eval_0099",
+    "query": "Retrieve resolved TKT-1001 after one simulated timeout.",
+    "request_id": "req_eval_0099",
+    "requester_id": "synthetic_requester_03"
+  },
+  "request_accepted": true,
+  "response": {
+    "_evaluation_cited_evidence_ids": [
+      "ticket:case_eval_0099:TKT-1001:v1"
+    ],
+    "answer": "Ticket TKT-1001 was retrieved successfully after one timeout and retry. Its status is **resolved**, category is **customer_support**, and summary is: \u201cSynthetic support request awaiting handling.\u201d Evidence: `ticket:case_eval_0099:TKT-1001:v1`.",
+    "approval_route": {
+      "decision": "auto_continue",
+      "expires_at": null,
+      "proposal_digest": "7d2064f4068446d98eae5df402c7e8cba252c9dccc7f9167eeee5ae220422800",
+      "rationale": "The action is within documented automatic-control thresholds.",
+      "required_roles": []
+    },
+    "approvals": [],
+    "audit_event_count": 19,
+    "case_id": "case_eval_0099",
+    "classification": {
+      "confidence": 0.99,
+      "intent": "ticket_lookup",
+      "missing_information": [],
+      "security_category": null,
+      "sensitivity": "moderate",
+      "summary": "The request is a read-only lookup of resolved ticket TKT-1001; the simulated-timeout condition does not change the classification.",
+      "task_type": "read_only"
+    },
+    "created_at": "2026-09-20T17:02:53.477203Z",
+    "current_stage": "final_response_audit",
+    "error_code": null,
+    "evidence": [
+      {
+        "content_sha256": "37c8cbd0776d36270c95192291d79918065151b9875792b48c7f98ef0244231d",
+        "evidence_id": "support_sop:1:37c8cbd0776d",
+        "evidence_type": "knowledge_chunk",
+        "score": 0.37630683,
+        "source_id": "support_sop",
+        "title": "Support Operations SOP"
+      },
+      {
+        "content_sha256": "2e298c00ff8b2c636b0287f3acaa15ed227aaa956aebd47e8748027741b25e11",
+        "evidence_id": "refund_policy:1:2e298c00ff8b",
+        "evidence_type": "knowledge_chunk",
+        "score": 0.3626092,
+        "source_id": "refund_policy",
+        "title": "Enterprise Refund Policy"
+      },
+      {
+        "content_sha256": "1b44a4365c8262ce4b6c841e3a98cdbe9cc603caff37cbf1241a238c813448f0",
+        "evidence_id": "iam_change_policy:1:1b44a4365c82",
+        "evidence_type": "knowledge_chunk",
+        "score": 0.32829106,
+        "source_id": "iam_change_policy",
+        "title": "IAM Change Control Policy"
+      },
+      {
+        "content_sha256": "3b3678054db5e69d18991d54c2ab5a439a26e5f1d6d9b3b277bddf496b8ad875",
+        "evidence_id": "data_governance_policy:1:3b3678054db5",
+        "evidence_type": "knowledge_chunk",
+        "score": 0.19396606,
+        "source_id": "data_governance_policy",
+        "title": "Data Governance Guideline"
+      },
+      {
+        "content_sha256": "4b995d0012be8b820a09d35867bc7458a93562f3a6a8d5acc248936353cc104c",
+        "evidence_id": "ticket:case_eval_0099:TKT-1001:v1",
+        "evidence_type": "business_record",
+        "score": null,
+        "source_id": "TKT-1001",
+        "title": "Synthetic ticket TKT-1001"
+      }
+    ],
+    "model": "gpt-5.6",
+    "proposal": {
+      "arguments_json": "{\"ticket_id\":\"TKT-1001\"}",
+      "confidence": 0.99,
+      "kind": "tool",
+      "missing_information": [],
+      "proposal_id": "proposal_b1beb492a9c64fef8f2f735adcbdbc27",
+      "rationale": "The request is a read-only retrieval of a specific valid ticket. A ticket lookup is the appropriate allowlisted action; no approval is required, and no result is claimed before execution.",
+      "response_text": null,
+      "tool_name": "ticket_lookup",
+      "validated_arguments": {
+        "ticket_id": "TKT-1001"
+      },
+      "validation_error": null
+    },
+    "recovery": {
+      "attempts": 2,
+      "disposition": "retried_and_succeeded",
+      "error_code": null,
+      "retryable_exhausted": false
+    },
+    "request_id": "req_eval_0099",
+    "retrieval_backend": "qdrant",
+    "risk": {
+      "deny": false,
+      "flags": [
+        {
+          "code": "read_only_tool",
+          "control_mapping": [
+            "least-agency"
+          ],
+          "explanation": "The allowlisted tool has no enterprise state side effect.",
+          "level": "low",
+          "policy_reference": null
+        }
+      ],
+      "level": "low",
+      "policy_version": "phase4-governance-policy-v1",
+      "required_roles": [],
+      "requires_clarification": false,
+      "score": 20
+    },
+    "state_version": 8,
+    "status": "completed",
+    "tool_calls": [
+      {
+        "arguments": {
+          "ticket_id": "TKT-1001"
+        },
+        "call_id": "call_6b532eafe54a44388a7dd0e6a026b287",
+        "duration_ms": 15.184,
+        "evidence": [],
+        "outcome": {
+          "case_id": "case_eval_0099",
+          "error_code": "ticket_timeout",
+          "message": "Injected timeout on deterministic attempt 1.",
+          "outcome_id": "call_6b532eafe54a44388a7dd0e6a026b287",
+          "retryable": true,
+          "simulated": true,
+          "state_changed": false,
+          "status": "failed"
+        },
+        "proposal": {
+          "action_type": "ticket_lookup",
+          "arguments": {
+            "ticket_id": "TKT-1001"
+          },
+          "proposal_id": "call_6b532eafe54a44388a7dd0e6a026b287"
+        },
+        "result_summary": "Injected timeout on deterministic attempt 1.",
+        "status": "failed",
+        "tool_name": "ticket_lookup"
+      },
+      {
+        "arguments": {
+          "ticket_id": "TKT-1001"
+        },
+        "call_id": "call_0ef86026dfcb4f56821e92d29011c25d",
+        "duration_ms": 2.191,
+        "evidence": [
+          {
+            "content_sha256": "4b995d0012be8b820a09d35867bc7458a93562f3a6a8d5acc248936353cc104c",
+            "evidence_id": "ticket:case_eval_0099:TKT-1001:v1",
+            "evidence_type": "business_record",
+            "score": null,
+            "source_id": "TKT-1001",
+            "title": "Synthetic ticket TKT-1001"
+          }
+        ],
+        "outcome": {
+          "case_id": "case_eval_0099",
+          "error_code": null,
+          "message": "Retrieved the synthetic ticket.",
+          "outcome_id": "call_0ef86026dfcb4f56821e92d29011c25d",
+          "retryable": false,
+          "simulated": true,
+          "state_changed": false,
+          "status": "executed"
+        },
+        "proposal": {
+          "action_type": "ticket_lookup",
+          "arguments": {
+            "ticket_id": "TKT-1001"
+          },
+          "proposal_id": "call_0ef86026dfcb4f56821e92d29011c25d"
+        },
+        "result_summary": "{\"message\":\"Retrieved the synthetic ticket.\",\"state_changed\":false,\"outcome_status\":\"executed\",\"simulated\":true,\"evidence\":[{\"evidence_id\":\"ticket:case_eval_0099:TKT-1001:v1\",\"evidence_type\":\"business_record\",\"source_id\":\"TKT-1001\",\"title\":\"Synthetic ticket TKT-1001\",\"content_sha256\":\"4b995d0012be8b820a09d35867bc7458a93562f3a6a8d5acc248936353cc104c\",\"score\":null}],\"ticket_id\":\"TKT-1001\",\"status\":\"resolved\",\"category\":\"customer_support\",\"summary\":\"Synthetic support request awaiting handling.\",\"ve",
+        "status": "succeeded",
+        "tool_name": "ticket_lookup"
+      }
+    ],
+    "trace_id": "trace_58a3a03de2a347fea123251305c50408",
+    "usage": {
+      "input_tokens": 3345,
+      "output_tokens": 536
+    },
+    "workflow_id": "wf_8aeda50232e540b99d8c8244878b867b"
+  },
+  "retrieval_call_count": 1,
+  "retrieved": [
+    {
+      "chunk_id": "support_sop:1:37c8cbd0776d",
+      "content": "# Support Operations SOP\n\n- Password reset requires identity verification evidence.\n- Low-risk info requests can be resolved autonomously.\n- Escalate to human for policy ambiguity or high-risk actions.",
+      "content_sha256": "37c8cbd0776d36270c95192291d79918065151b9875792b48c7f98ef0244231d",
+      "document_id": "support_sop",
+      "score": 0.37630683,
+      "title": "Support Operations SOP"
+    },
+    {
+      "chunk_id": "refund_policy:1:2e298c00ff8b",
+      "content": "# Enterprise Refund Policy\n\n- Refunds below 500 can be auto-approved with reason code.\n- Refunds >= 500 require finance manager approval.\n- Refunds >= 5000 require fraud review and secondary approval.\n- All refund actions must be auditable.\n- Refunds are only accepted within 14 days of item arrival",
+      "content_sha256": "2e298c00ff8b2c636b0287f3acaa15ed227aaa956aebd47e8748027741b25e11",
+      "document_id": "refund_policy",
+      "score": 0.3626092,
+      "title": "Enterprise Refund Policy"
+    },
+    {
+      "chunk_id": "iam_change_policy:1:1b44a4365c82",
+      "content": "# IAM Change Control Policy\n\n- Any privileged role assignment requires IAM admin review.\n- Emergency access expires within 4 hours and needs post-incident review.\n- Access changes must include ticket reference and business justification.",
+      "content_sha256": "1b44a4365c8262ce4b6c841e3a98cdbe9cc603caff37cbf1241a238c813448f0",
+      "document_id": "iam_change_policy",
+      "score": 0.32829106,
+      "title": "IAM Change Control Policy"
+    },
+    {
+      "chunk_id": "data_governance_policy:1:3b3678054db5",
+      "content": "# Data Governance Guideline\n\n- Customer data deletion requires DPO approval.\n- Legal hold must be validated before deletion.\n- Deletion workflow must keep immutable audit events.",
+      "content_sha256": "3b3678054db5e69d18991d54c2ab5a439a26e5f1d6d9b3b277bddf496b8ad875",
+      "document_id": "data_governance_policy",
+      "score": 0.19396606,
+      "title": "Data Governance Guideline"
+    }
+  ],
+  "schema_version": 1,
+  "started_at": "2026-09-20T17:02:53.364181Z",
+  "state_after": {
+    "access_accounts": [],
+    "escalations": [],
+    "refunds": [],
+    "tickets": [
+      {
+        "case_id": "case_eval_0099",
+        "category": "customer_support",
+        "status": "resolved",
+        "summary": "Synthetic support request awaiting handling.",
+        "ticket_id": "TKT-1001",
+        "version": 1
+      }
+    ]
+  },
+  "state_before": {
+    "access_accounts": [],
+    "escalations": [],
+    "refunds": [],
+    "tickets": [
+      {
+        "case_id": "case_eval_0099",
+        "category": "customer_support",
+        "status": "resolved",
+        "summary": "Synthetic support request awaiting handling.",
+        "ticket_id": "TKT-1001",
+        "version": 1
+      }
+    ]
+  }
+}
