@@ -26,50 +26,63 @@ in the [project bibliography](docs/references.md). Test ownership and scope are 
 ## Setup
 
 Python 3.11–3.13, [uv](https://docs.astral.sh/uv/), and Docker are required for complete local
-execution.
+execution. Start local configuration from [`.env.example`](.env.example); never commit `.env` or
+real credentials.
 
 Install the baseline application environment:
 
-```console
+```bash
 uv sync --frozen
 ```
 
 Install the independently locked Phase 6 environment:
 
-```console
+```bash
 uv sync --project experiments/paired_agent_evaluation --group dev --frozen
 ```
 
 The default development profile uses lexical retrieval and an isolated SQLite database. Start it
 with:
 
-```console
+```bash
 uv run uvicorn app.baseline_main:app --app-dir src
 ```
 
 Model-backed execution requires `RAG_OPENAI_API_KEY`. Production and experiment profiles also
-require `RAG_SAFETY_IDENTIFIER_SECRET`. Full experiment reproduction requires the pinned Qdrant
-service and configuration described in the [Phase 6 guide](experiments/paired_agent_evaluation/README.md#prerequisites).
+require independent `RAG_SAFETY_IDENTIFIER_SECRET` and `RAG_GOVERNANCE_AUDIT_INTEGRITY_KEY`
+values. Full experiment reproduction requires the pinned Qdrant service and configuration
+described in the [Phase 6 guide](experiments/paired_agent_evaluation/README.md#prerequisites).
 
 ## Verify the Phase 6 evidence
 
-From the repository root, verify the inherited Phase 3–5 identities and frozen harness:
+From the repository root, verify the inherited Phase 3–5 identities and Phase 6 readiness:
 
-```console
+```bash
 uv run --project experiments/paired_agent_evaluation \
   python experiments/paired_agent_evaluation/scripts/verify_harness.py
 ```
 
 Verify the sealed release independently:
 
-```console
+```bash
 uv run --project experiments/paired_agent_evaluation \
   python experiments/paired_agent_evaluation/scripts/verify_release.py
 ```
 
-Expected release identity:
+The preregistered base harness was followed by a transparent, scoring-only correction. The
+[correction manifest](docs/phase-6-experiments/scoring-correction-manifest.json) records the changed
+source digests and confirms that acquisition, raw observations, normalization, and adjudication
+were not repeated or changed.
+
+Recorded Phase 6 identities:
 
 ```text
+paired-agent-evaluation-harness-v1
+52b04baaeabdddccb93581b2280bb272fbc56eb9562f7d746d13eb09744128ad
+
+paired-agent-evaluation-scoring-correction-v1
+cc3f9396d303a2041b56febe330ca74d5c23eedd0f3eb5704fc2953adad781ff
+
 paired-agent-evaluation-v1
 150be865736eb274751ddec24f0a084e2d2942c119a25e164600907f492165ea
 ```
@@ -94,7 +107,7 @@ Working artifacts support inspection but do not replace the canonical release.
 
 Run the repository-level checks with:
 
-```console
+```bash
 uv run ruff check src tests scripts
 uv run ruff format --check src tests scripts
 uv run mypy
