@@ -57,3 +57,28 @@
 > NOTE: The Microsoft and ServiceNow sources support the realism of synthetic routing, case-management,
 knowledge, approval, and escalation scenarios. They are illustrative enterprise-domain sources,
 not evidence that this project reproduces either commercial platform.
+
+## Phase 6: experimental design, statistics, and secondary evaluation
+
+32. OpenAI, “Evaluate agent workflows,” *OpenAI API Documentation*. [Guide](https://developers.openai.com/api/docs/guides/agent-evals).
+33. S. Es, J. James, L. Espinosa-Anke, and S. Schockaert, “RAGAs: Automated Evaluation of
+    Retrieval Augmented Generation,” in *Proceedings of EACL 2024: System Demonstrations*,
+    pp. 150–158, 2024. [https://doi.org/10.18653/v1/2024.eacl-demo.16](https://doi.org/10.18653/v1/2024.eacl-demo.16).
+34. Ragas, “Faithfulness,” *Ragas Documentation*. [Metric documentation](https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/faithfulness/).
+35. Ragas, “LLMs,” *Ragas API Reference*. [API reference](https://docs.ragas.io/en/stable/references/llms/).
+36. LangChain, “`langchain-community`,” *LangChain Python Reference*. [API reference](https://reference.langchain.com/python/langchain-community).
+37. B. Efron and R. Tibshirani, “Bootstrap Methods for Standard Errors, Confidence Intervals,
+    and Other Measures of Statistical Accuracy,” *Statistical Science*, vol. 1, no. 1,
+    pp. 54–75, 1986. [https://doi.org/10.1214/ss/1177013815](https://doi.org/10.1214/ss/1177013815).
+38. SciPy Community, “`scipy.stats.bootstrap`,” *SciPy API Reference*. [Documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html).
+39. scikit-learn developers, “`fbeta_score`,” *scikit-learn API Reference*. [Documentation](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.fbeta_score.html).
+40. NIST/SEMATECH, “Randomized Block Designs,” *e-Handbook of Statistical Methods*.
+    [Handbook](https://www.itl.nist.gov/div898/handbook/ppc/section3/ppc332.htm).
+41. Python Software Foundation, “`secrets` — Generate secure random numbers for managing
+    secrets,” *Python Documentation*. [Documentation](https://docs.python.org/3/library/secrets.html).
+42. Python Software Foundation, “`asyncio` — Asynchronous I/O,” *Python Documentation*.
+    [Documentation](https://docs.python.org/3/library/asyncio.html).
+
+> NOTE: Ragas faithfulness is used only as a secondary diagnostic in Phase 6. The preregistered primary
+metrics and human adjudication remain authoritative; the Ragas paper or library documentation does
+not replace the project's frozen scoring rubric.
