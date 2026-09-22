@@ -114,7 +114,7 @@ not evidence that this project reproduces either commercial platform.
 
 [42] SciPy Community, “`scipy.stats.bootstrap`,” *SciPy API Reference*. Available: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html [Accessed: Sep. 08, 2026].
 
-[43] scikit-learn developers, “`fbeta_score`,” *scikit-learn API Reference*. [Documentation](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.fbeta_score.html) [Accessed: Sep. 08, 2026].
+[43] scikit-learn developers, “`fbeta_score`,” *scikit-learn API Reference*.  Available: (https://scikit-learn.org/stable/modules/generated/sklearn.metrics.fbeta_score.html) [Accessed: Sep. 08, 2026].
 
 > NOTE: Ragas faithfulness is used only as a secondary diagnostic in Phase 6. The preregistered primary
 metrics and human adjudication remain authoritative; the Ragas paper or library documentation does
@@ -123,14 +123,26 @@ not replace the project's frozen scoring rubric.
 
 ## Reproducibility, testing, and reporting
 
-43. Astral, “Locking and syncing,” *uv Documentation*. [Documentation](https://docs.astral.sh/uv/concepts/projects/sync/).
-44. Pydantic Services Inc., “HTTPX2,” *HTTPX2 Documentation*. [Documentation](https://pydantic.dev/docs/httpx2/get-started/).
-45. pytest contributors, “pytest Documentation.” [Documentation](https://docs.pytest.org/en/stable/).
-46. Astral, “Ruff Documentation.” [Documentation](https://docs.astral.sh/ruff/).
-47. J. Lehtosalo *et al.*, “mypy Documentation.” [Documentation](https://mypy.readthedocs.io/en/stable/).
-48. Microsoft, “Pyright Documentation.” [Documentation](https://microsoft.github.io/pyright/).
-49. W3C Web Accessibility Initiative, “Providing Accessible Names and Descriptions,”
-    *ARIA Authoring Practices Guide*. [Guidance](https://www.w3.org/WAI/ARIA/apg/practices/names-and-descriptions/).
-50. Mozilla, “`<table>`: The Table element,” *MDN Web Docs*. [Documentation](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/table).
-51. Mozilla, “`<svg>`,” *MDN Web Docs*. [Documentation](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/svg).
+[44] OpenAI, “Predicting model behavior before release by simulating deployment,” 2025. [Online]. Available: https://openai.com/index/deployment-simulation/ [Accessed: Aug. 26, 2026].
+
+[45] Astral, “Locking and syncing,” uv Documentation. [Online]. Available: https://docs.astral.sh/uv/concepts/projects/sync/ [Accessed: Jun. 20, 2026].
+
+[46] Pydantic Services Inc., “HTTPX2,” HTTPX2 Documentation. [Online]. Available: https://pydantic.dev/docs/httpx2/get-started/ [Accessed: Jul. 14, 2026].
+
+[47] pytest contributors, “pytest documentation.” [Online]. Available: https://docs.pytest.org/en/stable/ [Accessed: Jul. 14, 2026].
+
+[48] Astral, “Ruff documentation.” [Online]. Available: https://docs.astral.sh/ruff/ [Accessed: 20. 20, 2026].
+
+[49] J. Lehtosalo et al., “mypy documentation.” [Online]. Available: https://mypy.readthedocs.io/en/stable/ [Accessed: Jul. 16, 2026].
+
+[50] Microsoft, “Pyright documentation.” [Online]. Available: https://microsoft.github.io/pyright/ [Accessed: Jul. 15, 2026].
+
+[51] pre-commit contributors, “pre-commit documentation.” [Online]. Available: https://pre-commit.com/ [Accessed: Jul. 15, 2026].
+
+[52] W3C Web Accessibility Initiative, “Providing accessible names and descriptions,” ARIA Authoring Practices Guide. [Online]. Available: https://www.w3.org/WAI/ARIA/apg/practices/names-and-descriptions/ [Accessed: Aug. 01, 2026].
+
+[53] Mozilla, “<table>: The Table element,” MDN Web Docs. [Online]. Available: https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/table [Accessed: Sep. 10, 2026].
+
+[55] Mozilla, “<svg>,” MDN Web Docs. [Online]. Available: https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/svg [Accessed: Sep. 10, 2026].
+
 
