@@ -23,6 +23,13 @@ Supporting design documents are available under [`docs/`](docs/), with external 
 in the [project bibliography](docs/references.md). Test ownership and scope are described in
 [`tests/README.md`](tests/README.md).
 
+### Documentation conventions
+
+Following [PEP 257](https://peps.python.org/pep-0257/), simple modules in `baseline/` and
+`governance/` use concise docstrings to avoid repetition and maintenance overhead, while complex
+functions and classes receive more detailed documentation. Development references are cited where
+relevant and consolidated in [`docs/references.md`](docs/references.md) for reviewer access.
+
 ## Setup
 
 Python 3.11–3.13, [uv](https://docs.astral.sh/uv/), and Docker are required for complete local
