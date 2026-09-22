@@ -25,21 +25,28 @@ v1.2 is the current approved SLSA specification.
 [4] Software, Systems and Enterprise—Architecture Description, ISO/IEC/IEEE Standard 42010:2022, Nov. 2022. [Online]. Available: https://www.iso.org/standard/74393.html [Accessed: Jul. 15, 2026].
 
 ## Phase 3: baseline implementation
+[5] OpenAI, “Create a model response,” OpenAI API Reference. [Online]. Available: https://developers.openai.com/api/reference/python/resources/responses/methods/create [Accessed: Jul. 15, 2026].
 
-5. OpenAI, “Create a model response,” *OpenAI API Reference*. [Responses API](https://developers.openai.com/api/reference/python/resources/responses/methods/create).
-6. OpenAI, “Function calling,” *OpenAI API Documentation*. [Guide](https://developers.openai.com/api/docs/guides/function-calling).
-7. OpenAI, “Vector embeddings,” *OpenAI API Documentation*. [Guide](https://developers.openai.com/api/docs/guides/embeddings).
-8. S. Ramírez, “Lifespan Events,” *FastAPI Documentation*. [Documentation](https://fastapi.tiangolo.com/advanced/events/).
-9. Pydantic Services Inc., “Strict Mode,” *Pydantic Documentation*. [Documentation](https://docs.pydantic.dev/latest/concepts/strict_mode/).
-10. Pydantic Services Inc., “Configuration,” *Pydantic Documentation*. [Documentation](https://docs.pydantic.dev/latest/concepts/config/).
-11. Pydantic Services Inc., “Settings Management,” *Pydantic Documentation*. [Documentation](https://docs.pydantic.dev/latest/concepts/pydantic_settings/).
-12. Qdrant Solutions GmbH, “Search,” *Qdrant Documentation*. [Documentation](https://qdrant.tech/documentation/concepts/search/).
-13. Qdrant Solutions GmbH, “Scroll points,” *Qdrant API Reference*. [API reference](https://api.qdrant.tech/api-reference/points/scroll-points).
-14. Python Software Foundation, “`sqlite3` — DB-API 2.0 interface for SQLite databases,”
-    *Python Documentation*. [Documentation](https://docs.python.org/3/library/sqlite3.html).
-15. SQLite Project, “Transaction.” [SQLite documentation](https://www.sqlite.org/lang_transaction.html).
-16. I. Levkivskyi, J. Lehtosalo, and Ł. Langa, “PEP 544 — Protocols: Structural subtyping
-    (static duck typing),” 2017. [PEP 544](https://peps.python.org/pep-0544/).
+[6] OpenAI, “Function calling,” OpenAI API Documentation. [Online]. Available: https://developers.openai.com/api/docs/guides/function-calling [Accessed: Jul. 16, 2026].
+
+[7] OpenAI, “Vector embeddings,” OpenAI API Documentation. [Online]. Available: https://developers.openai.com/api/docs/guides/embeddings [Accessed: Jul. 16, 2026].
+
+[8] S. Ramírez, “Lifespan events,” FastAPI Documentation. [Online]. Available: https://fastapi.tiangolo.com/advanced/events/ [Accessed: Jul. 20, 2026].
+
+[9] Pydantic Services Inc., “Strict mode,” Pydantic Documentation. [Online]. Available: https://docs.pydantic.dev/latest/concepts/strict_mode/ [Accessed: Jul. 20, 2026].
+
+[10] Pydantic Services Inc., “Settings management,” Pydantic Documentation. [Online]. Available: https://docs.pydantic.dev/latest/concepts/pydantic_settings/ [Accessed: Jul. 20, 2026].
+
+[11] Qdrant Solutions GmbH, “Query points,” Qdrant API Reference. [Online]. Available: https://api.qdrant.tech/api-reference/search/query-points [Accessed: Jul. 22, 2026].
+
+[12] Qdrant Solutions GmbH, “Scroll points,” Qdrant API Reference. [Online]. Available: https://api.qdrant.tech/api-reference/points/scroll-points [Accessed: Jul. 22, 2026].
+
+[13] Python Software Foundation, “sqlite3—DB-API 2.0 interface for SQLite databases,” Python 3 Documentation. [Online]. Available: https://docs.python.org/3/library/sqlite3.html [Accessed: Jul. 22, 2026].
+
+[14] SQLite Project, “Transaction.” [Online]. Available: https://www.sqlite.org/lang_transaction.html [Accessed: Jul. 23, 2026].
+
+[15] I. Levkivskyi, J. Lehtosalo, and Ł. Langa, “PEP 544—Protocols: Structural subtyping (static duck typing),” Python Enhancement Proposals, 2017. [Online]. Available: https://peps.python.org/pep-0544/ [Accessed: Jul. 28, 2026].
+
 
 ## Phase 4: governance, security, and assurance
 
