@@ -68,15 +68,22 @@ v1.2 is the current approved SLSA specification.
 
 ## Phase 5: evaluation contracts and provenance
 
-25. JSON Schema, “JSON Schema Specification, Draft 2020-12.” [Specification](https://json-schema.org/specification).
-26. A. Rundgren, B. Jordan, and S. Erdtman, “JSON Canonicalization Scheme (JCS),” RFC 8785,
-    2020. [https://doi.org/10.17487/RFC8785](https://doi.org/10.17487/RFC8785).
-27. National Institute of Standards and Technology, *Secure Hash Standard (SHS)*, FIPS PUB
-    180-4, 2015. [https://doi.org/10.6028/NIST.FIPS.180-4](https://doi.org/10.6028/NIST.FIPS.180-4).
-28. SLSA, “Provenance,” *SLSA Specification v1.2*. [Specification](https://slsa.dev/spec/v1.2/provenance).
-29. I. Ward, “JSON Lines.” [Format documentation](https://jsonlines.org/).
-30. Microsoft, “Autonomous service agents in Dynamics 365,” *Microsoft Learn*. [Documentation](https://learn.microsoft.com/en-us/dynamics365/contact-center/administer/autonomous-agents-overview).
-31. ServiceNow, “Approval assistance AI agent,” *ServiceNow Product Documentation*. [Documentation](https://www.servicenow.com/docs/r/intelligent-experiences/plat-approval-assistance-ai-agent.html).
+[24] JSON Schema, “JSON Schema specification, Draft 2020-12.” [Online]. Available: https://json-schema.org/specification [Accessed: Aug. 15, 2026].
+
+[25] A. Rundgren, B. Jordan, and S. Erdtman, “JSON Canonicalization Scheme (JCS),” RFC 8785, Jun. 2020, doi: 10.17487/RFC8785.
+
+[26] National Institute of Standards and Technology, Secure Hash Standard (SHS), FIPS PUB 180-4, Aug. 2015, doi: 10.6028/NIST.FIPS.180-4.
+
+[27] SLSA Community, “Provenance,” SLSA Specification, ver. 1.2, Nov. 2025. [Online]. Available: https://slsa.dev/spec/v1.2/provenance [Accessed: Aug. 15, 2026].
+
+[28] I. Ward, “JSON Lines.” [Online]. Available: https://jsonlines.org/ [Accessed: Aug. 17, 2026].
+
+[29] Microsoft, “Use Service Agent in Customer Service,” Microsoft Learn. [Online]. Available: https://learn.microsoft.com/en-us/dynamics365/customer-service/use/use-service-agent [Accessed: Aug. 15, 2026].
+
+[30] ServiceNow, “Customer service management AI agent use cases,” ServiceNow Product Documentation. [Online]. Available: https://www.servicenow.com/docs/r/xanadu/customer-service-management/now-assist-for-csm/csm-ai-agents-use-cases.html [Accessed: Aug. 21, 2026].
+
+[31] ServiceNow, “Approval assistance AI agent,” ServiceNow Product Documentation. [Online]. Available: https://www.servicenow.com/docs/r/intelligent-experiences/plat-approval-assistance-ai-agent.html [Accessed: Aug. 21, 2026].
+
 
 > NOTE: The Microsoft and ServiceNow sources support the realism of synthetic routing, case-management,
 knowledge, approval, and escalation scenarios. They are illustrative enterprise-domain sources,
