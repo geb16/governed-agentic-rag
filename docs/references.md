@@ -26,3 +26,18 @@
 15. SQLite Project, “Transaction.” [SQLite documentation](https://www.sqlite.org/lang_transaction.html).
 16. I. Levkivskyi, J. Lehtosalo, and Ł. Langa, “PEP 544 — Protocols: Structural subtyping
     (static duck typing),” 2017. [PEP 544](https://peps.python.org/pep-0544/).
+
+## Phase 4: governance, security, and assurance
+
+17. E. Tabassi, *Artificial Intelligence Risk Management Framework (AI RMF 1.0)*, NIST AI
+    100-1, 2023. [https://doi.org/10.6028/NIST.AI.100-1](https://doi.org/10.6028/NIST.AI.100-1).
+18. C. Autio *et al.*, *Artificial Intelligence Risk Management Framework: Generative Artificial
+    Intelligence Profile*, NIST AI 600-1, 2024. [https://doi.org/10.6028/NIST.AI.600-1](https://doi.org/10.6028/NIST.AI.600-1).
+19. M. Souppaya, K. Scarfone, and D. Dodson, *Secure Software Development Framework (SSDF)
+    Version 1.1*, NIST SP 800-218, 2022. [https://doi.org/10.6028/NIST.SP.800-218](https://doi.org/10.6028/NIST.SP.800-218).
+20. OWASP Foundation, “AI Agent Security Cheat Sheet,” *OWASP Cheat Sheet Series*. [Guidance](https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html).
+21. OWASP GenAI Security Project, *OWASP Top 10 for Agentic Applications 2026*, 2025.
+    [Guidance](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/).
+22. OWASP GenAI Security Project, “LLM06:2025 Excessive Agency.” [Guidance](https://genai.owasp.org/llmrisk/llm062025-excessive-agency/).
+23. OWASP Foundation, “Logging Cheat Sheet,” *OWASP Cheat Sheet Series*. [Guidance](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html).
+24. OWASP Foundation, “Input Validation Cheat Sheet,” *OWASP Cheat Sheet Series*. [Guidance](https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html).
