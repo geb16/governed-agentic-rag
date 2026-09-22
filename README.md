@@ -19,8 +19,9 @@ and reproducibility requirements.
 | 5 — Evaluation | Frozen dataset, schemas, and scoring rubric | [Phase 5 guide](docs/phase-5-evaluation/README.md) | [`phase5-evaluation-v5`](docs/phase-5-evaluation/freeze-manifest.json) |
 | 6 — Experiment | Paired, blinded experimental evaluation | [Phase 6 guide](experiments/paired_agent_evaluation/README.md) | [`paired-agent-evaluation-harness-v1`](docs/phase-6-experiments/harness-freeze-manifest.json) |
 
-Supporting design documents are available under [`docs/`](docs/). Test ownership and scope are
-described in [`tests/README.md`](tests/README.md).
+Supporting design documents are available under [`docs/`](docs/), with external sources collected
+in the [project bibliography](docs/references.md). Test ownership and scope are described in
+[`tests/README.md`](tests/README.md).
 
 ## Setup
 
