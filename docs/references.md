@@ -16,13 +16,13 @@ v1.2 is the current approved SLSA specification.
 
 ## Foundations: RAG and agentic architecture
 
-1. P. Lewis *et al.*, “Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks,”
-   *Advances in Neural Information Processing Systems*, vol. 33, 2020. [NeurIPS paper](https://papers.neurips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html).
-2. S. Yao *et al.*, “ReAct: Synergizing Reasoning and Acting in Language Models,” *International
-   Conference on Learning Representations*, 2023. [Paper](https://arxiv.org/abs/2210.03629).
-3. A. Cockburn, “Hexagonal Architecture,” 2005. [Original article](https://alistair.cockburn.us/hexagonal-architecture/).
-4. ISO/IEC/IEEE 42010:2022, *Software, systems and enterprise — Architecture description*, 2022.
-   [Standard record](https://www.iso.org/standard/74393.html).
+[1] P. Lewis et al., “Retrieval-augmented generation for knowledge-intensive NLP tasks,” in Advances in Neural Information Processing Systems 33, 2020, pp. 9459–9474. [Online]. Available: https://papers.neurips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html [Accessed: Jul. 14, 2026].
+
+[2] S. Yao et al., “ReAct: Synergizing reasoning and acting in language models,” in Proc. Int. Conf. Learn. Representations, 2023. [Online]. Available: https://arxiv.org/abs/2210.03629 [Accessed: Jul. 14, 2026].
+
+[3] A. Cockburn, “Hexagonal architecture,” 2005. [Online]. Available: https://alistair.cockburn.us/hexagonal-architecture/ [Accessed: Jul. 15, 2026].
+
+[4] Software, Systems and Enterprise—Architecture Description, ISO/IEC/IEEE Standard 42010:2022, Nov. 2022. [Online]. Available: https://www.iso.org/standard/74393.html [Accessed: Jul. 15, 2026].
 
 ## Phase 3: baseline implementation
 
