@@ -91,28 +91,35 @@ not evidence that this project reproduces either commercial platform.
 
 ## Phase 6: experimental design, statistics, and secondary evaluation
 
-32. OpenAI, “Evaluate agent workflows,” *OpenAI API Documentation*. [Guide](https://developers.openai.com/api/docs/guides/agent-evals).
-33. S. Es, J. James, L. Espinosa-Anke, and S. Schockaert, “RAGAs: Automated Evaluation of
-    Retrieval Augmented Generation,” in *Proceedings of EACL 2024: System Demonstrations*,
-    pp. 150–158, 2024. [https://doi.org/10.18653/v1/2024.eacl-demo.16](https://doi.org/10.18653/v1/2024.eacl-demo.16).
-34. Ragas, “Faithfulness,” *Ragas Documentation*. [Metric documentation](https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/faithfulness/).
-35. Ragas, “LLMs,” *Ragas API Reference*. [API reference](https://docs.ragas.io/en/stable/references/llms/).
-36. LangChain, “`langchain-community`,” *LangChain Python Reference*. [API reference](https://reference.langchain.com/python/langchain-community).
-37. B. Efron and R. Tibshirani, “Bootstrap Methods for Standard Errors, Confidence Intervals,
-    and Other Measures of Statistical Accuracy,” *Statistical Science*, vol. 1, no. 1,
-    pp. 54–75, 1986. [https://doi.org/10.1214/ss/1177013815](https://doi.org/10.1214/ss/1177013815).
-38. SciPy Community, “`scipy.stats.bootstrap`,” *SciPy API Reference*. [Documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html).
-39. scikit-learn developers, “`fbeta_score`,” *scikit-learn API Reference*. [Documentation](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.fbeta_score.html).
-40. NIST/SEMATECH, “Randomized Block Designs,” *e-Handbook of Statistical Methods*.
-    [Handbook](https://www.itl.nist.gov/div898/handbook/ppc/section3/ppc332.htm).
-41. Python Software Foundation, “`secrets` — Generate secure random numbers for managing
-    secrets,” *Python Documentation*. [Documentation](https://docs.python.org/3/library/secrets.html).
-42. Python Software Foundation, “`asyncio` — Asynchronous I/O,” *Python Documentation*.
+[32] OpenAI, “Improving support with every interaction at OpenAI,” 2025. [Online]. Available: https://openai.com/index/openai-support-model/ [Accessed: Aug. 26, 2026].
+
+[33] S. Es, J. James, L. Espinosa-Anke, and S. Schockaert, “RAGAs: Automated evaluation of retrieval augmented generation,” in Proc. 18th Conf. Eur. Chapter Assoc. Comput. Linguistics: System Demonstrations, 2024, pp. 150–158, doi: 10.18653/v1/2024.eacl-demo.16.
+
+[34] Ragas, “Faithfulness,” Ragas Documentation. [Online]. Available: https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/faithfulness/ [Accessed: Sep. 02, 2026].
+
+[35] Ragas, “LLMs,” Ragas API Reference. [Online]. Available: https://docs.ragas.io/en/stable/references/llms/ [Accessed: Sep. 02, 2026].
+
+[36] OpenAI, “How evals drive the next chapter in AI for businesses,” 2025. [Online]. Available: https://openai.com/index/evals-drive-next-chapter-of-ai/ [Accessed: Aug. 26, 2026].
+
+[37] B. Efron and R. Tibshirani, “Bootstrap methods for standard errors, confidence intervals, and other measures of statistical accuracy,” Statistical Science, vol. 1, no. 1, pp. 54–75, Feb. 1986, doi: 10.1214/ss/1177013815.
+
+[38] C. J. van Rijsbergen, Information Retrieval, 2nd ed. London, U.K.: Butterworths, 1979. [Online]. Available: https://www.dcs.gla.ac.uk/Keith/Preface.html [Accessed: Sep. 03, 2026].
+
+[39] NIST/SEMATECH, “Randomized block designs,” e-Handbook of Statistical Methods. [Online]. Available: https://www.itl.nist.gov/div898/handbook/ppc/section3/ppc332.htm [Accessed: Sep. 03, 2026].
+
+[40] Python Software Foundation, “secrets—Generate secure random numbers for managing secrets,” Python 3 Documentation. [Online]. Available: https://docs.python.org/3/library/secrets.html [Accessed: Sep. 04, 2026].
+
+[41] Python Software Foundation, “`asyncio` — Asynchronous I/O,” *Python Documentation*.
     [Documentation](https://docs.python.org/3/library/asyncio.html).
+
+[42] SciPy Community, “`scipy.stats.bootstrap`,” *SciPy API Reference*. Available: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html [Accessed: Sep. 08, 2026].
+
+[43] scikit-learn developers, “`fbeta_score`,” *scikit-learn API Reference*. [Documentation](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.fbeta_score.html) [Accessed: Sep. 08, 2026].
 
 > NOTE: Ragas faithfulness is used only as a secondary diagnostic in Phase 6. The preregistered primary
 metrics and human adjudication remain authoritative; the Ragas paper or library documentation does
 not replace the project's frozen scoring rubric.
+> The percentile bootstrap and F-score calculations are implemented directly in application/statistics.py and application/scoring.py. The _SciPy_ and _scikit-learn_ references were only used for basic guidance.
 
 ## Reproducibility, testing, and reporting
 
