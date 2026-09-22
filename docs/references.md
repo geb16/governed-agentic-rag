@@ -41,3 +41,19 @@
 22. OWASP GenAI Security Project, “LLM06:2025 Excessive Agency.” [Guidance](https://genai.owasp.org/llmrisk/llm062025-excessive-agency/).
 23. OWASP Foundation, “Logging Cheat Sheet,” *OWASP Cheat Sheet Series*. [Guidance](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html).
 24. OWASP Foundation, “Input Validation Cheat Sheet,” *OWASP Cheat Sheet Series*. [Guidance](https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html).
+
+## Phase 5: evaluation contracts and provenance
+
+25. JSON Schema, “JSON Schema Specification, Draft 2020-12.” [Specification](https://json-schema.org/specification).
+26. A. Rundgren, B. Jordan, and S. Erdtman, “JSON Canonicalization Scheme (JCS),” RFC 8785,
+    2020. [https://doi.org/10.17487/RFC8785](https://doi.org/10.17487/RFC8785).
+27. National Institute of Standards and Technology, *Secure Hash Standard (SHS)*, FIPS PUB
+    180-4, 2015. [https://doi.org/10.6028/NIST.FIPS.180-4](https://doi.org/10.6028/NIST.FIPS.180-4).
+28. SLSA, “Provenance,” *SLSA Specification v1.2*. [Specification](https://slsa.dev/spec/v1.2/provenance).
+29. I. Ward, “JSON Lines.” [Format documentation](https://jsonlines.org/).
+30. Microsoft, “Autonomous service agents in Dynamics 365,” *Microsoft Learn*. [Documentation](https://learn.microsoft.com/en-us/dynamics365/contact-center/administer/autonomous-agents-overview).
+31. ServiceNow, “Approval assistance AI agent,” *ServiceNow Product Documentation*. [Documentation](https://www.servicenow.com/docs/r/intelligent-experiences/plat-approval-assistance-ai-agent.html).
+
+> NOTE: The Microsoft and ServiceNow sources support the realism of synthetic routing, case-management,
+knowledge, approval, and escalation scenarios. They are illustrative enterprise-domain sources,
+not evidence that this project reproduces either commercial platform.
