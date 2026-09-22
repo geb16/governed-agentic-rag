@@ -14,6 +14,17 @@ published Secure Hash Standard with a revision planned. The project therefore ci
 versions against which it was designed rather than silently substituting future revisions. SLSA
 v1.2 is the current approved SLSA specification.
 
+## Reference groups
+
+- [Foundations: RAG and agentic architecture](#foundations-rag-and-agentic-architecture)
+- [Phase 3: baseline implementation](#phase-3-baseline-implementation)
+- [Phase 4: governance, security, and assurance](#phase-4-governance-security-and-assurance)
+- [Phase 5: evaluation contracts and provenance](#phase-5-evaluation-contracts-and-provenance)
+- [Phase 6: experimental design, statistics, and secondary evaluation](#phase-6-experimental-design-statistics-and-secondary-evaluation)
+- [Reproducibility, testing, and reporting](#reproducibility-testing-and-reporting)
+
+---
+
 ## Foundations: RAG and agentic architecture
 
 [1] P. Lewis et al., “Retrieval-augmented generation for knowledge-intensive NLP tasks,” in Advances in Neural Information Processing Systems 33, 2020, pp. 9459–9474. [Online]. Available: https://papers.neurips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html [Accessed: Jul. 14, 2026].
@@ -24,7 +35,10 @@ v1.2 is the current approved SLSA specification.
 
 [4] Software, Systems and Enterprise—Architecture Description, ISO/IEC/IEEE Standard 42010:2022, Nov. 2022. [Online]. Available: https://www.iso.org/standard/74393.html [Accessed: Jul. 15, 2026].
 
+---
+
 ## Phase 3: baseline implementation
+
 [5] OpenAI, “Create a model response,” OpenAI API Reference. [Online]. Available: https://developers.openai.com/api/reference/python/resources/responses/methods/create [Accessed: Jul. 15, 2026].
 
 [6] OpenAI, “Function calling,” OpenAI API Documentation. [Online]. Available: https://developers.openai.com/api/docs/guides/function-calling [Accessed: Jul. 16, 2026].
@@ -47,6 +61,7 @@ v1.2 is the current approved SLSA specification.
 
 [15] I. Levkivskyi, J. Lehtosalo, and Ł. Langa, “PEP 544—Protocols: Structural subtyping (static duck typing),” Python Enhancement Proposals, 2017. [Online]. Available: https://peps.python.org/pep-0544/ [Accessed: Jul. 28, 2026].
 
+---
 
 ## Phase 4: governance, security, and assurance
 
@@ -66,6 +81,8 @@ v1.2 is the current approved SLSA specification.
 
 [23] OWASP Foundation, “Input validation cheat sheet,” OWASP Cheat Sheet Series. [Online]. Available: https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html [Accessed: Aug. 07, 2026].
 
+---
+
 ## Phase 5: evaluation contracts and provenance
 
 [24] JSON Schema, “JSON Schema specification, Draft 2020-12.” [Online]. Available: https://json-schema.org/specification [Accessed: Aug. 15, 2026].
@@ -84,10 +101,11 @@ v1.2 is the current approved SLSA specification.
 
 [31] ServiceNow, “Approval assistance AI agent,” ServiceNow Product Documentation. [Online]. Available: https://www.servicenow.com/docs/r/intelligent-experiences/plat-approval-assistance-ai-agent.html [Accessed: Aug. 21, 2026].
 
+> **Scope note:** The Microsoft and ServiceNow sources support the realism of synthetic routing,
+> case-management, knowledge, approval, and escalation scenarios. They are illustrative
+> enterprise-domain sources, not evidence that this project reproduces either commercial platform.
 
-> NOTE: The Microsoft and ServiceNow sources support the realism of synthetic routing, case-management,
-knowledge, approval, and escalation scenarios. They are illustrative enterprise-domain sources,
-not evidence that this project reproduces either commercial platform.
+---
 
 ## Phase 6: experimental design, statistics, and secondary evaluation
 
@@ -109,20 +127,24 @@ not evidence that this project reproduces either commercial platform.
 
 [40] Python Software Foundation, “secrets—Generate secure random numbers for managing secrets,” Python 3 Documentation. [Online]. Available: https://docs.python.org/3/library/secrets.html [Accessed: Sep. 04, 2026].
 
-[41] Python Software Foundation, “`asyncio` — Asynchronous I/O,” *Python Documentation*. Available: (https://docs.python.org/3/library/asyncio.html). 
-[Accessed: Jul. 17, 2026].
-[42] SciPy Community, “`scipy.stats.bootstrap`,” *SciPy API Reference*. Available: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html [Accessed: Sep. 08, 2026].
+[41] Python Software Foundation, “`asyncio`—Asynchronous I/O,” Python Documentation. [Online]. Available: https://docs.python.org/3/library/asyncio.html [Accessed: Jul. 17, 2026].
 
-[43] scikit-learn developers, “`fbeta_score`,” *scikit-learn API Reference*.  Available: (https://scikit-learn.org/stable/modules/generated/sklearn.metrics.fbeta_score.html) [Accessed: Sep. 08, 2026].
+[42] SciPy Community, “`scipy.stats.bootstrap`,” SciPy API Reference. [Online]. Available: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html [Accessed: Sep. 08, 2026].
 
-[44] LangChain, “langchain-community,” *LangChain Python Reference*. [Online]. Available: https://reference.langchain.com/python/langchain-community    [Accessed: Sep. 02, 2026].
+[43] scikit-learn developers, “`fbeta_score`,” scikit-learn API Reference. [Online]. Available: https://scikit-learn.org/stable/modules/generated/sklearn.metrics.fbeta_score.html [Accessed: Sep. 08, 2026].
 
-> NOTE: 
-> 1. Ragas faithfulness is used only as a secondary diagnostic in Phase 6. The preregistered primary
-     metrics and human adjudication remain authoritative; the Ragas paper or library documentation does
-     not replace the project's frozen scoring rubric.
-> 2. The percentile bootstrap and F-score calculations are implemented directly in application/statistics.py and application/scoring.py.
-The _SciPy_ and _scikit-learn_ references were only used for basic guidance.
+[44] LangChain, “langchain-community,” LangChain Python Reference. [Online]. Available: https://reference.langchain.com/python/langchain-community [Accessed: Sep. 02, 2026].
+
+> **Method note:**
+>
+> 1. Ragas faithfulness is used only as a secondary diagnostic in Phase 6. The preregistered
+>    primary metrics and human adjudication remain authoritative; the Ragas paper or library
+>    documentation does not replace the project's frozen scoring rubric.
+> 2. The percentile bootstrap and F-score calculations are implemented directly in
+>    `application/statistics.py` and `application/scoring.py`. The *SciPy* and *scikit-learn*
+>    references were used only for basic guidance.
+
+---
 
 ## Reproducibility, testing, and reporting
 
@@ -144,8 +166,6 @@ The _SciPy_ and _scikit-learn_ references were only used for basic guidance.
 
 [53] W3C Web Accessibility Initiative, “Providing accessible names and descriptions,” ARIA Authoring Practices Guide. [Online]. Available: https://www.w3.org/WAI/ARIA/apg/practices/names-and-descriptions/ [Accessed: Aug. 01, 2026].
 
-[54] Mozilla, “<table>: The Table element,” MDN Web Docs. [Online]. Available: https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/table [Accessed: Sep. 10, 2026].
+[54] Mozilla, “`<table>`: The Table element,” MDN Web Docs. [Online]. Available: https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/table [Accessed: Sep. 10, 2026].
 
 [55] Mozilla, “svg,” MDN Web Docs. [Online]. Available: https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/svg [Accessed: Sep. 10, 2026].
-
-
