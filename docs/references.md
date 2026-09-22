@@ -116,10 +116,12 @@ not evidence that this project reproduces either commercial platform.
 
 [43] scikit-learn developers, “`fbeta_score`,” *scikit-learn API Reference*.  Available: (https://scikit-learn.org/stable/modules/generated/sklearn.metrics.fbeta_score.html) [Accessed: Sep. 08, 2026].
 
-> NOTE: Ragas faithfulness is used only as a secondary diagnostic in Phase 6. The preregistered primary
-metrics and human adjudication remain authoritative; the Ragas paper or library documentation does
-not replace the project's frozen scoring rubric.
-> The percentile bootstrap and F-score calculations are implemented directly in application/statistics.py and application/scoring.py. The _SciPy_ and _scikit-learn_ references were only used for basic guidance.
+> NOTE: 
+> 1. Ragas faithfulness is used only as a secondary diagnostic in Phase 6. The preregistered primary
+     metrics and human adjudication remain authoritative; the Ragas paper or library documentation does
+     not replace the project's frozen scoring rubric.
+> 2. The percentile bootstrap and F-score calculations are implemented directly in application/statistics.py and application/scoring.py.
+The _SciPy_ and _scikit-learn_ references were only used for basic guidance.
 
 ## Reproducibility, testing, and reporting
 
@@ -143,6 +145,6 @@ not replace the project's frozen scoring rubric.
 
 [53] Mozilla, “<table>: The Table element,” MDN Web Docs. [Online]. Available: https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/table [Accessed: Sep. 10, 2026].
 
-[55] Mozilla, “<svg>,” MDN Web Docs. [Online]. Available: https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/svg [Accessed: Sep. 10, 2026].
+[54] Mozilla, “svg,” MDN Web Docs. [Online]. Available: https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/svg [Accessed: Sep. 10, 2026].
 
 
