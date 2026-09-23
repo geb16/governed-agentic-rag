@@ -78,12 +78,16 @@ def write_provenance(
         raise ValueError(f"Missing generated evidence: {', '.join(missing)}")
 
     generated = [output / name for name in GENERATED_FILENAMES]
+    analysis_sources = sorted(generator.parent.rglob("*.py"))
     provenance = {
         "schema_version": 1,
         "source_release_id": manifest["release_id"],
         "source_release_aggregate_sha256": manifest["aggregate_sha256"],
         "source_run_id": manifest["run_id"],
         "generator": str(generator.relative_to(repository)),
+        "analysis_sources": {
+            str(path.relative_to(repository)): sha256(path) for path in analysis_sources
+        },
         "generated_files": {path.name: sha256(path) for path in generated},
     }
     (output / "provenance.json").write_text(
