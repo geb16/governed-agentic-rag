@@ -7,9 +7,10 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
-from evidence_config import METRIC_LABELS
-from evidence_io import ReleaseData, write_csv
-from figures.svg_utils import format_value
+from formatting import format_value
+
+from evidence.evidence_config import METRIC_LABELS
+from evidence.evidence_io import ReleaseData, write_csv
 
 
 def generate_tables(data: ReleaseData, output: Path) -> None:
@@ -63,11 +64,6 @@ def _write_overall_results(
         ],
         rows,
     )
-
-
-def _interval(lower: float | None, upper: float | None) -> str:
-    return f"[{format_value(lower)}, {format_value(upper)}]"
-
 
 
 def _write_stratified_effects(differences: list[dict[str, Any]], output: Path) -> None:
@@ -178,6 +174,7 @@ def _write_operational_summary(
         rows,
     )
 
+
 def _percentile(values: list[float], probability: float) -> float:
     ordered = sorted(values)
     position = (len(ordered) - 1) * probability
@@ -185,6 +182,7 @@ def _percentile(values: list[float], probability: float) -> float:
     upper = min(lower + 1, len(ordered) - 1)
     weight = position - lower
     return ordered[lower] * (1 - weight) + ordered[upper] * weight
+
 
 def _write_categorical_counts(normalized: list[dict[str, Any]], output: Path) -> None:
     terminal_errors: Counter[tuple[str, str]] = Counter()
@@ -206,3 +204,7 @@ def _write_categorical_counts(normalized: list[dict[str, Any]], output: Path) ->
         ["condition", "observed_route", "count"],
         [[condition, route, count] for (condition, route), count in sorted(routes.items())],
     )
+
+
+def _interval(lower: float | None, upper: float | None) -> str:
+    return f"[{format_value(lower)}, {format_value(upper)}]"
