@@ -1,4 +1,4 @@
-# Render selected overall metric estimates by experimental condition.
+"""Render selected overall estimates for the two experimental conditions."""
 
 # ruff: noqa: E501 -- SVG elements remain readable as complete element strings.
 
@@ -25,8 +25,13 @@ SELECTED_METRICS = (
 
 
 def render_condition_estimates(estimates: list[dict[str, Any]], target: Path) -> None:
-    """Render grouped baseline and governed bars for selected metrics."""
+    """Render grouped baseline and governed bars for selected metrics.
 
+    Args:
+        estimates: Metric estimates containing overall rows for both conditions.
+        target: Destination path for the generated SVG figure.
+
+    """
     lookup = {
         (row["metric_id"], row["condition"]): row
         for row in estimates
@@ -60,6 +65,7 @@ def render_condition_estimates(estimates: list[dict[str, Any]], target: Path) ->
 
 
 def _add_y_axis(parts: list[str], left: int, top: int, plot_height: int) -> None:
+    """Append the shared zero-to-one scale and grid lines to an SVG."""
     for tick in (0.0, 0.25, 0.5, 0.75, 1.0):
         y = top + plot_height * (1 - tick)
         parts.append(f'<line x1="{left}" y1="{y}" x2="1185" y2="{y}" stroke="#dbe3ee"/>')
@@ -84,6 +90,7 @@ def _add_bars(
     top: int,
     plot_height: int,
 ) -> None:
+    """Append the baseline and governed bars for one metric."""
     for offset, condition, colour in (
         (-19, "baseline", "#64748b"),
         (19, "governed", "#0f766e"),
@@ -107,6 +114,7 @@ def _add_bars(
 
 
 def _add_label(parts: list[str], metric: str, centre: int) -> None:
+    """Append a wrapped human-readable metric label below a bar group."""
     for line_index, line in enumerate(METRIC_LABELS[metric].split()):
         parts.append(
             text(
