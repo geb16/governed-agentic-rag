@@ -60,22 +60,26 @@ def sanitize(value: Any) -> Any:
 
 def write_sanitized(source: Path, destination: Path) -> None:
     """Copies HTML or writes sanitized, deterministic JSON content."""
-    if source.suffix == ".html":
-        destination.write_text(
-            source.read_text(encoding="utf-8"),
-            encoding="utf-8",
-            newline="\n",
-        )
+    write_payload(destination, read_payload(source))
+
+
+def write_payload(destination: Path, value: Any) -> None:
+    """Writes one sanitized release payload using its canonical file encoding."""
+    value = sanitize(json_value(value))
+    if destination.suffix == ".html":
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text(str(value), encoding="utf-8", newline="\n")
         return
-    if source.suffix == ".jsonl":
-        records = [json.loads(line) for line in source.read_text(encoding="utf-8").splitlines()]
+    if destination.suffix == ".jsonl":
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        records = value if isinstance(value, list) else [value]
         content = "".join(
-            json.dumps(sanitize(record), separators=(",", ":"), sort_keys=True) + "\n"
+            json.dumps(record, separators=(",", ":"), sort_keys=True) + "\n"
             for record in records
         )
         destination.write_text(content, encoding="utf-8", newline="\n")
         return
-    atomic_json(destination, sanitize(json.loads(source.read_text(encoding="utf-8"))))
+    atomic_json(destination, value)
 
 
 def read_payload(path: Path) -> Any:
