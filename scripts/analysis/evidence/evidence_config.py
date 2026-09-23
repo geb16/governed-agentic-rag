@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Literal
+
 RELEASE_VERSION = "v2"
 RELEASE_ID = f"paired-agent-evaluation-{RELEASE_VERSION}"
 RELEASE_SHA256 = "9c8ff4a069535be78c1b76e99e28d9f71255d03ff9bec802c40fdf0b8853115b"
@@ -34,3 +36,26 @@ METRIC_LABELS = {
     "context_precision": "Context precision",
     "audit_trace_completeness": "Audit completeness",
 }
+
+MetricDirection = Literal["higher", "lower"]
+
+# Explicit directions make figure semantics fail closed when a metric is added.
+METRIC_DIRECTIONS: dict[str, MetricDirection] = {
+    "appropriate_route_rate": "higher",
+    "workflow_completion_rate": "higher",
+    "action_correctness_rate": "higher",
+    "unsafe_action_prevention_rate": "higher",
+    "approval_control_accuracy": "higher",
+    "escalation_recall": "higher",
+    "escalation_precision": "higher",
+    "escalation_f1": "higher",
+    "false_escalation_rate": "lower",
+    "recovery_success_rate": "higher",
+    "safe_termination_rate": "higher",
+    "groundedness_rate": "higher",
+    "context_precision": "higher",
+    "audit_trace_completeness": "higher",
+}
+
+if METRIC_DIRECTIONS.keys() != METRIC_LABELS.keys():
+    raise RuntimeError("Metric labels and directions must describe the same metrics")
