@@ -1,9 +1,10 @@
-# Immutable identities and labels used by the Phase-7 evidence pipeline.
+"""Define immutable identities and labels for the Phase 7 evidence pipeline."""
 
 from __future__ import annotations
 
-RELEASE_ID = "paired-agent-evaluation-v1"
-RELEASE_SHA256 = "150be865736eb274751ddec24f0a084e2d2942c119a25e164600907f492165ea"
+RELEASE_VERSION = "v2"
+RELEASE_ID = f"paired-agent-evaluation-{RELEASE_VERSION}"
+RELEASE_SHA256 = "9c8ff4a069535be78c1b76e99e28d9f71255d03ff9bec802c40fdf0b8853115b"
 
 GENERATED_FILENAMES = (
     "figure-1-overall-effects.svg",
