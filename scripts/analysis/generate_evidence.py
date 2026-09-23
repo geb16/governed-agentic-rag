@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from evidence.evidence_config import RELEASE_ID
-from evidence.evidence_io import load_release
+from evidence.evidence_io import load_release, write_provenance
 from evidence.evidence_tables import generate_tables
 from figures.figure_conditions import render_condition_estimates
 from figures.figure_operations import render_operational_indicators
@@ -33,7 +33,8 @@ def main() -> int:
         data.normalized,
         output / "figure-3-operational-indicators.svg",
     )
-    print(f"Generated Phase 7 evidence files from {RELEASE_ID}")
+    generated_count = write_provenance(output, data.manifest, script, repository)
+    print(f"Generated {generated_count} Phase 7 evidence files from {RELEASE_ID}")
     return 0
 
 
