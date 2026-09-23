@@ -1,6 +1,6 @@
 # Render the overall paired-effects forest plot.
 
-
+# ruff: noqa: E501 -- SVG elements remain readable as complete element strings.
 
 from __future__ import annotations
 

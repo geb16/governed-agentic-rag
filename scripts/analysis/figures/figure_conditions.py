@@ -1,6 +1,6 @@
 # Render selected overall metric estimates by experimental condition.
 
-
+# ruff: noqa: E501 -- SVG elements remain readable as complete element strings.
 
 from __future__ import annotations
 
