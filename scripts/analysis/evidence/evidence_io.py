@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from evidence_config import RELEASE_ID, RELEASE_SHA256
+from evidence.evidence_config import GENERATED_FILENAMES, RELEASE_ID, RELEASE_SHA256
 
 JsonObject = dict[str, Any]
 
@@ -70,7 +70,14 @@ def write_provenance(
 ) -> int:
     """Hash generated evidence and write its source provenance manifest."""
 
-    generated = sorted(path for path in output.iterdir() if path.name != "provenance.json")
+    expected = {*GENERATED_FILENAMES, "provenance.json"}
+    actual = {path.name for path in output.iterdir()}
+    if unexpected := sorted(actual - expected):
+        raise ValueError(f"Unmanaged generated evidence: {', '.join(unexpected)}")
+    if missing := sorted(set(GENERATED_FILENAMES) - actual):
+        raise ValueError(f"Missing generated evidence: {', '.join(missing)}")
+
+    generated = [output / name for name in GENERATED_FILENAMES]
     provenance = {
         "schema_version": 1,
         "source_release_id": manifest["release_id"],
