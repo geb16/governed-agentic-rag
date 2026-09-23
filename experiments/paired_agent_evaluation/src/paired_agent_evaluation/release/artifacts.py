@@ -74,8 +74,7 @@ def write_payload(destination: Path, value: Any) -> None:
         destination.parent.mkdir(parents=True, exist_ok=True)
         records = value if isinstance(value, list) else [value]
         content = "".join(
-            json.dumps(record, separators=(",", ":"), sort_keys=True) + "\n"
-            for record in records
+            json.dumps(record, separators=(",", ":"), sort_keys=True) + "\n" for record in records
         )
         destination.write_text(content, encoding="utf-8", newline="\n")
         return
