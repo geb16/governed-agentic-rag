@@ -1,4 +1,4 @@
-# Render the overall paired-effects forest plot.
+"""Render the overall governed-minus-baseline paired-effects forest plot."""
 
 # ruff: noqa: E501 -- SVG elements remain readable as complete element strings.
 
@@ -15,14 +15,20 @@ from figures.svg_utils import text, write_svg
 
 
 def render_overall_effects(rows: list[dict[str, Any]], target: Path) -> None:
-    """Render governed-minus-baseline effects and confidence intervals."""
+    """Render governed-minus-baseline effects and confidence intervals.
 
+    Args:
+        rows: Overall paired-difference records in display order.
+        target: Destination path for the generated SVG figure.
+
+    """
     width, plot_left, plot_width = 1200, 520, 560
     row_height, top = 49, 118
     height = top + row_height * len(rows) + 90
     x_min, x_max = -0.55, 0.65
 
     def x(value: float) -> float:
+        """Map an effect value onto the horizontal plot coordinate."""
         return plot_left + (value - x_min) / (x_max - x_min) * plot_width
 
     parts = [
@@ -66,6 +72,7 @@ def render_overall_effects(rows: list[dict[str, Any]], target: Path) -> None:
 
 
 def _add_axis(parts: list[str], x: Callable[[float], float], height: int) -> None:
+    """Append the effect-scale grid, zero line, and tick labels."""
     for tick in (-0.5, -0.25, 0.0, 0.25, 0.5):
         colour = "#334155" if tick == 0 else "#dbe3ee"
         stroke_width = 2 if tick == 0 else 1
@@ -95,6 +102,7 @@ def _add_metric_row(
     plot_left: int,
     plot_width: int,
 ) -> None:
+    """Append one labelled effect estimate and its confidence interval."""
     y = top + index * row_height
     if index % 2 == 0:
         parts.append(f'<rect x="30" y="{y - 27}" width="1135" height="43" rx="5" fill="#f1f5f9"/>')
