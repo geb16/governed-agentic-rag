@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import statistics
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +19,7 @@ def generate_tables(data: ReleaseData, output: Path) -> None:
     _write_stratified_effects(data.differences, output)
     _write_metric_denominators(data.scores, output)
     _write_operational_summary(data.summary, data.normalized, data.ragas, output)
+    _write_categorical_counts(data.normalized, output)
 
 
 def _write_overall_results(
@@ -177,7 +178,6 @@ def _write_operational_summary(
         rows,
     )
 
-
 def _percentile(values: list[float], probability: float) -> float:
     ordered = sorted(values)
     position = (len(ordered) - 1) * probability
@@ -185,3 +185,24 @@ def _percentile(values: list[float], probability: float) -> float:
     upper = min(lower + 1, len(ordered) - 1)
     weight = position - lower
     return ordered[lower] * (1 - weight) + ordered[upper] * weight
+
+def _write_categorical_counts(normalized: list[dict[str, Any]], output: Path) -> None:
+    terminal_errors: Counter[tuple[str, str]] = Counter()
+    routes: Counter[tuple[str, str]] = Counter()
+    for row in normalized:
+        condition = row["key"]["condition"]
+        terminal_errors[(condition, row["terminal_error_code"] or "none")] += 1
+        routes[(condition, row["observed_route"] or "none")] += 1
+    write_csv(
+        output / "terminal-errors.csv",
+        ["condition", "terminal_error_code", "count"],
+        [
+            [condition, error, count]
+            for (condition, error), count in sorted(terminal_errors.items())
+        ],
+    )
+    write_csv(
+        output / "observed-routes.csv",
+        ["condition", "observed_route", "count"],
+        [[condition, route, count] for (condition, route), count in sorted(routes.items())],
+    )
