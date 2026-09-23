@@ -1,4 +1,4 @@
-# Rendering operational latency and token indicators.
+"""Render operational latency and token-use indicators."""
 
 # ruff: noqa: E501 -- SVG elements remain readable as complete element strings.
 
@@ -17,8 +17,14 @@ def render_operational_indicators(
     normalized: list[dict[str, Any]],
     target: Path,
 ) -> None:
-    """Render separate-scale panels for latency and token usage."""
+    """Render separate-scale panels for latency and token usage.
 
+    Args:
+        summary: Sealed run summary containing token totals by condition.
+        normalized: Normalized observations containing per-request latency.
+        target: Destination path for the generated SVG figure.
+
+    """
     latency: dict[str, list[float]] = defaultdict(list)
     for row in normalized:
         latency[row["key"]["condition"]].append(float(row["latency_ms"]))
@@ -63,6 +69,7 @@ def _add_panel(
     values: dict[str, float],
     suffix: str,
 ) -> None:
+    """Append one independently scaled operational comparison panel."""
     parts.append(
         text(
             panel_x,
