@@ -70,17 +70,20 @@ uv run --project experiments/paired_agent_evaluation \
   python experiments/paired_agent_evaluation/scripts/verify_harness.py
 ```
 
-Verify the sealed release independently:
+Verify the canonical sealed release independently:
 
 ```bash
 uv run --project experiments/paired_agent_evaluation \
   python experiments/paired_agent_evaluation/scripts/verify_release.py
 ```
 
-The preregistered base harness was followed by a transparent, scoring-only correction. The
-[correction manifest](docs/phase-6-experiments/scoring-correction-manifest.json) records the changed
-source digests and confirms that acquisition, raw observations, normalization, and adjudication
-were not repeated or changed.
+The original v1 release remains preserved as audit history. A deterministic corrective release,
+v2, fixes asymmetric normalization of baseline safety blocks without repeating acquisition,
+human adjudication, or Ragas grading. Its canonical
+[correction record](data/evaluation/paired_agent_evaluation/v2/correction.json) identifies v1 and
+the five re-derived files that changed. The earlier
+[scoring correction manifest](docs/phase-6-experiments/scoring-correction-manifest.json) separately
+records the pre-v1 groundedness-eligibility correction.
 
 Recorded Phase 6 identities:
 
@@ -93,6 +96,9 @@ cc3f9396d303a2041b56febe330ca74d5c23eedd0f3eb5704fc2953adad781ff
 
 paired-agent-evaluation-v1
 150be865736eb274751ddec24f0a084e2d2942c119a25e164600907f492165ea
+
+paired-agent-evaluation-v2
+9c8ff4a069535be78c1b76e99e28d9f71255d03ff9bec802c40fdf0b8853115b
 ```
 
 These verification commands use repository-local evidence. They do not repeat provider calls,
@@ -100,17 +106,19 @@ Ragas grading, human adjudication, or experimental acquisition.
 
 ## Evidence locations
 
+- [`data/evaluation/paired_agent_evaluation/v2/`](data/evaluation/paired_agent_evaluation/v2/) is
+  the canonical, content-addressed Phase 6 corrective release. Its
+  [HTML report](data/evaluation/paired_agent_evaluation/v2/report.html) contains the corrected
+  primary results.
 - [`data/evaluation/paired_agent_evaluation/v1/`](data/evaluation/paired_agent_evaluation/v1/) is
-  the canonical, content-addressed Phase 6 release. Its
-  [HTML report](data/evaluation/paired_agent_evaluation/v1/report.html), scores, adjudications,
-  secondary grades, manifests, and execution claim are sealed and must remain unchanged.
+  the superseded original release, retained unchanged for provenance and comparison.
 - [`artifacts/paired_agent_evaluation/`](artifacts/paired_agent_evaluation/) is the supporting audit
   trail containing validation runs, the preregistered test run, blinded researcher work,
   schedules, journals, and intermediate execution state.
 - [`docs/phase-7-analysis/`](docs/phase-7-analysis/) contains the analysis, and
   reproducible figures derived from the sealed release in phase-6 experiments.
 
-The sealed release remains bound to the exact Phase 3–6 identities recorded in its manifests.
+Both sealed releases remain bound to the exact Phase 3–6 identities recorded in their manifests.
 Working artifacts support inspection but do not replace the canonical release.
 
 ## Quality gates

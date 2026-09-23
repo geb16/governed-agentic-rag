@@ -1,0 +1,15 @@
+{
+  "changed_files": [
+    "estimates.json",
+    "normalized.jsonl",
+    "paired-differences.json",
+    "report.html",
+    "scores.jsonl"
+  ],
+  "correction_id": "baseline-safety-terminal-error-v1",
+  "schema_version": 1,
+  "source_run_manifest_sha256": "85782601e8265881954e76cbfd67458e62e40925c51756f15de722c4c5dfbbc8",
+  "summary": "Project baseline safety blocks into terminal_error_code so end-to-end recovery success is scored symmetrically across conditions.",
+  "supersedes_aggregate_sha256": "150be865736eb274751ddec24f0a084e2d2942c119a25e164600907f492165ea",
+  "supersedes_release_id": "paired-agent-evaluation-v1"
+}

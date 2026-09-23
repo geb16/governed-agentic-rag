@@ -122,3 +122,18 @@ def test_baseline_route_normalization(
     observation = normalize(_raw_execution(Condition.BASELINE, response))
     assert observation.observed_route == route
     assert observation.route_requires_adjudication is needs_review
+
+
+def test_baseline_safety_block_is_a_terminal_error() -> None:
+    """Prevent safety-blocked baseline executions from scoring as recovered."""
+    observation = normalize(
+        _raw_execution(
+            Condition.BASELINE,
+            {
+                "status": "completed",
+                "safety": {"blocked": True, "category": "fabricated_citation"},
+            },
+        )
+    )
+
+    assert observation.terminal_error_code == "fabricated_citation"
