@@ -7,12 +7,6 @@ from pathlib import Path
 from typing import Any
 
 
-def format_value(value: float | None, digits: int = 3) -> str:
-    """Format a metric value, retaining an explicit non-estimable marker."""
-
-    return "NA" if value is None else f"{value:.{digits}f}"
-
-
 def text(x: float, y: float, value: str, **attrs: Any) -> str:
     """Render an escaped SVG text element."""
 
