@@ -13,7 +13,8 @@ def generate_tables(data: ReleaseData, output: Path) -> None:
     """Generate every Phase 7 CSV table."""
 
     _write_overall_results(data.estimates, data.differences, output)
-    
+    _write_stratified_effects(data.differences, output)
+
 
 
 def _write_overall_results(
@@ -61,4 +62,36 @@ def _write_overall_results(
 
 def _interval(lower: float | None, upper: float | None) -> str:
     return f"[{format_value(lower)}, {format_value(upper)}]"
+
+
+
+def _write_stratified_effects(differences: list[dict[str, Any]], output: Path) -> None:
+    rows = [
+        [
+            row["metric_id"],
+            row["stratum"],
+            format_value(row["governed_minus_baseline"]),
+            format_value(row["ci_lower"]),
+            format_value(row["ci_upper"]),
+            row["complete_pairs"],
+            row["eligible_case_clusters"],
+            row["valid_bootstrap_replicates"],
+        ]
+        for row in differences
+        if row["stratum"] != "overall"
+    ]
+    write_csv(
+        output / "stratified-paired-effects.csv",
+        [
+            "metric_id",
+            "stratum",
+            "difference",
+            "ci_lower",
+            "ci_upper",
+            "complete_pairs",
+            "eligible_case_clusters",
+            "valid_bootstrap_replicates",
+        ],
+        rows,
+    )
 
