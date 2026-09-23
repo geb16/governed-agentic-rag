@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="365" viewBox="0 0 1200 365" role="img" aria-labelledby="title desc">
+<title id="title">Operational cost indicators</title>
+<desc id="desc">Separate panels show median latency in seconds and total token usage in tens of thousands.</desc>
+<rect width="100%" height="100%" fill="#fbfcfe"/>
+<text x="38" y="45" font-family="Arial" font-size="24" font-weight="700" fill="#172554">Operational indicators</text>
+<text x="40" y="92" font-family="Arial" font-size="17" font-weight="700" fill="#334155">Median latency (seconds)</text>
+<text x="135" y="148" text-anchor="end" font-family="Arial" font-size="14" fill="#334155">Baseline</text>
+<rect x="155" y="125" width="222.9" height="35" rx="5" fill="#64748b"/>
+<text x="392.90378453902997" y="149" font-family="Arial" font-size="14" font-weight="700" fill="#0f172a">6.38s</text>
+<text x="135" y="226" text-anchor="end" font-family="Arial" font-size="14" fill="#334155">Governed</text>
+<rect x="155" y="203" width="350.0" height="35" rx="5" fill="#0f766e"/>
+<text x="520.0" y="227" font-family="Arial" font-size="14" font-weight="700" fill="#0f172a">10.03s</text>
+<text x="155" y="305" font-family="Arial" font-size="12" fill="#64748b">Panels use independent scales; compare conditions within each panel.</text>
+<text x="630" y="92" font-family="Arial" font-size="17" font-weight="700" fill="#334155">Total tokens (x10,000)</text>
+<text x="725" y="148" text-anchor="end" font-family="Arial" font-size="14" fill="#334155">Baseline</text>
+<rect x="745" y="125" width="350.0" height="35" rx="5" fill="#64748b"/>
+<text x="1110.0" y="149" font-family="Arial" font-size="14" font-weight="700" fill="#0f172a">101.47</text>
+<text x="725" y="226" text-anchor="end" font-family="Arial" font-size="14" fill="#334155">Governed</text>
+<rect x="745" y="203" width="274.0" height="35" rx="5" fill="#0f766e"/>
+<text x="1033.9754480058896" y="227" font-family="Arial" font-size="14" font-weight="700" fill="#0f172a">79.43</text>
+<text x="745" y="305" font-family="Arial" font-size="12" fill="#64748b">Panels use independent scales; compare conditions within each panel.</text>
+</svg>
