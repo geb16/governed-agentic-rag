@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="894" viewBox="0 0 1200 894" role="img" aria-labelledby="title desc">
+<title id="title">Overall paired effects of governance</title>
+<desc id="desc">Forest plot of governed minus baseline effects and pointwise 95 percent confidence intervals for fourteen preregistered metrics.</desc>
+<rect width="100%" height="100%" fill="#fbfcfe"/>
+<text x="44" y="46" font-family="Arial" font-size="25" font-weight="700" fill="#172554">Overall paired effects (governed - baseline)</text>
+<text x="44" y="78" font-family="Arial" font-size="15" fill="#475569">Pointwise 95% case-cluster bootstrap intervals; NA = not estimable</text>
+<line x1="543.3" y1="96" x2="543.3" y2="840" stroke="#dbe3ee" stroke-width="1"/>
+<text x="543.3333333333334" y="866" text-anchor="middle" font-family="Arial" font-size="13" fill="#475569">-0.50</text>
+<line x1="660.0" y1="96" x2="660.0" y2="840" stroke="#dbe3ee" stroke-width="1"/>
+<text x="660.0" y="866" text-anchor="middle" font-family="Arial" font-size="13" fill="#475569">-0.25</text>
+<line x1="776.7" y1="96" x2="776.7" y2="840" stroke="#334155" stroke-width="2"/>
+<text x="776.6666666666666" y="866" text-anchor="middle" font-family="Arial" font-size="13" fill="#475569">+0.00</text>
+<line x1="893.3" y1="96" x2="893.3" y2="840" stroke="#dbe3ee" stroke-width="1"/>
+<text x="893.3333333333333" y="866" text-anchor="middle" font-family="Arial" font-size="13" fill="#475569">+0.25</text>
+<line x1="1010.0" y1="96" x2="1010.0" y2="840" stroke="#dbe3ee" stroke-width="1"/>
+<text x="1010.0" y="866" text-anchor="middle" font-family="Arial" font-size="13" fill="#475569">+0.50</text>
+<rect x="30" y="91" width="1135" height="43" rx="5" fill="#f1f5f9"/>
+<text x="290" y="118" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Appropriate route</text>
+<line x1="761.1" y1="113" x2="871.9" y2="113" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+<circle cx="815.6" cy="113" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
+<text x="1110" y="118" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.083 [-0.033, 0.204]</text>
+<text x="290" y="167" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Workflow completion</text>
+<line x1="851.6" y1="162" x2="1048.9" y2="162" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+<circle cx="950.9" cy="162" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
+<text x="1110" y="167" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.373 [0.160, 0.583]</text>
+<rect x="30" y="189" width="1135" height="43" rx="5" fill="#f1f5f9"/>
+<text x="290" y="216" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Action correctness</text>
+<line x1="739.6" y1="211" x2="854.4" y2="211" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+<circle cx="793.0" cy="211" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
+<text x="1110" y="216" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.035 [-0.079, 0.167]</text>
+<text x="290" y="265" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Unsafe-action prevention</text>
+<line x1="776.7" y1="260" x2="790.8" y2="260" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+<circle cx="782.3" cy="260" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
+<text x="1110" y="265" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.012 [0.000, 0.030]</text>
+<rect x="30" y="287" width="1135" height="43" rx="5" fill="#f1f5f9"/>
+<text x="290" y="314" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Approval control</text>
+<line x1="776.7" y1="309" x2="776.7" y2="309" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+<circle cx="776.7" cy="309" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
+<text x="1110" y="314" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.000 [0.000, 0.000]</text>
+<text x="290" y="363" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Escalation recall</text>
+<line x1="776.7" y1="358" x2="776.7" y2="358" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+<circle cx="776.7" cy="358" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
+<text x="1110" y="363" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.000 [0.000, 0.000]</text>
+<rect x="30" y="385" width="1135" height="43" rx="5" fill="#f1f5f9"/>
+<text x="290" y="412" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Escalation precision</text>
+<text x="800.0" y="412" text-anchor="middle" font-family="Arial" font-size="14" fill="#64748b">NA</text>
+<text x="1110" y="412" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">NA</text>
+<text x="290" y="461" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Escalation F1</text>
+<line x1="776.7" y1="456" x2="776.7" y2="456" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+<circle cx="776.7" cy="456" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
+<text x="1110" y="461" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.000 [0.000, 0.000]</text>
+<rect x="30" y="483" width="1135" height="43" rx="5" fill="#f1f5f9"/>
+<text x="290" y="510" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">False escalation</text>
+<line x1="776.7" y1="505" x2="801.2" y2="505" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+<circle cx="785.7" cy="505" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
+<text x="1110" y="510" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.019 [0.000, 0.053]</text>
+<text x="290" y="559" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Recovery success</text>
+<line x1="543.3" y1="554" x2="776.7" y2="554" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+<circle cx="679.4" cy="554" r="7" fill="#c2410c" stroke="#ffffff" stroke-width="2"/>
+<text x="1110" y="559" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">-0.208 [-0.500, 0.000]</text>
+<rect x="30" y="581" width="1135" height="43" rx="5" fill="#f1f5f9"/>
+<text x="290" y="608" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Safe termination</text>
+<line x1="776.7" y1="603" x2="776.7" y2="603" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+<circle cx="776.7" cy="603" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
+<text x="1110" y="608" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.000 [0.000, 0.000]</text>
+<text x="290" y="657" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Groundedness</text>
+<line x1="795.3" y1="652" x2="1029.4" y2="652" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+<circle cx="897.7" cy="652" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
+<text x="1110" y="657" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.259 [0.040, 0.542]</text>
+<rect x="30" y="679" width="1135" height="43" rx="5" fill="#f1f5f9"/>
+<text x="290" y="706" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Context precision</text>
+<line x1="776.7" y1="701" x2="776.7" y2="701" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+<circle cx="776.7" cy="701" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
+<text x="1110" y="706" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.000 [0.000, 0.000]</text>
+<text x="290" y="755" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Audit completeness</text>
+<line x1="880.0" y1="750" x2="904.8" y2="750" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+<circle cx="892.3" cy="750" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
+<text x="1110" y="755" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.248 [0.221, 0.275]</text>
+<text x="800.0" y="889" text-anchor="middle" font-family="Arial" font-size="14" fill="#334155">Difference on registered metric scale</text>
+</svg>
