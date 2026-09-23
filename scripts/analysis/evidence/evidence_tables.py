@@ -14,8 +14,13 @@ from evidence.evidence_io import ReleaseData, write_csv
 
 
 def generate_tables(data: ReleaseData, output: Path) -> None:
-    """Generate every Phase 7 CSV table."""
+    """Generate every Phase 7 CSV table.
 
+    Args:
+        data: Verified inputs from the sealed Phase 6 release.
+        output: Directory in which to write the evidence tables.
+
+    """
     _write_overall_results(data.estimates, data.differences, output)
     _write_stratified_effects(data.differences, output)
     _write_metric_denominators(data.scores, output)
@@ -28,6 +33,7 @@ def _write_overall_results(
     differences: list[dict[str, Any]],
     output: Path,
 ) -> None:
+    """Write condition estimates and paired effects for overall metrics."""
     overall_estimates = [row for row in estimates if row["stratum"] == "overall"]
     estimate_lookup = {(row["metric_id"], row["condition"]): row for row in overall_estimates}
     overall_differences = [row for row in differences if row["stratum"] == "overall"]
@@ -67,6 +73,7 @@ def _write_overall_results(
 
 
 def _write_stratified_effects(differences: list[dict[str, Any]], output: Path) -> None:
+    """Write paired effects for every non-overall analysis stratum."""
     rows = [
         [
             row["metric_id"],
@@ -98,6 +105,7 @@ def _write_stratified_effects(differences: list[dict[str, Any]], output: Path) -
 
 
 def _write_metric_denominators(scores: list[dict[str, Any]], output: Path) -> None:
+    """Write eligible counts and contribution totals by metric and condition."""
     contributions: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
     for row in scores:
         contributions[(row["metric_id"], row["key"]["condition"])].append(row)
@@ -128,6 +136,7 @@ def _write_operational_summary(
     ragas: list[dict[str, Any]],
     output: Path,
 ) -> None:
+    """Write latency, token-use, and secondary-groundedness summaries."""
     latency: dict[str, list[float]] = defaultdict(list)
     for row in normalized:
         latency[row["key"]["condition"]].append(float(row["latency_ms"]))
@@ -176,6 +185,16 @@ def _write_operational_summary(
 
 
 def _percentile(values: list[float], probability: float) -> float:
+    """Estimate a percentile by linear interpolation between adjacent values.
+
+    Args:
+        values: Nonempty sample of numeric observations.
+        probability: Quantile probability on the closed interval from zero to one.
+
+    Returns:
+        Interpolated percentile value.
+
+    """
     ordered = sorted(values)
     position = (len(ordered) - 1) * probability
     lower = int(position)
@@ -185,6 +204,7 @@ def _percentile(values: list[float], probability: float) -> float:
 
 
 def _write_categorical_counts(normalized: list[dict[str, Any]], output: Path) -> None:
+    """Write terminal-error and observed-route counts by condition."""
     terminal_errors: Counter[tuple[str, str]] = Counter()
     routes: Counter[tuple[str, str]] = Counter()
     for row in normalized:
@@ -207,4 +227,5 @@ def _write_categorical_counts(normalized: list[dict[str, Any]], output: Path) ->
 
 
 def _interval(lower: float | None, upper: float | None) -> str:
+    """Format optional lower and upper confidence limits as an interval."""
     return f"[{format_value(lower)}, {format_value(upper)}]"
