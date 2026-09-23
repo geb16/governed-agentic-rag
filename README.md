@@ -18,6 +18,7 @@ and reproducibility requirements.
 | 4 — Governance | Governance-aware workflow condition | [Phase 4 guide](docs/phase-4-governance/README.md) | [`phase4-governance-v6`](docs/phase-4-governance/freeze-manifest.json) |
 | 5 — Evaluation | Frozen dataset, schemas, and scoring rubric | [Phase 5 guide](docs/phase-5-evaluation/README.md) | [`phase5-evaluation-v5`](docs/phase-5-evaluation/freeze-manifest.json) |
 | 6 — Experiment | Paired, blinded experimental evaluation | [Phase 6 guide](experiments/paired_agent_evaluation/README.md) | [`paired-agent-evaluation-harness-v1`](docs/phase-6-experiments/harness-freeze-manifest.json) |
+| 7 — Analysis | Sealed-results analysis and dissertation | [Phase 7 guide](docs/phase-7-analysis/README.md) | Derived from [`paired-agent-evaluation-v1`](data/evaluation/paired_agent_evaluation/v1/manifest.json) |
 
 Supporting design documents are available under [`docs/`](docs/), with external sources collected
 in the [project bibliography](docs/references.md). Test ownership and scope are described in
@@ -106,6 +107,8 @@ Ragas grading, human adjudication, or experimental acquisition.
 - [`artifacts/paired_agent_evaluation/`](artifacts/paired_agent_evaluation/) is the supporting audit
   trail containing validation runs, the preregistered test run, blinded researcher work,
   schedules, journals, and intermediate execution state.
+- [`docs/phase-7-analysis/`](docs/phase-7-analysis/) contains the analysis, and
+  reproducible figures derived from the sealed release in phase-6 experiments.
 
 The sealed release remains bound to the exact Phase 3–6 identities recorded in its manifests.
 Working artifacts support inspection but do not replace the canonical release.
