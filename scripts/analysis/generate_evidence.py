@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from evidence.evidence_config import RELEASE_ID
+from evidence.evidence_config import RELEASE_ID, RELEASE_VERSION
 from evidence.evidence_io import load_release, write_provenance
 from evidence.evidence_tables import generate_tables
 from figures.figure_conditions import render_condition_estimates
@@ -12,12 +12,17 @@ from figures.figure_operations import render_operational_indicators
 from figures.figure_overall import render_overall_effects
 
 
-def main() -> int:
-    # Verify sealed inputs and regenerate all derived Phase 7 evidence.
+def generate_evidence(*, repository: Path, generator: Path) -> int:
+    """Verify the sealed release and regenerate every Phase 7 derivative.
 
-    script = Path(__file__).resolve()
-    repository = script.parents[2]
-    release = repository / "data/evaluation/paired_agent_evaluation/v1"
+    Args:
+        repository: Repository root containing the sealed release and documentation.
+        generator: Generator script recorded in the provenance manifest.
+
+    Returns:
+        Number of generated evidence files recorded in provenance.
+    """
+    release = repository / "data/evaluation/paired_agent_evaluation" / RELEASE_VERSION
     output = repository / "docs/phase-7-analysis/generated"
     output.mkdir(parents=True, exist_ok=True)
 
@@ -33,7 +38,14 @@ def main() -> int:
         data.normalized,
         output / "figure-3-operational-indicators.svg",
     )
-    generated_count = write_provenance(output, data.manifest, script, repository)
+    return write_provenance(output, data.manifest, generator, repository)
+
+
+def main() -> int:
+    """Regenerate Phase 7 evidence from the configured sealed release."""
+    generator = Path(__file__).resolve()
+    repository = generator.parents[2]
+    generated_count = generate_evidence(repository=repository, generator=generator)
     print(f"Generated {generated_count} Phase 7 evidence files from {RELEASE_ID}")
     return 0
 
