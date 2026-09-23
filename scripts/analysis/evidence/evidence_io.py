@@ -61,6 +61,31 @@ def write_csv(path: Path, headings: list[str], rows: list[list[Any]]) -> None:
         writer.writerow(headings)
         writer.writerows(rows)
 
+
+def write_provenance(
+    output: Path,
+    manifest: JsonObject,
+    generator: Path,
+    repository: Path,
+) -> int:
+    """Hash generated evidence and write its source provenance manifest."""
+
+    generated = sorted(path for path in output.iterdir() if path.name != "provenance.json")
+    provenance = {
+        "schema_version": 1,
+        "source_release_id": manifest["release_id"],
+        "source_release_aggregate_sha256": manifest["aggregate_sha256"],
+        "source_run_id": manifest["run_id"],
+        "generator": str(generator.relative_to(repository)),
+        "generated_files": {path.name: sha256(path) for path in generated},
+    }
+    (output / "provenance.json").write_text(
+        json.dumps(provenance, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return len(generated)
+
+
 def _load_json(path: Path) -> Any:
     with path.open(encoding="utf-8") as stream:
         return json.load(stream)
