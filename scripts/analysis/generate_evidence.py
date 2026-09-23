@@ -21,6 +21,7 @@ def generate_evidence(*, repository: Path, generator: Path) -> int:
 
     Returns:
         Number of generated evidence files recorded in provenance.
+
     """
     release = repository / "data/evaluation/paired_agent_evaluation" / RELEASE_VERSION
     output = repository / "docs/phase-7-analysis/generated"
