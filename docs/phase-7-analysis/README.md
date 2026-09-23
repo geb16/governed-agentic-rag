@@ -4,6 +4,12 @@ Phase 7 interprets the immutable Phase 6 test release and prepares dissertation 
 not reacquire observations, change adjudication, rerun Ragas, or modify any file under
 `data/evaluation/paired_agent_evaluation/v1/`.
 
+## Documents
+
+- [Analysis](analysis.md) distinguishes preregistered overall results from exploratory subgroup
+  findings and records denominator, failure, cost, and secondary-grading checks.
+- [`generated/`](generated/) contains publication-ready SVG figures, CSV tables, and a provenance
+  record derived only from the sealed release.
 
 ## Reproduce the evidence
 
