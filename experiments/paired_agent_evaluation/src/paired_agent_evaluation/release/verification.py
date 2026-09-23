@@ -67,9 +67,7 @@ def verify_release(release_root: Path) -> ReleaseManifest:
         (release_root / "manifest.json").read_text(encoding="utf-8")
     )
     actual = {
-        path.name
-        for path in release_root.iterdir()
-        if path.is_file() and path.name != "README.md"
+        path.name for path in release_root.iterdir() if path.is_file() and path.name != "README.md"
     }
     if actual != {*manifest.files, "manifest.json"}:
         raise ValueError("Release file set is not closed")
