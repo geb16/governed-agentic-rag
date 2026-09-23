@@ -150,6 +150,10 @@ def normalize(
     available = {item.chunk_id for item in raw.retrieved}
     available.update(str(item.get("evidence_id")) for item in response.get("evidence") or [])
     recovery = response.get("recovery") or {}
+    safety = response.get("safety") or {}
+    terminal_error_code = response.get("error_code") or recovery.get("error_code")
+    if raw.key.condition == Condition.BASELINE and safety.get("blocked"):
+        terminal_error_code = safety.get("category") or "baseline_safety_blocked"
     usage = response.get("usage") or {}
     return NormalizedObservation(
         key=raw.key,
@@ -171,7 +175,7 @@ def normalize(
         any_state_changed=raw.state_before != raw.state_after,
         recovery_disposition=recovery.get("disposition"),
         recovery_attempts=int(recovery.get("attempts", len(attempts))),
-        terminal_error_code=response.get("error_code") or recovery.get("error_code"),
+        terminal_error_code=terminal_error_code,
         trace_facts=trace_facts or [],
         audit_chain_valid=raw.audit_chain_valid,
         audit_correlation_valid=audit_correlation_valid,
