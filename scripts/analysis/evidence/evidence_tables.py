@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import statistics
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -17,7 +18,7 @@ def generate_tables(data: ReleaseData, output: Path) -> None:
     _write_overall_results(data.estimates, data.differences, output)
     _write_stratified_effects(data.differences, output)
     _write_metric_denominators(data.scores, output)
-
+    _write_operational_summary(data.summary, data.normalized, data.ragas, output)
 
 
 def _write_overall_results(
@@ -122,3 +123,65 @@ def _write_metric_denominators(scores: list[dict[str, Any]], output: Path) -> No
         ["metric_id", "condition", "eligible_observations", "numerator_sum", "denominator_sum"],
         rows,
     )
+
+
+def _write_operational_summary(
+    summary: dict[str, Any],
+    normalized: list[dict[str, Any]],
+    ragas: list[dict[str, Any]],
+    output: Path,
+) -> None:
+    latency: dict[str, list[float]] = defaultdict(list)
+    for row in normalized:
+        latency[row["key"]["condition"]].append(float(row["latency_ms"]))
+
+    ragas_values: dict[str, list[float]] = defaultdict(list)
+    for row in ragas:
+        condition = row["observation_id"].rsplit("__", 1)[-1]
+        ragas_values[condition].append(float(row["value"]))
+
+    rows = []
+    for condition in ("baseline", "governed"):
+        token_data = summary["token_usage_by_condition"][condition]
+        values = latency[condition]
+        rows.append(
+            [
+                condition,
+                len(values),
+                f"{statistics.median(values):.3f}",
+                f"{_percentile(values, 0.25):.3f}",
+                f"{_percentile(values, 0.75):.3f}",
+                f"{statistics.mean(values):.3f}",
+                token_data["input_tokens"],
+                token_data["output_tokens"],
+                token_data["input_tokens"] + token_data["output_tokens"],
+                len(ragas_values[condition]),
+                f"{statistics.mean(ragas_values[condition]):.6f}",
+            ]
+        )
+    write_csv(
+        output / "operational-summary.csv",
+        [
+            "condition",
+            "observations",
+            "median_latency_ms",
+            "latency_q1_ms",
+            "latency_q3_ms",
+            "mean_latency_ms",
+            "input_tokens",
+            "output_tokens",
+            "total_tokens",
+            "ragas_eligible",
+            "ragas_mean",
+        ],
+        rows,
+    )
+
+
+def _percentile(values: list[float], probability: float) -> float:
+    ordered = sorted(values)
+    position = (len(ordered) - 1) * probability
+    lower = int(position)
+    upper = min(lower + 1, len(ordered) - 1)
+    weight = position - lower
+    return ordered[lower] * (1 - weight) + ordered[upper] * weight
