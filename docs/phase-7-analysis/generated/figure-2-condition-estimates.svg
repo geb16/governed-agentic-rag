@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="720" viewBox="0 0 1240 720" role="img" aria-labelledby="title desc">
+<title id="title">Overall condition estimates</title>
+<desc id="desc">Grouped bars compare baseline and governed point estimates for selected preregistered metrics.</desc>
+<rect width="100%" height="100%" fill="#fbfcfe"/>
+<text x="40" y="45" font-family="Arial" font-size="25" font-weight="700" fill="#172554">Overall condition estimates</text>
+<rect x="875" y="35" width="18" height="18" fill="#64748b"/><text x="901" y="50" font-family="Arial" font-size="14" fill="#334155">Baseline</text>
+<rect x="995" y="35" width="18" height="18" fill="#0f766e"/><text x="1021" y="50" font-family="Arial" font-size="14" fill="#334155">Governed</text>
+<line x1="245" y1="610.0" x2="1185" y2="610.0" stroke="#dbe3ee"/>
+<text x="233" y="615.0" text-anchor="end" font-family="Arial" font-size="13" fill="#475569">0.00</text>
+<line x1="245" y1="485.0" x2="1185" y2="485.0" stroke="#dbe3ee"/>
+<text x="233" y="490.0" text-anchor="end" font-family="Arial" font-size="13" fill="#475569">0.25</text>
+<line x1="245" y1="360.0" x2="1185" y2="360.0" stroke="#dbe3ee"/>
+<text x="233" y="365.0" text-anchor="end" font-family="Arial" font-size="13" fill="#475569">0.50</text>
+<line x1="245" y1="235.0" x2="1185" y2="235.0" stroke="#dbe3ee"/>
+<text x="233" y="240.0" text-anchor="end" font-family="Arial" font-size="13" fill="#475569">0.75</text>
+<line x1="245" y1="110.0" x2="1185" y2="110.0" stroke="#dbe3ee"/>
+<text x="233" y="115.0" text-anchor="end" font-family="Arial" font-size="13" fill="#475569">1.00</text>
+<rect x="275" y="387.1" width="32" height="222.9" rx="3" fill="#64748b"/>
+<text x="291" y="380.0833333333333" text-anchor="middle" font-family="Arial" font-size="11" fill="#334155">0.446</text>
+<rect x="313" y="345.4" width="32" height="264.6" rx="3" fill="#0f766e"/>
+<text x="329" y="338.4166666666667" text-anchor="middle" font-family="Arial" font-size="11" fill="#334155">0.529</text>
+<text x="310" y="640" text-anchor="middle" font-family="Arial" font-size="12" fill="#334155">Appropriate</text>
+<text x="310" y="656" text-anchor="middle" font-family="Arial" font-size="12" fill="#334155">route</text>
+<rect x="387" y="456.7" width="32" height="153.3" rx="3" fill="#64748b"/>
+<text x="403" y="449.6666666666667" text-anchor="middle" font-family="Arial" font-size="11" fill="#334155">0.307</text>
+<rect x="425" y="270.0" width="32" height="340.0" rx="3" fill="#0f766e"/>
+<text x="441" y="263.0" text-anchor="middle" font-family="Arial" font-size="11" fill="#334155">0.680</text>
+<text x="422" y="640" text-anchor="middle" font-family="Arial" font-size="12" fill="#334155">Workflow</text>
+<text x="422" y="656" text-anchor="middle" font-family="Arial" font-size="12" fill="#334155">completion</text>
+<rect x="499" y="478.4" width="32" height="131.6" rx="3" fill="#64748b"/>
+<text x="515" y="471.42105263157896" text-anchor="middle" font-family="Arial" font-size="11" fill="#334155">0.263</text>
+<rect x="537" y="460.9" width="32" height="149.1" rx="3" fill="#0f766e"/>
+<text x="553" y="453.8771929824561" text-anchor="middle" font-family="Arial" font-size="11" fill="#334155">0.298</text>
+<text x="534" y="640" text-anchor="middle" font-family="Arial" font-size="12" fill="#334155">Action</text>
+<text x="534" y="656" text-anchor="middle" font-family="Arial" font-size="12" fill="#334155">correctness</text>
+<rect x="611" y="116.1" width="32" height="493.9" rx="3" fill="#64748b"/>
+<text x="627" y="109.06060606060606" text-anchor="middle" font-family="Arial" font-size="11" fill="#334155">0.988</text>
+<rect x="649" y="110.0" width="32" height="500.0" rx="3" fill="#0f766e"/>
+<text x="665" y="103.0" text-anchor="middle" font-family="Arial" font-size="11" fill="#334155">1.000</text>
+<text x="646" y="640" text-anchor="middle" font-family="Arial" font-size="12" fill="#334155">Unsafe-action</text>
+<text x="646" y="656" text-anchor="middle" font-family="Arial" font-size="12" fill="#334155">prevention</text>
+<rect x="723" y="276.7" width="32" height="333.3" rx="3" fill="#64748b"/>
+<text x="739" y="269.6666666666667" text-anchor="middle" font-family="Arial" font-size="11" fill="#334155">0.667</text>
+<rect x="761" y="380.8" width="32" height="229.2" rx="3" fill="#0f766e"/>
+<text x="777" y="373.83333333333337" text-anchor="middle" font-family="Arial" font-size="11" fill="#334155">0.458</text>
+<text x="758" y="640" text-anchor="middle" font-family="Arial" font-size="12" fill="#334155">Recovery</text>
+<text x="758" y="656" text-anchor="middle" font-family="Arial" font-size="12" fill="#334155">success</text>
+<rect x="835" y="239.6" width="32" height="370.4" rx="3" fill="#64748b"/>
+<text x="851" y="232.62962962962968" text-anchor="middle" font-family="Arial" font-size="11" fill="#334155">0.741</text>
+<rect x="873" y="110.0" width="32" height="500.0" rx="3" fill="#0f766e"/>
+<text x="889" y="103.0" text-anchor="middle" font-family="Arial" font-size="11" fill="#334155">1.000</text>
+<text x="870" y="640" text-anchor="middle" font-family="Arial" font-size="12" fill="#334155">Groundedness</text>
+<rect x="947" y="485.0" width="32" height="125.0" rx="3" fill="#64748b"/>
+<text x="963" y="478.0" text-anchor="middle" font-family="Arial" font-size="11" fill="#334155">0.250</text>
+<rect x="985" y="485.0" width="32" height="125.0" rx="3" fill="#0f766e"/>
+<text x="1001" y="478.0" text-anchor="middle" font-family="Arial" font-size="11" fill="#334155">0.250</text>
+<text x="982" y="640" text-anchor="middle" font-family="Arial" font-size="12" fill="#334155">Context</text>
+<text x="982" y="656" text-anchor="middle" font-family="Arial" font-size="12" fill="#334155">precision</text>
+<rect x="1059" y="333.3" width="32" height="276.7" rx="3" fill="#64748b"/>
+<text x="1075" y="326.3062330623306" text-anchor="middle" font-family="Arial" font-size="11" fill="#334155">0.553</text>
+<rect x="1097" y="209.5" width="32" height="400.5" rx="3" fill="#0f766e"/>
+<text x="1113" y="202.45799457994582" text-anchor="middle" font-family="Arial" font-size="11" fill="#334155">0.801</text>
+<text x="1094" y="640" text-anchor="middle" font-family="Arial" font-size="12" fill="#334155">Audit</text>
+<text x="1094" y="656" text-anchor="middle" font-family="Arial" font-size="12" fill="#334155">completeness</text>
+</svg>
