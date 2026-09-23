@@ -9,7 +9,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-from svg_utils import text, write_svg
+from figures.svg_utils import text, write_svg
 
 
 def render_operational_indicators(

@@ -9,7 +9,9 @@ from pathlib import Path
 from typing import Any
 
 from evidence.evidence_config import METRIC_LABELS
-from svg_utils import format_value, text, write_svg
+from formatting import format_value
+
+from figures.svg_utils import text, write_svg
 
 
 def render_overall_effects(rows: list[dict[str, Any]], target: Path) -> None:
