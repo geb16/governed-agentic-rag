@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
+from evidence_config import METRIC_LABELS
 from evidence_io import ReleaseData, write_csv
 from figures.svg_utils import format_value
 
@@ -14,6 +16,7 @@ def generate_tables(data: ReleaseData, output: Path) -> None:
 
     _write_overall_results(data.estimates, data.differences, output)
     _write_stratified_effects(data.differences, output)
+    _write_metric_denominators(data.scores, output)
 
 
 
@@ -95,3 +98,27 @@ def _write_stratified_effects(differences: list[dict[str, Any]], output: Path) -
         rows,
     )
 
+
+def _write_metric_denominators(scores: list[dict[str, Any]], output: Path) -> None:
+    contributions: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    for row in scores:
+        contributions[(row["metric_id"], row["key"]["condition"])].append(row)
+
+    rows = []
+    for metric in METRIC_LABELS:
+        for condition in ("baseline", "governed"):
+            eligible = [row for row in contributions[(metric, condition)] if row["eligible"]]
+            rows.append(
+                [
+                    metric,
+                    condition,
+                    len(eligible),
+                    format_value(sum(float(row["numerator"]) for row in eligible)),
+                    format_value(sum(float(row["denominator"]) for row in eligible)),
+                ]
+            )
+    write_csv(
+        output / "metric-denominators.csv",
+        ["metric_id", "condition", "eligible_observations", "numerator_sum", "denominator_sum"],
+        rows,
+    )
