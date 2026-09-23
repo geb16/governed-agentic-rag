@@ -1,7 +1,7 @@
 # Project References
 
 This bibliography consolidates the primary research, standards, security guidance, and official
-technical documentation that inform Phases 3–6. Phase-specific documents explain how individual
+technical documentation that inform Phases 3–7(baseline, governance, evaluation, experiment and analysis). Phase-specific documents explain how individual
 sources apply to particular design decisions; this file provides one reviewer-facing index.
 
 Sources were last checked on **22 September 2026**. Version-sensitive implementation behaviour is
