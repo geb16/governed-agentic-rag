@@ -158,6 +158,64 @@ def test_corrective_release_preserves_v1_and_records_provenance(
     assert sha256_file(v1_root / "manifest.json") == v1_manifest_sha256
 
 
+def test_corrective_release_cannot_overwrite_prior(tmp_path: Path) -> None:
+    """Reject a corrective destination that aliases its superseded release."""
+    release_root = tmp_path / "v1"
+
+    with pytest.raises(ValueError, match="must not overwrite"):
+        seal_corrective_release(
+            run_root=tmp_path / "run",
+            prior_release_root=release_root,
+            release_root=release_root,
+            release_id="paired-agent-evaluation-v2",
+            correction_id="test-correction",
+            correction_summary="Test correction.",
+        )
+
+
+def test_corrective_release_rejects_noop_before_writing(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Reject a no-op correction without leaving a partial release directory."""
+    run_root = tmp_path / "run"
+    v1_root = tmp_path / "v1"
+    v2_root = tmp_path / "v2"
+    run_root.mkdir()
+    _write_complete_run(run_root)
+    monkeypatch.setattr(release_sealing, "verify_primary_artifacts", lambda *_: None)
+    seal_run(run_root=run_root, release_root=v1_root)
+    derived_names = {
+        "raw-results.jsonl",
+        "normalized.jsonl",
+        "review-packet.jsonl",
+        "resolved-adjudications.jsonl",
+        "scores.jsonl",
+        "estimates.json",
+        "paired-differences.json",
+        "summary.json",
+    }
+    derived = {name: read_payload(v1_root / name) for name in derived_names}
+    monkeypatch.setattr(release_sealing, "derive_primary_artifacts", lambda **_: derived)
+    monkeypatch.setattr(
+        release_sealing,
+        "render_html_report",
+        lambda *_: read_payload(v1_root / "report.html"),
+    )
+
+    with pytest.raises(ValueError, match="no changed artifacts"):
+        seal_corrective_release(
+            run_root=run_root,
+            prior_release_root=v1_root,
+            release_root=v2_root,
+            release_id="paired-agent-evaluation-v2",
+            correction_id="test-correction",
+            correction_summary="Test correction.",
+        )
+
+    assert not v2_root.exists()
+
+
 def test_incomplete_or_unadjudicated_run_cannot_be_sealed(tmp_path: Path) -> None:
     """Reject release creation when required finalized artifacts are absent."""
     run_root = tmp_path / "run"
