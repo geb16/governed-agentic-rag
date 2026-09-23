@@ -155,6 +155,13 @@ release.sealing.seal_run(run_root, release_root)
      paired differences, and summary from raw observations and authoritative inputs
   -> reject sealing if any stored primary artifact differs from its rederived value
   -> sanitize (redact secret-shaped keys) and content-address every file
+
+release.sealing.seal_corrective_release(run_root, prior_release_root, release_root, ...)
+  -> independently verify the superseded release and source-run manifest identity
+  -> rederive primary artifacts from the original immutable test evidence
+  -> require raw observations, review packet, and resolved adjudications to match exactly
+  -> copy unchanged control and secondary artifacts from the superseded release
+  -> record changed derived files in correction.json and verify the new closed release
 ```
 
 ## Failure and consistency model
@@ -175,6 +182,7 @@ release.sealing.seal_run(run_root, release_root)
 | A fully scored run's split is `"validation"` | `seal_run` refuses to seal; only a `"test"`-split run may become the release |
 | A stored normalized result, review artifact, score, estimate, paired difference, or summary drifts from deterministic rederivation | `seal_run` refuses to seal, regardless of manifest status |
 | `verify_release` against a sealed directory | Recomputes and compares every file digest and the aggregate digest; any mismatch fails closed |
+| A corrective release changes authoritative inputs or targets its superseded directory | `seal_corrective_release` fails before publishing a new manifest |
 | Secondary Ragas grading run before adjudication is locked | Not code-enforced today; the protocol in `experiments/paired_agent_evaluation/README.md` requires human labels be fixed first — see known compromises |
 
 Each `BaselineSystemRunner`/`GovernedSystemRunner` attempt constructs a fresh, isolated SQLite
@@ -200,8 +208,8 @@ invalid or mismatched envelope contribute no audit-completeness facts.
 | Stored primary result artifacts and `report.html` | Derived, not authoritative | `seal_run` rederives and compares them from raw observations, the schedule, dataset, rubric, blinding plan, and adjudication inputs |
 | Harness freeze and test-execution claim | Preregistered control evidence | Bind reviewed source bytes and completed validation to one test ID; claim is created exclusively before provider access and copied into the sealed run |
 | Run and release manifests | Content-addressed, internal | Hash every input file plus runtime, tool-schema, and Qdrant-content identities; sensitive-key fields are redacted before sealing |
-| Raw run artifacts (`artifacts/paired_agent_evaluation/`) | Mutable, local, gitignored | Never committed; only a sealed release under `data/evaluation/paired_agent_evaluation/v1/` is |
-| Sealed release directory | Immutable once verified | `seal_run` refuses a non-empty destination; `verify_release` re-derives every hash rather than trusting stored values |
+| Raw run artifacts (`artifacts/paired_agent_evaluation/`) | Mutable, local, gitignored | Never canonical; only a verified release under `data/evaluation/paired_agent_evaluation/` is reported |
+| Sealed release directory | Immutable once verified | v1 remains preserved as superseded history; v2 is canonical; sealing refuses a non-empty destination and verification recomputes every hash |
 
 ## Known architectural compromises
 
