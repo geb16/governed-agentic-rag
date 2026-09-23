@@ -44,6 +44,12 @@ class EvaluationPaths:
         validate_run_id(run_id)
         return self.artifacts / run_id
 
+    def release_root(self, version: str) -> Path:
+        """Returns a validated versioned release directory."""
+        if re.fullmatch(r"v[1-9][0-9]*", version) is None:
+            raise ValueError("release version must match v[1-9][0-9]*")
+        return self.release.parent / version
+
 
 def validate_run_id(run_id: str) -> None:
     """Validates a run identifier against the artifact-name allowlist.
