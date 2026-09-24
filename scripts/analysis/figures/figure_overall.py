@@ -78,7 +78,7 @@ def render_overall_effects(rows: list[dict[str, Any]], target: Path) -> None:
         text(
             30,
             104,
-            "Positions and reported values are governed - baseline; colour indicates desirability",
+            "Positions and reported values are governed minus baseline; colour indicates desirability",
             font_family=FONT_FAMILY,
             font_size="16",
             fill=MUTED_TEXT,
