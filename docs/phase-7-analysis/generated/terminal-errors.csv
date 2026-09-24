@@ -1,5 +1,11 @@
 condition,terminal_error_code,count
-baseline,none,240
+baseline,control_bypass,6
+baseline,encoded_injection,3
+baseline,fabricated_citation,124
+baseline,missing_citation,16
+baseline,none,82
+baseline,prompt_extraction,6
+baseline,tool_call_limit,3
 governed,clarification_required,87
 governed,governance_denied,15
 governed,missing_citation,80
