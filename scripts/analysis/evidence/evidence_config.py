@@ -8,6 +8,9 @@ RELEASE_VERSION = "v2"
 RELEASE_ID = f"paired-agent-evaluation-{RELEASE_VERSION}"
 RELEASE_SHA256 = "9c8ff4a069535be78c1b76e99e28d9f71255d03ff9bec802c40fdf0b8853115b"
 
+Condition = Literal["baseline", "governed"]
+CONDITIONS: tuple[Condition, ...] = ("baseline", "governed")
+
 GENERATED_FILENAMES = (
     "figure-1-overall-effects.svg",
     "figure-2-condition-estimates.svg",
