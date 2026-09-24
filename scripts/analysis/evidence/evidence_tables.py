@@ -9,7 +9,7 @@ from typing import Any
 
 from formatting import format_value
 
-from evidence.evidence_config import METRIC_LABELS
+from evidence.evidence_config import CONDITIONS, METRIC_LABELS
 from evidence.evidence_io import ReleaseData, write_csv
 
 
@@ -112,7 +112,7 @@ def _write_metric_denominators(scores: list[dict[str, Any]], output: Path) -> No
 
     rows = []
     for metric in METRIC_LABELS:
-        for condition in ("baseline", "governed"):
+        for condition in CONDITIONS:
             eligible = [row for row in contributions[(metric, condition)] if row["eligible"]]
             rows.append(
                 [
@@ -147,7 +147,7 @@ def _write_operational_summary(
         ragas_values[condition].append(float(row["value"]))
 
     rows = []
-    for condition in ("baseline", "governed"):
+    for condition in CONDITIONS:
         token_data = summary["token_usage_by_condition"][condition]
         values = latency[condition]
         rows.append(
