@@ -6,6 +6,28 @@ import html
 from pathlib import Path
 from typing import Any
 
+from figures.style import WORD_WIDTH_IN
+
+
+def word_svg_root(viewbox_width: int, viewbox_height: int) -> str:
+    """Create an accessible SVG root sized to the printable width in Word.
+
+    Args:
+        viewbox_width: Internal SVG coordinate-system width.
+        viewbox_height: Internal SVG coordinate-system height.
+
+    Returns:
+        Opening SVG element with a proportional physical size and accessible
+        title and description references.
+
+    """
+    physical_height = viewbox_height / viewbox_width * WORD_WIDTH_IN
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{WORD_WIDTH_IN}in" '
+        f'height="{physical_height:.2f}in" viewBox="0 0 {viewbox_width} {viewbox_height}" '
+        'role="img" aria-labelledby="title desc">'
+    )
+
 
 def text(x: float, y: float, value: str, **attrs: Any) -> str:
     """Render an escaped SVG text element.
