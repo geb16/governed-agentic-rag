@@ -11,15 +11,22 @@ from typing import Any
 from evidence.evidence_config import METRIC_DIRECTIONS, METRIC_LABELS
 from formatting import format_value
 
-from figures.svg_utils import text, write_svg
-
-FONT_FAMILY = "Aptos, Calibri, Arial, sans-serif"
-BENEFICIAL = "#007A5E"
-ADVERSE = "#C2410C"
-NEUTRAL = "#64748B"
+from figures.style import (
+    ADVERSE,
+    BACKGROUND,
+    BENEFICIAL,
+    FONT_FAMILY,
+    GRID,
+    MUTED_TEXT,
+    NEUTRAL,
+    ROW_BAND,
+    SECONDARY_TEXT,
+    TEXT,
+    TITLE,
+)
+from figures.svg_utils import text, word_svg_root, write_svg
 
 SVG_WIDTH = 1000
-WORD_WIDTH_IN = 6.5
 PLOT_LEFT = 330
 PLOT_WIDTH = 390
 RESULT_X = 974
@@ -41,17 +48,16 @@ def render_overall_effects(rows: list[dict[str, Any]], target: Path) -> None:
 
     """
     height = FIRST_ROW_Y + ROW_HEIGHT * len(rows) + 104
-    physical_height = height / SVG_WIDTH * WORD_WIDTH_IN
 
     def x(value: float) -> float:
         """Map a governed-minus-baseline effect onto the plot coordinate."""
         return PLOT_LEFT + (value - X_MIN) / (X_MAX - X_MIN) * PLOT_WIDTH
 
     parts = [
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{WORD_WIDTH_IN}in" height="{physical_height:.2f}in" viewBox="0 0 {SVG_WIDTH} {height}" role="img" aria-labelledby="title desc">',
+        word_svg_root(SVG_WIDTH, height),
         '<title id="title">Overall paired effects of governance</title>',
         '<desc id="desc">Forest plot of governed minus baseline effects and pointwise 95 percent confidence intervals. Positions remain on the registered metric scale; marker colours account for whether higher or lower values are desirable.</desc>',
-        '<rect width="100%" height="100%" fill="#FFFFFF"/>',
+        f'<rect width="100%" height="100%" fill="{BACKGROUND}"/>',
         text(
             30,
             48,
@@ -59,7 +65,7 @@ def render_overall_effects(rows: list[dict[str, Any]], target: Path) -> None:
             font_family=FONT_FAMILY,
             font_size="30",
             font_weight="700",
-            fill="#16324F",
+            fill=TITLE,
         ),
         text(
             30,
@@ -67,7 +73,7 @@ def render_overall_effects(rows: list[dict[str, Any]], target: Path) -> None:
             "Pointwise 95% case-cluster bootstrap intervals",
             font_family=FONT_FAMILY,
             font_size="17",
-            fill="#475569",
+            fill=MUTED_TEXT,
         ),
         text(
             30,
@@ -75,7 +81,7 @@ def render_overall_effects(rows: list[dict[str, Any]], target: Path) -> None:
             "Positions and reported values are governed - baseline; colour indicates desirability",
             font_family=FONT_FAMILY,
             font_size="16",
-            fill="#475569",
+            fill=MUTED_TEXT,
         ),
     ]
     _add_legend(parts)
@@ -93,7 +99,7 @@ def render_overall_effects(rows: list[dict[str, Any]], target: Path) -> None:
             font_family=FONT_FAMILY,
             font_size="15",
             font_weight="600",
-            fill="#334155",
+            fill=SECONDARY_TEXT,
         )
     )
     write_svg(target, parts)
@@ -117,7 +123,7 @@ def _add_legend(parts: list[str]) -> None:
                 label,
                 font_family=FONT_FAMILY,
                 font_size="15",
-                fill="#334155",
+                fill=SECONDARY_TEXT,
             )
         )
 
@@ -134,7 +140,7 @@ def _add_headers(parts: list[str]) -> None:
                 font_family=FONT_FAMILY,
                 font_size="16",
                 font_weight="700",
-                fill="#334155",
+                fill=SECONDARY_TEXT,
             ),
             text(
                 RESULT_X,
@@ -144,7 +150,7 @@ def _add_headers(parts: list[str]) -> None:
                 font_family=FONT_FAMILY,
                 font_size="16",
                 font_weight="700",
-                fill="#334155",
+                fill=SECONDARY_TEXT,
             ),
             '<line x1="26" y1="199" x2="976" y2="199" stroke="#CBD5E1" stroke-width="1.5"/>',
         ]
@@ -155,13 +161,15 @@ def _add_row_backgrounds(parts: list[str], row_count: int) -> None:
     """Append alternating row bands behind all foreground content."""
     for index in range(0, row_count, 2):
         y = FIRST_ROW_Y + index * ROW_HEIGHT
-        parts.append(f'<rect x="26" y="{y - 24}" width="950" height="44" rx="4" fill="#F5F7FA"/>')
+        parts.append(
+            f'<rect x="26" y="{y - 24}" width="950" height="44" rx="4" fill="{ROW_BAND}"/>'
+        )
 
 
 def _add_axis(parts: list[str], x: Callable[[float], float], height: int) -> None:
     """Append the registered effect-scale grid, zero line, and tick labels."""
     for tick in (-0.5, -0.25, 0.0, 0.25, 0.5):
-        colour = "#475569" if tick == 0 else "#DCE3EA"
+        colour = MUTED_TEXT if tick == 0 else GRID
         stroke_width = 2 if tick == 0 else 1
         parts.append(
             f'<line x1="{x(tick):.1f}" y1="202" x2="{x(tick):.1f}" y2="{height - 72}" stroke="{colour}" stroke-width="{stroke_width}"/>'
@@ -174,7 +182,7 @@ def _add_axis(parts: list[str], x: Callable[[float], float], height: int) -> Non
                 text_anchor="middle",
                 font_family=FONT_FAMILY,
                 font_size="15",
-                fill="#475569",
+                fill=MUTED_TEXT,
             )
         )
 
@@ -199,7 +207,7 @@ def _add_metric_row(
             text_anchor="end",
             font_family=FONT_FAMILY,
             font_size="17",
-            fill="#172033",
+            fill=TEXT,
         )
     )
     effect = row["governed_minus_baseline"]
@@ -241,7 +249,7 @@ def _add_metric_row(
             font_family=FONT_FAMILY,
             font_size="16",
             font_weight="600",
-            fill="#263548",
+            fill=SECONDARY_TEXT,
         )
     )
 
