@@ -7,10 +7,22 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from evidence.evidence_config import METRIC_LABELS
+from evidence.evidence_config import CONDITIONS, METRIC_LABELS
 from formatting import format_value
 
-from figures.svg_utils import text, write_svg
+from figures.style import (
+    BACKGROUND,
+    BASELINE,
+    FONT_FAMILY,
+    GOVERNED,
+    GRID,
+    MUTED_TEXT,
+    ROW_BAND,
+    SECONDARY_TEXT,
+    TEXT,
+    TITLE,
+)
+from figures.svg_utils import text, word_svg_root, write_svg
 
 SELECTED_METRICS = (
     "appropriate_route_rate",
@@ -23,13 +35,8 @@ SELECTED_METRICS = (
     "audit_trace_completeness",
 )
 
-FONT_FAMILY = "Aptos, Calibri, Arial, sans-serif"
-BASELINE = "#5F6B7A"
-GOVERNED = "#0072B2"
-
 SVG_WIDTH = 1000
 SVG_HEIGHT = 760
-WORD_WIDTH_IN = 6.5
 PLOT_LEFT = 330
 PLOT_WIDTH = 540
 FIRST_ROW_Y = 196
@@ -49,12 +56,11 @@ def render_condition_estimates(estimates: list[dict[str, Any]], target: Path) ->
         for row in estimates
         if row["stratum"] == "overall"
     }
-    physical_height = SVG_HEIGHT / SVG_WIDTH * WORD_WIDTH_IN
     parts = [
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{WORD_WIDTH_IN}in" height="{physical_height:.2f}in" viewBox="0 0 {SVG_WIDTH} {SVG_HEIGHT}" role="img" aria-labelledby="title desc">',
+        word_svg_root(SVG_WIDTH, SVG_HEIGHT),
         '<title id="title">Selected overall condition estimates</title>',
         '<desc id="desc">Horizontal grouped bars compare baseline and governed point estimates for eight selected preregistered metrics.</desc>',
-        '<rect width="100%" height="100%" fill="#FFFFFF"/>',
+        f'<rect width="100%" height="100%" fill="{BACKGROUND}"/>',
         text(
             30,
             48,
@@ -62,7 +68,7 @@ def render_condition_estimates(estimates: list[dict[str, Any]], target: Path) ->
             font_family=FONT_FAMILY,
             font_size="30",
             font_weight="700",
-            fill="#16324F",
+            fill=TITLE,
         ),
         text(
             30,
@@ -70,7 +76,7 @@ def render_condition_estimates(estimates: list[dict[str, Any]], target: Path) ->
             "Registered proportions; higher values are better for every metric shown",
             font_family=FONT_FAMILY,
             font_size="17",
-            fill="#475569",
+            fill=MUTED_TEXT,
         ),
     ]
     _add_legend(parts)
@@ -99,7 +105,7 @@ def _add_legend(parts: list[str]) -> None:
                 font_family=FONT_FAMILY,
                 font_size="16",
                 font_weight="600",
-                fill="#334155",
+                fill=SECONDARY_TEXT,
             )
         )
 
@@ -108,7 +114,9 @@ def _add_row_backgrounds(parts: list[str]) -> None:
     """Append alternating row bands behind the chart grid."""
     for index in range(0, len(SELECTED_METRICS), 2):
         y = FIRST_ROW_Y + index * ROW_HEIGHT
-        parts.append(f'<rect x="26" y="{y - 29}" width="950" height="58" rx="4" fill="#F5F7FA"/>')
+        parts.append(
+            f'<rect x="26" y="{y - 29}" width="950" height="58" rx="4" fill="{ROW_BAND}"/>'
+        )
 
 
 def _add_axis(parts: list[str]) -> None:
@@ -116,7 +124,7 @@ def _add_axis(parts: list[str]) -> None:
     for tick in (0.0, 0.25, 0.5, 0.75, 1.0):
         x_position = PLOT_LEFT + tick * PLOT_WIDTH
         parts.append(
-            f'<line x1="{x_position:.1f}" y1="166" x2="{x_position:.1f}" y2="{SVG_HEIGHT - 58}" stroke="#D7E0E8" stroke-width="1.2"/>'
+            f'<line x1="{x_position:.1f}" y1="166" x2="{x_position:.1f}" y2="{SVG_HEIGHT - 58}" stroke="{GRID}" stroke-width="1.2"/>'
         )
         parts.append(
             text(
@@ -126,7 +134,7 @@ def _add_axis(parts: list[str]) -> None:
                 text_anchor="middle",
                 font_family=FONT_FAMILY,
                 font_size="16",
-                fill="#475569",
+                fill=MUTED_TEXT,
             )
         )
     parts.append(
@@ -138,7 +146,7 @@ def _add_axis(parts: list[str]) -> None:
             font_family=FONT_FAMILY,
             font_size="16",
             font_weight="700",
-            fill="#334155",
+            fill=SECONDARY_TEXT,
         )
     )
 
@@ -158,13 +166,14 @@ def _add_metric_group(
             text_anchor="end",
             font_family=FONT_FAMILY,
             font_size="18",
-            fill="#172033",
+            fill=TEXT,
         )
     )
-    for offset, condition, colour in (
-        (-13, "baseline", BASELINE),
-        (13, "governed", GOVERNED),
-    ):
+    offsets = dict(zip(CONDITIONS, (-13, 13), strict=True))
+    colours = {"baseline": BASELINE, "governed": GOVERNED}
+    for condition in CONDITIONS:
+        offset = offsets[condition]
+        colour = colours[condition]
         value = lookup[(metric, condition)]["estimate"]
         bar_width = 0 if value is None else value * PLOT_WIDTH
         parts.append(
@@ -179,6 +188,6 @@ def _add_metric_group(
                 font_family=FONT_FAMILY,
                 font_size="16",
                 font_weight="700",
-                fill="#263548",
+                fill=SECONDARY_TEXT,
             )
         )
