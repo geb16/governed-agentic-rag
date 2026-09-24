@@ -1,18 +1,32 @@
 {
+  "analysis_sources": {
+    "scripts/analysis/evidence/__init__.py": "0a8073adf9e1504d4a2b4b5866343cd0f32e1c403d73f78a798c631aac02f0be",
+    "scripts/analysis/evidence/evidence_config.py": "8515a30d9063a83614428c0684320b5fc5b5b3f19cbd59d8f5875cc90ef2ee4a",
+    "scripts/analysis/evidence/evidence_io.py": "9a77b983e30cf4c7b8a7431991f28053430441c33251971709f9d80fad100ea3",
+    "scripts/analysis/evidence/evidence_tables.py": "a82fe30edc0c3db020534e10f387c28ae4d5d8a7da723ca1b32a8edce32f10d8",
+    "scripts/analysis/figures/__init__.py": "06ee190e43b316eb5c06a0559a21e4097f8bc79d50f7496c7058c28513d678c4",
+    "scripts/analysis/figures/figure_conditions.py": "4cf160c8a8f3f84e1fde879e9827f1fb868ca18486075bedfa34e5d633d7cabf",
+    "scripts/analysis/figures/figure_operations.py": "181e31eb188d337f78560d8553b7751863e4840f5ecf953e1e3c3ebc796eb971",
+    "scripts/analysis/figures/figure_overall.py": "49c4b941381cd1886c8ad53ea0cd1de40bec116a16886eb6fd42657b7cd592e5",
+    "scripts/analysis/figures/style.py": "f23be490178bb8a31c225c9adee69272db9f52fec933bc632a4321e9d744ed6d",
+    "scripts/analysis/figures/svg_utils.py": "f6861c3b694e78c717c7fbd17f1c0f491325d02beac000d621ba09f99fb84497",
+    "scripts/analysis/formatting.py": "fb346fa66a4e7bb825c4f6dec5301febf0586995aa6e51b5dd85f14216b3c7ae",
+    "scripts/analysis/generate_evidence.py": "778b2ee871126a101986b45a36c3a80fad886b18da58d5cc8dd53588ad64484c"
+  },
   "generated_files": {
-    "figure-1-overall-effects.svg": "2e0d901c1a4ea5be29043ed2e2375c3b05ba71d40b7ac8e9fa6ae30d30329da4",
-    "figure-2-condition-estimates.svg": "fad43f40972addb104b5b362eec54fd7043da9f613971c6995b7a1354f6c1911",
-    "figure-3-operational-indicators.svg": "34275ec306830134dd364824a8212bd10145df6746a9a82e0d749d61c19a6573",
-    "metric-denominators.csv": "de37b45b4f63522ec359073d6a048d7e7c910b853b7170c0a6733cf26cc32d2c",
+    "figure-1-overall-effects.svg": "5a17fdbf39a45f4ea28aac7bcb09475dbf54f7165e2c1561c6e8280b5121c642",
+    "figure-2-condition-estimates.svg": "55642f91c4bd65b37210bcaf0f09c37bd10c940141b93cd75e670be25b86ea3e",
+    "figure-3-operational-indicators.svg": "1937f2c8ca50b7bfaac1b18c8b801baf138c59e608ff65d0b0fb8b6b77640be3",
+    "metric-denominators.csv": "5eb21b96f37c3d2bb56a66b06b6252af8ac97fbd4861db8c9be036c5e56da163",
     "observed-routes.csv": "b98418bb1a1f2ae5bbeea827de199db1fc83ceab0758851ec542cd38cac9719f",
     "operational-summary.csv": "f146755b9a6f0a7d84352517e8b4df47f8c0cd6388625cfbe7d13eba403f8243",
-    "overall-results.csv": "7434e253df636d36e44eba09bb572445f2976f5cfa8fca7342331ba55c2dddd9",
-    "stratified-paired-effects.csv": "c71695c8b75d68ea30b67430d3f6c22836fcbc9aa62c38edaa5a57a6f88b02ed",
-    "terminal-errors.csv": "178cfed335dbe7fb224d3be92f778ac64ab454e0e70ab652e00ae1c950582e58"
+    "overall-results.csv": "25977f203ea7802f24858134d995352bf1c29f4bda7763bc10f5808626a83813",
+    "stratified-paired-effects.csv": "750c82fa020217b54ca9f5e3c08d891ea558a0beba22b851747a9d75f8adb53e",
+    "terminal-errors.csv": "fef94d50aa217cf4465646936f1bcc798d3ca1e749bebbc4721a791ff8dbf354"
   },
   "generator": "scripts/analysis/generate_evidence.py",
   "schema_version": 1,
-  "source_release_aggregate_sha256": "150be865736eb274751ddec24f0a084e2d2942c119a25e164600907f492165ea",
-  "source_release_id": "paired-agent-evaluation-v1",
+  "source_release_aggregate_sha256": "9c8ff4a069535be78c1b76e99e28d9f71255d03ff9bec802c40fdf0b8853115b",
+  "source_release_id": "paired-agent-evaluation-v2",
   "source_run_id": "run_test_v1"
 }
