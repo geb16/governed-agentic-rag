@@ -1,80 +1,116 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="894" viewBox="0 0 1200 894" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="6.5in" height="6.47in" viewBox="0 0 1000 996" role="img" aria-labelledby="title desc">
 <title id="title">Overall paired effects of governance</title>
-<desc id="desc">Forest plot of governed minus baseline effects and pointwise 95 percent confidence intervals for fourteen preregistered metrics.</desc>
-<rect width="100%" height="100%" fill="#fbfcfe"/>
-<text x="44" y="46" font-family="Arial" font-size="25" font-weight="700" fill="#172554">Overall paired effects (governed - baseline)</text>
-<text x="44" y="78" font-family="Arial" font-size="15" fill="#475569">Pointwise 95% case-cluster bootstrap intervals; NA = not estimable</text>
-<line x1="543.3" y1="96" x2="543.3" y2="840" stroke="#dbe3ee" stroke-width="1"/>
-<text x="543.3333333333334" y="866" text-anchor="middle" font-family="Arial" font-size="13" fill="#475569">-0.50</text>
-<line x1="660.0" y1="96" x2="660.0" y2="840" stroke="#dbe3ee" stroke-width="1"/>
-<text x="660.0" y="866" text-anchor="middle" font-family="Arial" font-size="13" fill="#475569">-0.25</text>
-<line x1="776.7" y1="96" x2="776.7" y2="840" stroke="#334155" stroke-width="2"/>
-<text x="776.6666666666666" y="866" text-anchor="middle" font-family="Arial" font-size="13" fill="#475569">+0.00</text>
-<line x1="893.3" y1="96" x2="893.3" y2="840" stroke="#dbe3ee" stroke-width="1"/>
-<text x="893.3333333333333" y="866" text-anchor="middle" font-family="Arial" font-size="13" fill="#475569">+0.25</text>
-<line x1="1010.0" y1="96" x2="1010.0" y2="840" stroke="#dbe3ee" stroke-width="1"/>
-<text x="1010.0" y="866" text-anchor="middle" font-family="Arial" font-size="13" fill="#475569">+0.50</text>
-<rect x="30" y="91" width="1135" height="43" rx="5" fill="#f1f5f9"/>
-<text x="290" y="118" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Appropriate route</text>
-<line x1="761.1" y1="113" x2="871.9" y2="113" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
-<circle cx="815.6" cy="113" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
-<text x="1110" y="118" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.083 [-0.033, 0.204]</text>
-<text x="290" y="167" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Workflow completion</text>
-<line x1="851.6" y1="162" x2="1048.9" y2="162" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
-<circle cx="950.9" cy="162" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
-<text x="1110" y="167" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.373 [0.160, 0.583]</text>
-<rect x="30" y="189" width="1135" height="43" rx="5" fill="#f1f5f9"/>
-<text x="290" y="216" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Action correctness</text>
-<line x1="739.6" y1="211" x2="854.4" y2="211" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
-<circle cx="793.0" cy="211" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
-<text x="1110" y="216" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.035 [-0.079, 0.167]</text>
-<text x="290" y="265" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Unsafe-action prevention</text>
-<line x1="776.7" y1="260" x2="790.8" y2="260" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
-<circle cx="782.3" cy="260" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
-<text x="1110" y="265" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.012 [0.000, 0.030]</text>
-<rect x="30" y="287" width="1135" height="43" rx="5" fill="#f1f5f9"/>
-<text x="290" y="314" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Approval control</text>
-<line x1="776.7" y1="309" x2="776.7" y2="309" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
-<circle cx="776.7" cy="309" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
-<text x="1110" y="314" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.000 [0.000, 0.000]</text>
-<text x="290" y="363" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Escalation recall</text>
-<line x1="776.7" y1="358" x2="776.7" y2="358" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
-<circle cx="776.7" cy="358" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
-<text x="1110" y="363" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.000 [0.000, 0.000]</text>
-<rect x="30" y="385" width="1135" height="43" rx="5" fill="#f1f5f9"/>
-<text x="290" y="412" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Escalation precision</text>
-<text x="800.0" y="412" text-anchor="middle" font-family="Arial" font-size="14" fill="#64748b">NA</text>
-<text x="1110" y="412" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">NA</text>
-<text x="290" y="461" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Escalation F1</text>
-<line x1="776.7" y1="456" x2="776.7" y2="456" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
-<circle cx="776.7" cy="456" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
-<text x="1110" y="461" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.000 [0.000, 0.000]</text>
-<rect x="30" y="483" width="1135" height="43" rx="5" fill="#f1f5f9"/>
-<text x="290" y="510" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">False escalation</text>
-<line x1="776.7" y1="505" x2="801.2" y2="505" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
-<circle cx="785.7" cy="505" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
-<text x="1110" y="510" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.019 [0.000, 0.053]</text>
-<text x="290" y="559" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Recovery success</text>
-<line x1="543.3" y1="554" x2="776.7" y2="554" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
-<circle cx="679.4" cy="554" r="7" fill="#c2410c" stroke="#ffffff" stroke-width="2"/>
-<text x="1110" y="559" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">-0.208 [-0.500, 0.000]</text>
-<rect x="30" y="581" width="1135" height="43" rx="5" fill="#f1f5f9"/>
-<text x="290" y="608" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Safe termination</text>
-<line x1="776.7" y1="603" x2="776.7" y2="603" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
-<circle cx="776.7" cy="603" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
-<text x="1110" y="608" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.000 [0.000, 0.000]</text>
-<text x="290" y="657" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Groundedness</text>
-<line x1="795.3" y1="652" x2="1029.4" y2="652" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
-<circle cx="897.7" cy="652" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
-<text x="1110" y="657" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.259 [0.040, 0.542]</text>
-<rect x="30" y="679" width="1135" height="43" rx="5" fill="#f1f5f9"/>
-<text x="290" y="706" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Context precision</text>
-<line x1="776.7" y1="701" x2="776.7" y2="701" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
-<circle cx="776.7" cy="701" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
-<text x="1110" y="706" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.000 [0.000, 0.000]</text>
-<text x="290" y="755" text-anchor="end" font-family="Arial" font-size="14" fill="#0f172a">Audit completeness</text>
-<line x1="880.0" y1="750" x2="904.8" y2="750" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
-<circle cx="892.3" cy="750" r="7" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
-<text x="1110" y="755" text-anchor="end" font-family="Arial" font-size="13" fill="#334155">+0.248 [0.221, 0.275]</text>
-<text x="800.0" y="889" text-anchor="middle" font-family="Arial" font-size="14" fill="#334155">Difference on registered metric scale</text>
+<desc id="desc">Forest plot of governed minus baseline effects and pointwise 95 percent confidence intervals. Positions remain on the registered metric scale; marker colours account for whether higher or lower values are desirable.</desc>
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<text x="30" y="48" font-family="Aptos, Calibri, Arial, sans-serif" font-size="30" font-weight="700" fill="#16324F">Overall paired effects of governance</text>
+<text x="30" y="78" font-family="Aptos, Calibri, Arial, sans-serif" font-size="17" fill="#475569">Pointwise 95% case-cluster bootstrap intervals</text>
+<text x="30" y="104" font-family="Aptos, Calibri, Arial, sans-serif" font-size="16" fill="#475569">Positions and reported values are governed - baseline; colour indicates desirability</text>
+<circle cx="390" cy="137" r="7" fill="#007A5E" stroke="#FFFFFF" stroke-width="1.5"/>
+<text x="404" y="143" font-family="Aptos, Calibri, Arial, sans-serif" font-size="15" fill="#334155">Favours governed</text>
+<circle cx="596" cy="137" r="7" fill="#C2410C" stroke="#FFFFFF" stroke-width="1.5"/>
+<text x="610" y="143" font-family="Aptos, Calibri, Arial, sans-serif" font-size="15" fill="#334155">Favours baseline</text>
+<circle cx="786" cy="137" r="7" fill="#64748B" stroke="#FFFFFF" stroke-width="1.5"/>
+<text x="800" y="143" font-family="Aptos, Calibri, Arial, sans-serif" font-size="15" fill="#334155">No difference</text>
+<rect x="26" y="196" width="950" height="44" rx="4" fill="#F5F7FA"/>
+<rect x="26" y="292" width="950" height="44" rx="4" fill="#F5F7FA"/>
+<rect x="26" y="388" width="950" height="44" rx="4" fill="#F5F7FA"/>
+<rect x="26" y="484" width="950" height="44" rx="4" fill="#F5F7FA"/>
+<rect x="26" y="580" width="950" height="44" rx="4" fill="#F5F7FA"/>
+<rect x="26" y="676" width="950" height="44" rx="4" fill="#F5F7FA"/>
+<rect x="26" y="772" width="950" height="44" rx="4" fill="#F5F7FA"/>
+<line x1="346.2" y1="202" x2="346.2" y2="924" stroke="#D7E0E8" stroke-width="1"/>
+<text x="346.25" y="948" text-anchor="middle" font-family="Aptos, Calibri, Arial, sans-serif" font-size="15" fill="#475569">-0.50</text>
+<line x1="427.5" y1="202" x2="427.5" y2="924" stroke="#D7E0E8" stroke-width="1"/>
+<text x="427.5" y="948" text-anchor="middle" font-family="Aptos, Calibri, Arial, sans-serif" font-size="15" fill="#475569">-0.25</text>
+<line x1="508.8" y1="202" x2="508.8" y2="924" stroke="#475569" stroke-width="2"/>
+<text x="508.75" y="948" text-anchor="middle" font-family="Aptos, Calibri, Arial, sans-serif" font-size="15" fill="#475569">+0.00</text>
+<line x1="590.0" y1="202" x2="590.0" y2="924" stroke="#D7E0E8" stroke-width="1"/>
+<text x="590.0" y="948" text-anchor="middle" font-family="Aptos, Calibri, Arial, sans-serif" font-size="15" fill="#475569">+0.25</text>
+<line x1="671.2" y1="202" x2="671.2" y2="924" stroke="#D7E0E8" stroke-width="1"/>
+<text x="671.25" y="948" text-anchor="middle" font-family="Aptos, Calibri, Arial, sans-serif" font-size="15" fill="#475569">+0.50</text>
+<text x="306" y="188" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="16" font-weight="700" fill="#334155">Metric</text>
+<text x="974" y="188" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="16" font-weight="700" fill="#334155">Reported effect [95% CI]</text>
+<line x1="26" y1="199" x2="976" y2="199" stroke="#CBD5E1" stroke-width="1.5"/>
+<text x="306" y="220" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="17" fill="#172033">Appropriate route</text>
+<line x1="497.9" y1="214" x2="575.1" y2="214" stroke="#52677D" stroke-width="4" stroke-linecap="round"/>
+<line x1="497.9" y1="208" x2="497.9" y2="220" stroke="#52677D" stroke-width="2"/>
+<line x1="575.1" y1="208" x2="575.1" y2="220" stroke="#52677D" stroke-width="2"/>
+<circle cx="535.8" cy="214" r="8" fill="#007A5E" stroke="#FFFFFF" stroke-width="2"/>
+<text x="974" y="220" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="16" font-weight="600" fill="#334155">+0.083 [-0.033, 0.204]</text>
+<text x="306" y="268" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="17" fill="#172033">Workflow completion</text>
+<line x1="560.9" y1="262" x2="698.3" y2="262" stroke="#52677D" stroke-width="4" stroke-linecap="round"/>
+<line x1="560.9" y1="256" x2="560.9" y2="268" stroke="#52677D" stroke-width="2"/>
+<line x1="698.3" y1="256" x2="698.3" y2="268" stroke="#52677D" stroke-width="2"/>
+<circle cx="630.1" cy="262" r="8" fill="#007A5E" stroke="#FFFFFF" stroke-width="2"/>
+<text x="974" y="268" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="16" font-weight="600" fill="#334155">+0.373 [0.160, 0.583]</text>
+<text x="306" y="316" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="17" fill="#172033">Action correctness</text>
+<line x1="483.0" y1="310" x2="562.9" y2="310" stroke="#52677D" stroke-width="4" stroke-linecap="round"/>
+<line x1="483.0" y1="304" x2="483.0" y2="316" stroke="#52677D" stroke-width="2"/>
+<line x1="562.9" y1="304" x2="562.9" y2="316" stroke="#52677D" stroke-width="2"/>
+<circle cx="520.2" cy="310" r="8" fill="#007A5E" stroke="#FFFFFF" stroke-width="2"/>
+<text x="974" y="316" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="16" font-weight="600" fill="#334155">+0.035 [-0.079, 0.167]</text>
+<text x="306" y="364" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="17" fill="#172033">Unsafe-action prevention</text>
+<line x1="508.8" y1="358" x2="518.6" y2="358" stroke="#52677D" stroke-width="4" stroke-linecap="round"/>
+<line x1="508.8" y1="352" x2="508.8" y2="364" stroke="#52677D" stroke-width="2"/>
+<line x1="518.6" y1="352" x2="518.6" y2="364" stroke="#52677D" stroke-width="2"/>
+<circle cx="512.7" cy="358" r="8" fill="#007A5E" stroke="#FFFFFF" stroke-width="2"/>
+<text x="974" y="364" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="16" font-weight="600" fill="#334155">+0.012 [0.000, 0.030]</text>
+<text x="306" y="412" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="17" fill="#172033">Approval control</text>
+<line x1="508.8" y1="406" x2="508.8" y2="406" stroke="#52677D" stroke-width="4" stroke-linecap="round"/>
+<line x1="508.8" y1="400" x2="508.8" y2="412" stroke="#52677D" stroke-width="2"/>
+<line x1="508.8" y1="400" x2="508.8" y2="412" stroke="#52677D" stroke-width="2"/>
+<circle cx="508.8" cy="406" r="8" fill="#64748B" stroke="#FFFFFF" stroke-width="2"/>
+<text x="974" y="412" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="16" font-weight="600" fill="#334155">+0.000 [0.000, 0.000]</text>
+<text x="306" y="460" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="17" fill="#172033">Escalation recall</text>
+<line x1="508.8" y1="454" x2="508.8" y2="454" stroke="#52677D" stroke-width="4" stroke-linecap="round"/>
+<line x1="508.8" y1="448" x2="508.8" y2="460" stroke="#52677D" stroke-width="2"/>
+<line x1="508.8" y1="448" x2="508.8" y2="460" stroke="#52677D" stroke-width="2"/>
+<circle cx="508.8" cy="454" r="8" fill="#64748B" stroke="#FFFFFF" stroke-width="2"/>
+<text x="974" y="460" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="16" font-weight="600" fill="#334155">+0.000 [0.000, 0.000]</text>
+<text x="306" y="508" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="17" fill="#172033">Escalation precision</text>
+<text x="525.0" y="508" text-anchor="middle" font-family="Aptos, Calibri, Arial, sans-serif" font-size="16" font-weight="700" fill="#64748B">NA</text>
+<text x="974" y="508" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="16" font-weight="600" fill="#334155">NA</text>
+<text x="306" y="556" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="17" fill="#172033">Escalation F1</text>
+<line x1="508.8" y1="550" x2="508.8" y2="550" stroke="#52677D" stroke-width="4" stroke-linecap="round"/>
+<line x1="508.8" y1="544" x2="508.8" y2="556" stroke="#52677D" stroke-width="2"/>
+<line x1="508.8" y1="544" x2="508.8" y2="556" stroke="#52677D" stroke-width="2"/>
+<circle cx="508.8" cy="550" r="8" fill="#64748B" stroke="#FFFFFF" stroke-width="2"/>
+<text x="974" y="556" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="16" font-weight="600" fill="#334155">+0.000 [0.000, 0.000]</text>
+<text x="306" y="604" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="17" fill="#172033">False escalation (lower is better)</text>
+<line x1="508.8" y1="598" x2="525.9" y2="598" stroke="#52677D" stroke-width="4" stroke-linecap="round"/>
+<line x1="508.8" y1="592" x2="508.8" y2="604" stroke="#52677D" stroke-width="2"/>
+<line x1="525.9" y1="592" x2="525.9" y2="604" stroke="#52677D" stroke-width="2"/>
+<circle cx="515.0" cy="598" r="8" fill="#C2410C" stroke="#FFFFFF" stroke-width="2"/>
+<text x="974" y="604" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="16" font-weight="600" fill="#334155">+0.019 [0.000, 0.053]</text>
+<text x="306" y="652" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="17" fill="#172033">Recovery success</text>
+<line x1="454.6" y1="646" x2="761.5" y2="646" stroke="#52677D" stroke-width="4" stroke-linecap="round"/>
+<line x1="454.6" y1="640" x2="454.6" y2="652" stroke="#52677D" stroke-width="2"/>
+<line x1="761.5" y1="640" x2="761.5" y2="652" stroke="#52677D" stroke-width="2"/>
+<circle cx="617.1" cy="646" r="8" fill="#007A5E" stroke="#FFFFFF" stroke-width="2"/>
+<text x="974" y="652" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="16" font-weight="600" fill="#334155">+0.333 [-0.167, 0.778]</text>
+<text x="306" y="700" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="17" fill="#172033">Safe termination</text>
+<line x1="508.8" y1="694" x2="508.8" y2="694" stroke="#52677D" stroke-width="4" stroke-linecap="round"/>
+<line x1="508.8" y1="688" x2="508.8" y2="700" stroke="#52677D" stroke-width="2"/>
+<line x1="508.8" y1="688" x2="508.8" y2="700" stroke="#52677D" stroke-width="2"/>
+<circle cx="508.8" cy="694" r="8" fill="#64748B" stroke="#FFFFFF" stroke-width="2"/>
+<text x="974" y="700" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="16" font-weight="600" fill="#334155">+0.000 [0.000, 0.000]</text>
+<text x="306" y="748" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="17" fill="#172033">Groundedness</text>
+<line x1="521.8" y1="742" x2="684.8" y2="742" stroke="#52677D" stroke-width="4" stroke-linecap="round"/>
+<line x1="521.8" y1="736" x2="521.8" y2="748" stroke="#52677D" stroke-width="2"/>
+<line x1="684.8" y1="736" x2="684.8" y2="748" stroke="#52677D" stroke-width="2"/>
+<circle cx="593.0" cy="742" r="8" fill="#007A5E" stroke="#FFFFFF" stroke-width="2"/>
+<text x="974" y="748" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="16" font-weight="600" fill="#334155">+0.259 [0.040, 0.542]</text>
+<text x="306" y="796" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="17" fill="#172033">Context precision</text>
+<line x1="508.8" y1="790" x2="508.8" y2="790" stroke="#52677D" stroke-width="4" stroke-linecap="round"/>
+<line x1="508.8" y1="784" x2="508.8" y2="796" stroke="#52677D" stroke-width="2"/>
+<line x1="508.8" y1="784" x2="508.8" y2="796" stroke="#52677D" stroke-width="2"/>
+<circle cx="508.8" cy="790" r="8" fill="#64748B" stroke="#FFFFFF" stroke-width="2"/>
+<text x="974" y="796" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="16" font-weight="600" fill="#334155">+0.000 [0.000, 0.000]</text>
+<text x="306" y="844" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="17" fill="#172033">Audit completeness</text>
+<line x1="580.7" y1="838" x2="598.0" y2="838" stroke="#52677D" stroke-width="4" stroke-linecap="round"/>
+<line x1="580.7" y1="832" x2="580.7" y2="844" stroke="#52677D" stroke-width="2"/>
+<line x1="598.0" y1="832" x2="598.0" y2="844" stroke="#52677D" stroke-width="2"/>
+<circle cx="589.3" cy="838" r="8" fill="#007A5E" stroke="#FFFFFF" stroke-width="2"/>
+<text x="974" y="844" text-anchor="end" font-family="Aptos, Calibri, Arial, sans-serif" font-size="16" font-weight="600" fill="#334155">+0.248 [0.221, 0.275]</text>
+<text x="525.0" y="979" text-anchor="middle" font-family="Aptos, Calibri, Arial, sans-serif" font-size="15" font-weight="600" fill="#334155">Governed - baseline effect on the registered metric scale</text>
 </svg>
