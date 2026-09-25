@@ -24,7 +24,7 @@ def test_freeze_scope_covers_clean_architecture_and_phase3_contracts() -> None:
         "src/app/baseline/composition.py",
         "src/app/infrastructure/llm/openai_responses.py",
         "src/app/infrastructure/persistence/sqlite/repository.py",
-        "tests/README.md",
+        "tests/baseline/README.md",
         "tests/baseline/architecture/test_baseline_boundaries.py",
         "tests/baseline/integration/test_agent.py",
         "tests/baseline/integration/test_experiment_manifest.py",

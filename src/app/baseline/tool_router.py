@@ -1,4 +1,11 @@
-"""Allowlisted validation and dispatch of model-proposed tool calls."""
+"""Validate and dispatch model-proposed tool calls through an allowlist.
+
+Rejects unknown tools and invalid JSON arguments, applies deterministic fault
+injection, then executes with trusted context. Every path, including denial,
+fault, and exception, returns a timed ToolExecution instead of raising.
+Core:
+    - ToolRouter: ToolGateway implementation exposing strict function specs.
+"""
 
 from __future__ import annotations
 

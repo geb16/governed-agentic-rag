@@ -1,4 +1,12 @@
-"""Authenticated HTTP endpoint for baseline agent invocations."""
+"""Expose the authenticated endpoint for baseline agent invocations.
+
+POST /baseline/invoke requires an API key, validates the body as
+BaselineRequest, and runs the synchronous use case in a threadpool so
+blocking model and tool I/O never stalls the event loop.
+Core:
+    - router: APIRouter mounted under /baseline.
+    - invoke_baseline: handler returning a structured BaselineResponse.
+"""
 
 from __future__ import annotations
 

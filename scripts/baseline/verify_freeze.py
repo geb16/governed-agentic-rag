@@ -1,4 +1,13 @@
-"""Write or verify the cryptographic identity of the Phase 3 baseline."""
+"""Write or verify the SHA-256 freeze manifest of the Phase 3 baseline.
+
+Hashes files matched by FROZEN_PATTERNS, rejecting symlinks and empty patterns,
+into per-file and aggregate digests. Verify mode (default) lists added, removed,
+and modified files; --write atomically replaces the manifest. Exits 1 on failure.
+Core:
+    - build_freeze_payload: builds the comparable manifest payload.
+    - describe_freeze_differences: reports why a manifest does not match.
+    - main: CLI entry point.
+"""
 
 from __future__ import annotations
 
@@ -36,7 +45,7 @@ FROZEN_PATTERNS = (
     "src/app/rag/*.py",
     "src/app/tools/*.py",
     "tests/__init__.py",
-    "tests/README.md",
+    "tests/baseline/README.md",
     "tests/conftest.py",
     "tests/baseline/**/*.py",
     "tests/shared/**/*.py",

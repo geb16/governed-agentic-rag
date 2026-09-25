@@ -1,4 +1,12 @@
-"""Baseline instructions and serialization of untrusted request context."""
+"""Define the baseline system prompt and serialize untrusted request context.
+
+The system prompt fixes mission, grounding, citation, and security rules and is
+hashed into experiment manifests. Request and retrieved chunks are emitted as
+compact deterministic JSON labelled as data, separating them from instructions.
+Core:
+    - SYSTEM_PROMPT: frozen baseline instructions.
+    - build_user_prompt: serializes the request and chunks as untrusted data.
+"""
 
 from __future__ import annotations
 

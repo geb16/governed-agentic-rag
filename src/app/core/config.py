@@ -1,4 +1,13 @@
-"""Validated environment configuration and production security invariants."""
+"""Load validated environment settings and enforce production security invariants.
+
+Settings reads RAG_-prefixed variables and .env through pydantic-settings. A
+model validator rejects unsafe profiles: production needs API, OpenAI, and
+safety-ID secrets, no wildcard hosts, and HTTPS Qdrant with a read key; the
+experiment profile needs Qdrant, an OpenAI key, a run ID, and a safety secret.
+Core:
+    - Settings: typed runtime configuration and cross-field validation.
+    - get_settings: process-wide cached Settings instance.
+"""
 
 from __future__ import annotations
 
