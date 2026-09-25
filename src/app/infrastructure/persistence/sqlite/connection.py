@@ -1,4 +1,11 @@
-"""Transactional SQLite connection lifecycle for support persistence."""
+"""Open one transactional SQLite connection per repository operation.
+
+Each connection enforces foreign keys, waits on locks for a bounded time, and
+returns sqlite3.Row rows; immediate=True takes the write lock up front. Commits
+on success, rolls back on error, and always closes, so threads never share one.
+Core:
+    - sqlite_connection: context manager owning one connection's transaction.
+"""
 
 from __future__ import annotations
 

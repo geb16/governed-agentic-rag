@@ -1,4 +1,11 @@
-"""SQLite operations for versioned ticket and access-account records."""
+"""Read and update versioned ticket and access-account records.
+
+Updates return (record, changed) and increment version only when the value
+actually changes, so repeated identical writes are no-ops.
+Core:
+    - get_ticket, update_ticket_status: case-scoped ticket access.
+    - get_access_account, change_access_role: case-scoped account access.
+"""
 
 from __future__ import annotations
 
