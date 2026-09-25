@@ -18,7 +18,7 @@ and reproducibility requirements.
 | 4 — Governance | Governance-aware workflow condition | [Phase 4 guide](docs/phase-4-governance/README.md) | [`phase4-governance-v6`](docs/phase-4-governance/freeze-manifest.json) |
 | 5 — Evaluation | Frozen dataset, schemas, and scoring rubric | [Phase 5 guide](docs/phase-5-evaluation/README.md) | [`phase5-evaluation-v5`](docs/phase-5-evaluation/freeze-manifest.json) |
 | 6 — Experiment | Paired, blinded experimental evaluation | [Phase 6 guide](experiments/paired_agent_evaluation/README.md) | [`paired-agent-evaluation-harness-v1`](docs/phase-6-experiments/harness-freeze-manifest.json) |
-| 7 — Analysis | Sealed-results analysis and dissertation | [Phase 7 guide](docs/phase-7-analysis/README.md) | Derived from [`paired-agent-evaluation-v1`](data/evaluation/paired_agent_evaluation/v1/manifest.json) |
+| 7 — Analysis | Sealed-results analysis and dissertation | [Phase 7 guide](docs/phase-7-analysis/README.md) | Derived from [`paired-agent-evaluation-v3`](data/evaluation/paired_agent_evaluation/v3/manifest.json) |
 
 Supporting design documents are available under [`docs/`](docs/), with external sources collected
 in the [project bibliography](docs/references.md). Test ownership and scope are described in
@@ -77,10 +77,11 @@ uv run --project experiments/paired_agent_evaluation \
   python experiments/paired_agent_evaluation/scripts/verify_release.py
 ```
 
-The original v1 release remains preserved as audit history. A deterministic corrective release,
-v2, fixes asymmetric normalization of baseline safety blocks without repeating acquisition,
-human adjudication, or Ragas grading. Its canonical
-[correction record](data/evaluation/paired_agent_evaluation/v2/correction.json) identifies v1 and
+The original v1 release and corrective v2 release remain preserved as audit history. Corrective
+v2 fixes asymmetric terminal-error normalization; canonical v3 fixes baseline route precedence
+when a completed human-review request is followed by final-answer citation blocking. Neither
+correction repeats acquisition, human adjudication, or Ragas grading. The v3
+[correction record](data/evaluation/paired_agent_evaluation/v3/correction.json) identifies v2 and
 the five re-derived files that changed. The earlier
 [scoring correction manifest](docs/phase-6-experiments/scoring-correction-manifest.json) separately
 records the pre-v1 groundedness-eligibility correction.
@@ -99,6 +100,9 @@ paired-agent-evaluation-v1
 
 paired-agent-evaluation-v2
 9c8ff4a069535be78c1b76e99e28d9f71255d03ff9bec802c40fdf0b8853115b
+
+paired-agent-evaluation-v3
+0f2c281ab19ea6a1c44bf75ad79266c1d51e9a88ee82cd8ea01850561bc7110e
 ```
 
 These verification commands use repository-local evidence. They do not repeat provider calls,
@@ -106,19 +110,20 @@ Ragas grading, human adjudication, or experimental acquisition.
 
 ## Evidence locations
 
-- [`data/evaluation/paired_agent_evaluation/v2/`](data/evaluation/paired_agent_evaluation/v2/) is
+- [`data/evaluation/paired_agent_evaluation/v3/`](data/evaluation/paired_agent_evaluation/v3/) is
   the canonical, content-addressed Phase 6 corrective release. Its
-  [HTML report](data/evaluation/paired_agent_evaluation/v2/report.html) contains the corrected
+  [HTML report](data/evaluation/paired_agent_evaluation/v3/report.html) contains the corrected
   primary results.
-- [`data/evaluation/paired_agent_evaluation/v1/`](data/evaluation/paired_agent_evaluation/v1/) is
-  the superseded original release, retained unchanged for provenance and comparison.
+- [`data/evaluation/paired_agent_evaluation/v1/`](data/evaluation/paired_agent_evaluation/v1/) and
+  [`v2`](data/evaluation/paired_agent_evaluation/v2/) are superseded releases retained unchanged
+  for provenance and comparison.
 - [`artifacts/paired_agent_evaluation/`](artifacts/paired_agent_evaluation/) is the supporting audit
   trail containing validation runs, the preregistered test run, blinded researcher work,
   schedules, journals, and intermediate execution state.
 - [`docs/phase-7-analysis/`](docs/phase-7-analysis/) contains the analysis, and
   reproducible figures derived from the sealed release in phase-6 experiments.
 
-Both sealed releases remain bound to the exact Phase 3–6 identities recorded in their manifests.
+All sealed releases remain bound to the exact Phase 3–6 identities recorded in their manifests.
 Working artifacts support inspection but do not replace the canonical release.
 
 ## Quality gates
