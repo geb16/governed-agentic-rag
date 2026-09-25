@@ -1,4 +1,12 @@
-"""SQLite operations for synthetic evaluation-case partitions."""
+"""Persist and look up case partitions of synthetic evaluation state.
+
+create_case writes a fixture's tickets, access accounts, and fault plans in the
+caller's transaction. replace=True first deletes the case and all of its state,
+including simulated refunds and escalations, so a used case can be re-seeded.
+Core:
+    - create_case: inserts one complete case fixture.
+    - case_exists: reports whether a case partition exists.
+"""
 
 from __future__ import annotations
 
