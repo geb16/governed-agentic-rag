@@ -209,7 +209,7 @@ invalid or mismatched envelope contribute no audit-completeness facts.
 | Harness freeze and test-execution claim | Preregistered control evidence | Bind reviewed source bytes and completed validation to one test ID; claim is created exclusively before provider access and copied into the sealed run |
 | Run and release manifests | Content-addressed, internal | Hash every input file plus runtime, tool-schema, and Qdrant-content identities; sensitive-key fields are redacted before sealing |
 | Raw run artifacts (`artifacts/paired_agent_evaluation/`) | Mutable, local, gitignored | Never canonical; only a verified release under `data/evaluation/paired_agent_evaluation/` is reported |
-| Sealed release directory | Immutable once verified | v1 remains preserved as superseded history; v2 is canonical; sealing refuses a non-empty destination and verification recomputes every hash |
+| Sealed release directory | Immutable once verified | v1 and v2 remain preserved as superseded history; v3 is canonical; sealing refuses a non-empty destination and verification recomputes every hash |
 
 ## Known architectural compromises
 
