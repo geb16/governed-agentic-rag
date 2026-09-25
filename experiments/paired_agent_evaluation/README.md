@@ -13,8 +13,8 @@ run and one preregistered test run before the test split can execute. It also ve
 [limitations](../../docs/phase-6-experiments/limitations.md) for known compromises.
 
 Mutable run output is written to the gitignored `artifacts/paired_agent_evaluation/`. Only a
-completed, adjudicated, sanitized **test**-split run can be sealed. The original v1 release is
-preserved as superseded audit history; v2 is the canonical corrective release.
+completed, adjudicated, sanitized **test**-split run can be sealed. The original v1 and corrective
+v2 releases are preserved as superseded audit history; v3 is the canonical corrective release.
 
 `prepare_run` creates a cryptographically random `blinding-plan.json` before acquisition and pins
 its digest in the run manifest. Reviewers receive only `review-packet.jsonl`, whose opaque IDs and
@@ -159,18 +159,20 @@ regenerate an inherited manifest from this project to force a pass.
    primary artifact from authoritative inputs. It fails if normalized results, review artifacts,
    scores, estimates, paired differences, or the summary were altered or became stale.
 
-   A post-release normalization defect was then corrected deterministically from the same immutable
-   test evidence. The resulting v2 release preserves v1 and records its exact derivation in
-   [`correction.json`](../../data/evaluation/paired_agent_evaluation/v2/correction.json). Acquisition,
-   raw observations, human adjudication, and Ragas grades were not repeated or modified. Verify the
-   canonical release with:
+   Two post-release normalization defects were corrected deterministically from the same immutable
+   test evidence. Corrective v2 projects baseline safety blocks into the terminal-error field.
+   Canonical v3 preserves a completed baseline human-review route when later citation validation
+   blocks the final answer. Each release records its immediate predecessor and changed derivatives
+   in `correction.json`; see the canonical
+   [v3 record](../../data/evaluation/paired_agent_evaluation/v3/correction.json). Acquisition, raw
+   observations, human adjudication, and Ragas grades were not repeated or modified. Verify v3 with:
 
    ```bash
    uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_release.py
    ```
 
-   The default verification target is v2; pass `--release-version v1` to verify the superseded
-   original independently.
+   The default verification target is v3; pass `--release-version v1` or `--release-version v2`
+   to verify either superseded release independently.
 
 The test split is not a tuning set. Never rerun accepted observations, manually replace model
 outputs, or alter labels after viewing comparative results. Each attempt is journaled before system
