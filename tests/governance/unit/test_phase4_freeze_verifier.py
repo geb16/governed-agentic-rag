@@ -76,7 +76,7 @@ def test_freeze_payload_pins_release_schema_policy_and_baseline_identity() -> No
     phase3_manifest = verifier.PHASE3_MANIFEST_PATH.read_bytes()
 
     assert payload["manifest_schema_version"] == verifier.MANIFEST_SCHEMA_VERSION == 1
-    assert payload["freeze_id"] == verifier.PHASE4_FREEZE_ID == "phase4-governance-v6"
+    assert payload["freeze_id"] == verifier.PHASE4_FREEZE_ID == "phase4-governance-v7"
     assert payload["governed_app_version"] == GOVERNED_APP_VERSION
     assert payload["workflow_schema_version"] == WORKFLOW_SCHEMA_VERSION
     assert payload["governance_policy_version"] == GOVERNANCE_POLICY_VERSION
