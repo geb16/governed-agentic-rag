@@ -1,9 +1,12 @@
-"""Run the focused deterministic smoke suite for the Phase 3 baseline.
+"""Run the deterministic Phase 3 smoke suite and propagate pytest's exit status.
 
-The selected tests exercise FastAPI startup, liveness and readiness, authenticated
-invocation, one complete grounded agent turn, and the frozen shared tool registry.
-They use local lexical retrieval, isolated SQLite state, and deterministic model
-doubles; no provider, Qdrant, or production business system is contacted.
+Covers FastAPI startup, health probes, authenticated invocation, one grounded
+agent turn, and the frozen tool registry, using lexical retrieval, isolated
+SQLite state, and model doubles; no provider or Qdrant is contacted. Pytest
+runs with strict config and markers and without its cache provider.
+Core:
+    - SMOKE_TARGETS: pytest node IDs forming the smoke suite.
+    - main: runs the suite in a subprocess and returns its exit code.
 """
 
 from __future__ import annotations
