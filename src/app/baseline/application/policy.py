@@ -1,4 +1,11 @@
-"""Provider-neutral runtime limits for the baseline application service."""
+"""Define provider-neutral runtime limits for the baseline application service.
+
+A frozen, slotted dataclass that decouples the use case from environment config.
+Core:
+    - AgentRuntimePolicy: query size, turn, tool-call, and safety-ID limits.
+References:
+    [1] Python, "dataclasses." https://docs.python.org/3/library/dataclasses.html
+"""
 
 from __future__ import annotations
 

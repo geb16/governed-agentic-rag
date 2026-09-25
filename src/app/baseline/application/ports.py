@@ -1,4 +1,16 @@
-"""Inbound and outbound ports used by the baseline application layer."""
+"""Define the inbound and outbound ports of the baseline application layer.
+
+Structural Protocols keep the service independent of FastAPI, OpenAI, SQLite,
+and Qdrant; adapters satisfy them without inheritance.
+Core:
+    - BaselineUseCase: inbound port consumed by the HTTP layer.
+    - CaseReader, RetrievalGateway, ModelGateway, ToolGateway: outbound ports.
+    - InputSafetyPolicy, OutputSafetyPolicy: guardrail ports.
+    - SafetyDecision, ToolExecution: value objects crossing the boundaries.
+References:
+    [1] A. Cockburn, "Hexagonal Architecture." https://alistair.cockburn.us/hexagonal-architecture/
+    [2] PEP 544, "Protocols: Structural subtyping." https://peps.python.org/pep-0544/
+"""
 
 from __future__ import annotations
 

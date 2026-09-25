@@ -1,4 +1,15 @@
-"""Phase 3 application request, response, status, and execution contracts."""
+"""Define application request, response, status, and tool-record contracts.
+
+Strict Pydantic models and StrEnums shared by the service, tool router, and
+HTTP layer; BaselineRequest reuses the domain TaskRequest unchanged.
+Core:
+    - AgentStatus, ToolStatus: terminal invocation and tool dispatch states.
+    - BaselineRequest, BaselineResponse: public invocation contract.
+    - ToolCallRecord: proposal, outcome, timing, and evidence of one tool call.
+    - Usage, SafetyResult: token counts and the deterministic safety verdict.
+References:
+    [1] Pydantic, "Models." https://docs.pydantic.dev/latest/concepts/models/
+"""
 
 from __future__ import annotations
 

@@ -1,4 +1,14 @@
-"""Liveness and dependency-readiness endpoints."""
+"""Expose liveness and dependency-readiness endpoints.
+
+GET /health/live confirms the process serves HTTP. GET /health/ready also
+requires a configured retriever and agent, answering 503 "not_ready" otherwise.
+Core:
+    - live: process liveness probe.
+    - ready: dependency readiness probe.
+References:
+    [1] Kubernetes, "Configure Liveness, Readiness and Startup Probes."
+        https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+"""
 
 from __future__ import annotations
 

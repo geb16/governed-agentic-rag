@@ -1,4 +1,12 @@
-"""FastAPI dependency resolvers for application-layer ports."""
+"""Resolve application-layer ports for FastAPI request handlers.
+
+Reads the BaselineUseCase from lifespan state and raises HTTP 503 when no
+model-backed agent is configured, so routes depend on the port only.
+Core:
+    - get_agent: dependency returning the configured BaselineUseCase.
+References:
+    [1] FastAPI, "Dependencies." https://fastapi.tiangolo.com/tutorial/dependencies/
+"""
 
 from __future__ import annotations
 

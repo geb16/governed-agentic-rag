@@ -1,4 +1,12 @@
-"""Phase 3 HTTP-only response contracts."""
+"""Define HTTP-only response contracts for the baseline API.
+
+Strict Pydantic models that live only at the transport edge and never leak
+into the application layer.
+Core:
+    - HealthResponse: liveness/readiness status with a UTC timestamp.
+References:
+    [1] Pydantic, "Models." https://docs.pydantic.dev/latest/concepts/models/
+"""
 
 from __future__ import annotations
 

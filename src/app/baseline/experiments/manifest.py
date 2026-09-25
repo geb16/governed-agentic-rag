@@ -1,4 +1,16 @@
-"""Reproducibility manifest for controlled Phase 3 experiment runs."""
+"""Record reproducibility manifests for controlled experiment runs.
+
+A manifest hashes the knowledge manifest, system prompt, and tool schemas and
+pins models, retrieval settings, contract and package versions under one
+canonical configuration SHA-256. Files are created exclusively per run ID;
+reusing a run ID with a different configuration raises RuntimeError.
+Core:
+    - ExperimentRunManifest: immutable experiment identity.
+    - build_experiment_manifest: derives a manifest from settings and tools.
+    - record_experiment_manifest: writes once and verifies existing manifests.
+References:
+    [1] Python, "importlib.metadata." https://docs.python.org/3/library/importlib.metadata.html
+"""
 
 from __future__ import annotations
 

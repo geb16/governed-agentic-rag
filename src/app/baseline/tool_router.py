@@ -1,4 +1,15 @@
-"""Allowlisted validation and dispatch of model-proposed tool calls."""
+"""Validate and dispatch model-proposed tool calls through an allowlist.
+
+Rejects unknown tools and invalid JSON arguments, applies deterministic fault
+injection, then executes with trusted context. Every path, including denial,
+fault, and exception, returns a timed ToolExecution instead of raising.
+Core:
+    - ToolRouter: ToolGateway implementation exposing strict function specs.
+References:
+    [1] OpenAI, "Function calling." https://platform.openai.com/docs/guides/function-calling
+    [2] OWASP, "Top 10 for LLM Applications."
+        https://owasp.org/www-project-top-10-for-large-language-model-applications/
+"""
 
 from __future__ import annotations
 
