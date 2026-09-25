@@ -45,7 +45,7 @@ FROZEN_PATTERNS = (
     "src/app/rag/*.py",
     "src/app/tools/*.py",
     "tests/__init__.py",
-    "tests/README.md",
+    "tests/baseline/README.md",
     "tests/conftest.py",
     "tests/baseline/**/*.py",
     "tests/shared/**/*.py",
