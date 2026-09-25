@@ -15,8 +15,8 @@ and reproducibility requirements.
 | Phase | Purpose | Documentation | Frozen identity |
 | --- | --- | --- | --- |
 | 3 — Baseline | Conventional agentic RAG control condition | [Phase 3 guide](docs/phase-3-baseline/README.md) | [`phase3-baseline-v5`](docs/phase-3-baseline/freeze-manifest.json) |
-| 4 — Governance | Governance-aware workflow condition | [Phase 4 guide](docs/phase-4-governance/README.md) | [`phase4-governance-v6`](docs/phase-4-governance/freeze-manifest.json) |
-| 5 — Evaluation | Frozen dataset, schemas, and scoring rubric | [Phase 5 guide](docs/phase-5-evaluation/README.md) | [`phase5-evaluation-v5`](docs/phase-5-evaluation/freeze-manifest.json) |
+| 4 — Governance | Governance-aware workflow condition | [Phase 4 guide](docs/phase-4-governance/README.md) | [`phase4-governance-v7`](docs/phase-4-governance/freeze-manifest.json) |
+| 5 — Evaluation | Frozen dataset, schemas, and scoring rubric | [Phase 5 guide](docs/phase-5-evaluation/README.md) | [`phase5-evaluation-v6`](docs/phase-5-evaluation/freeze-manifest.json) |
 | 6 — Experiment | Paired, blinded experimental evaluation | [Phase 6 guide](experiments/paired_agent_evaluation/README.md) | [`paired-agent-evaluation-harness-v1`](docs/phase-6-experiments/harness-freeze-manifest.json) |
 | 7 — Analysis | Sealed-results analysis and dissertation | [Phase 7 guide](docs/phase-7-analysis/README.md) | Derived from [`paired-agent-evaluation-v3`](data/evaluation/paired_agent_evaluation/v3/manifest.json) |
 
