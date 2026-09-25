@@ -1,8 +1,8 @@
 # Phase 7 — Analysis and Dissertation
 
 Phase-7 interprets the immutable Phase-6 test release and prepares dissertation evidence. It does
-not reacquire observations, change adjudication, rerun Ragas, or modify any file under
-`data/evaluation/paired_agent_evaluation/v1/` or `v2/`.
+not reacquire observations, change adjudication, rerun Ragas, or modify any superseded release
+under `data/evaluation/paired_agent_evaluation/v1/` or `v2/`.
 
 ## Documents
 
@@ -27,12 +27,12 @@ uv run python scripts/analysis/generate_evidence.py
 ```
 
 The generator refuses a source whose release ID, aggregate SHA-256, or member-file digests differ
-from `paired-agent-evaluation-v2` / `9c8ff4a069535be78c1b76e99e28d9f71255d03ff9bec802c40fdf0b8853115b`.
+from `paired-agent-evaluation-v3` / `0f2c281ab19ea6a1c44bf75ad79266c1d51e9a88ee82cd8ea01850561bc7110e`.
 The generated [provenance record](generated/provenance.json) binds every table and figure to that
 source identity and records the SHA-256 digest of every Python source file in the analysis
-pipeline. Corrective v2 preserves v1 as superseded audit history and changes only the five derived
-files declared in its
-[`correction.json`](../../data/evaluation/paired_agent_evaluation/v2/correction.json).
+pipeline. Corrective v3 preserves v1 and v2 as superseded audit history and changes only the five
+derived files declared in its
+[`correction.json`](../../data/evaluation/paired_agent_evaluation/v3/correction.json).
 
 ## Interpretation rules
 
