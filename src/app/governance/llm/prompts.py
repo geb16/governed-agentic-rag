@@ -18,6 +18,8 @@ CLASSIFICATION_PROMPT = (
 Classify the request by intent, task type, sensitivity, and missing information.
 Do not retrieve information, propose an action, approve anything, or invoke a tool.
 Use UNSUPPORTED when the requested capability is outside the supplied intent taxonomy.
+Missing information means facts the requester must supply, not workflow approval.
+Do not raise sensitivity merely because an action changes state or requires approval.
 The summary is a short decision explanation, not hidden chain-of-thought.
 """
     + COMMON_SECURITY
@@ -28,7 +30,10 @@ PROPOSAL_PROMPT = (
 Generate one candidate response or one candidate allowlisted tool action. Do not execute it.
 Use only retrieved knowledge. Tool arguments must be a single JSON object encoded in
 arguments_json. Choose RESPOND when no tool is necessary. Identify missing information
-instead of guessing. Never assume approval. The rationale is a concise decision summary.
+instead of guessing. If the request supplies the action inputs, propose the underlying
+tool action even when policy requires approval; a later deterministic stage routes it.
+Never treat workflow approval as missing information or assume it has been granted.
+The rationale is a concise decision summary.
 """
     + COMMON_SECURITY
 )
