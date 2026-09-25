@@ -1,14 +1,14 @@
 """Seal a Phase 6 test run or verify a versioned release.
 
-The default action verifies canonical v2. ``--release-version`` selects another release.
+The default action verifies canonical v3. ``--release-version`` selects another release.
 Initial sealing remains restricted to preregistered v1; a later deterministic
 correction must explicitly name both the source run and superseded version.
 
-E.g., to seal the preregistered v1 run, verify v2, or seal a corrective v2 release:
+E.g., to seal the preregistered v1 run, verify v3, or seal corrective v3 from v2:
     python verify_release.py
     python verify_release.py --release-version v2
     python verify_release.py --seal-run run_test_v1
-    python verify_release.py --seal-corrective-run run_test_v1 --release-version v2
+    python verify_release.py --seal-corrective-run run_test_v1 --supersedes-version v2
 """
 
 from __future__ import annotations
@@ -20,11 +20,12 @@ from paired_agent_evaluation.composition import EvaluationPaths
 from paired_agent_evaluation.release import seal_corrective_release, seal_run, verify_release
 
 INITIAL_RELEASE_VERSION = "v1"
-CANONICAL_RELEASE_VERSION = "v2"
-CORRECTION_ID = "baseline-safety-terminal-error-v1"
+CANONICAL_RELEASE_VERSION = "v3"
+DEFAULT_SUPERSEDED_VERSION = "v2"
+CORRECTION_ID = "baseline-human-review-route-v1"
 CORRECTION_SUMMARY = (
-    "Project baseline safety blocks into terminal_error_code so end-to-end "
-    "recovery success is scored symmetrically across conditions."
+    "Preserve a successful baseline human-review route when later final-answer "
+    "citation validation records a terminal safety failure."
 )
 
 
@@ -44,7 +45,7 @@ def build_parser() -> argparse.ArgumentParser:
   verify_release.py
   verify_release.py --release-version v2
   verify_release.py --seal-run run_test_v1
-  verify_release.py --seal-corrective-run run_test_v1 --release-version v2
+  verify_release.py --seal-corrective-run run_test_v1 --supersedes-version v2
 """,
     )
     actions = parser.add_mutually_exclusive_group()
@@ -62,14 +63,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--release-version",
         type=_release_version,
         metavar="VERSION",
-        help="release to verify or create (default: v1 for --seal-run; otherwise v2)",
+        help="release to verify or create (default: v1 for --seal-run; otherwise v3)",
     )
     parser.add_argument(
         "--supersedes-version",
         type=_release_version,
-        default=INITIAL_RELEASE_VERSION,
         metavar="VERSION",
-        help="prior release used by --seal-corrective-run (default: v1)",
+        help="prior release used by --seal-corrective-run (default: v2)",
     )
     return parser
 
@@ -87,22 +87,23 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.seal_run:
         if release_version != INITIAL_RELEASE_VERSION:
             parser.error("--seal-run is reserved for the preregistered v1 release")
-        if args.supersedes_version != INITIAL_RELEASE_VERSION:
+        if args.supersedes_version is not None:
             parser.error("--supersedes-version is valid only with --seal-corrective-run")
         manifest = seal_run(run_root=paths.run_root(args.seal_run), release_root=release_root)
     elif args.seal_corrective_run:
-        if release_version == args.supersedes_version:
+        supersedes_version = args.supersedes_version or DEFAULT_SUPERSEDED_VERSION
+        if release_version == supersedes_version:
             parser.error("a corrective release must use a new version")
         manifest = seal_corrective_release(
             run_root=paths.run_root(args.seal_corrective_run),
-            prior_release_root=paths.release_root(args.supersedes_version),
+            prior_release_root=paths.release_root(supersedes_version),
             release_root=release_root,
             release_id=f"paired-agent-evaluation-{release_version}",
             correction_id=CORRECTION_ID,
             correction_summary=CORRECTION_SUMMARY,
         )
     else:
-        if args.supersedes_version != INITIAL_RELEASE_VERSION:
+        if args.supersedes_version is not None:
             parser.error("--supersedes-version is valid only with --seal-corrective-run")
         manifest = verify_release(release_root)
     print(f"Verified {manifest.release_id}: {manifest.aggregate_sha256}")
