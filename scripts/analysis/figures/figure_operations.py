@@ -56,14 +56,21 @@ def render_operational_indicators(
     latency_values: dict[Condition, float] = {
         condition: statistics.median(latency[condition]) / 1000 for condition in CONDITIONS
     }
-    token_values: dict[Condition, float] = {
-        condition: (tokens[condition]["input_tokens"] + tokens[condition]["output_tokens"]) / 10000
+    token_totals: dict[Condition, int] = {
+        condition: tokens[condition]["input_tokens"] + tokens[condition]["output_tokens"]
         for condition in CONDITIONS
     }
+    token_values: dict[Condition, float] = {
+        condition: token_totals[condition] / 10000 for condition in CONDITIONS
+    }
+    token_note = (
+        f"{token_values['baseline']:.2f} = {token_totals['baseline']:,}; "
+        f"{token_values['governed']:.2f} = {token_totals['governed']:,} tokens"
+    )
     parts = [
         word_svg_root(SVG_WIDTH, SVG_HEIGHT),
         '<title id="title">Operational indicators</title>',
-        '<desc id="desc">Separate panels compare median latency in seconds and total token usage in tens of thousands for the baseline and governed conditions.</desc>',
+        '<desc id="desc">Separate panels compare median latency in seconds and total token usage for the baseline and governed conditions. Token values are totals expressed in units of 10,000 tokens.</desc>',
         f'<rect width="100%" height="100%" fill="{BACKGROUND}"/>',
         text(
             30,
@@ -77,18 +84,24 @@ def render_operational_indicators(
         text(
             30,
             79,
-            "Panels use independent scales; compare conditions within each panel",
+            "Panels use independent scales; conditions are compared within each panel",
             font_family=FONT_FAMILY,
             font_size="17",
             fill=MUTED_TEXT,
         ),
     ]
     panels = (
-        (30, "Median latency (seconds)", latency_values, "s"),
-        (520, "Total tokens (per 10,000)", token_values, ""),
+        (30, "Median latency (seconds)", latency_values, "s", None),
+        (
+            520,
+            "Total token usage (x10,000-tokens)",
+            token_values,
+            "",
+            token_note,
+        ),
     )
-    for panel_x, title, values, suffix in panels:
-        _add_panel(parts, panel_x, title, values, suffix)
+    for panel_x, title, values, suffix, note in panels:
+        _add_panel(parts, panel_x, title, values, suffix, note)
     write_svg(target, parts)
 
 
@@ -98,6 +111,7 @@ def _add_panel(
     title: str,
     values: dict[Condition, float],
     suffix: str,
+    note: str | None,
 ) -> None:
     """Append one independently scaled operational comparison panel."""
     parts.append(f'<rect x="{panel_x}" y="105" width="450" height="240" rx="8" fill="{ROW_BAND}"/>')
@@ -112,9 +126,20 @@ def _add_panel(
             fill=SECONDARY_TEXT,
         )
     )
+    if note:
+        parts.append(
+            text(
+                panel_x + 20,
+                162,
+                note,
+                font_family=FONT_FAMILY,
+                font_size="13",
+                fill=MUTED_TEXT,
+            )
+        )
     maximum = max(values.values())
     for index, condition in enumerate(CONDITIONS):
-        y = 166 + index * 77
+        y = 174 + index * 77
         value = values[condition]
         bar_width = 0 if maximum == 0 else value / maximum * BAR_WIDTH
         parts.extend(
