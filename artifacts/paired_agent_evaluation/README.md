@@ -1,10 +1,10 @@
 # Paired Agent Evaluation Artifacts
 
 This directory preserves the Phase 6 execution audit trail. The canonical sealed release is
-[`data/evaluation/paired_agent_evaluation/v2/`](../../data/evaluation/paired_agent_evaluation/v2/).
-The original
-[`v1`](../../data/evaluation/paired_agent_evaluation/v1/) release is preserved unchanged as
-superseded audit history; working artifacts here support inspection but do not replace v2.
+[`data/evaluation/paired_agent_evaluation/v3/`](../../data/evaluation/paired_agent_evaluation/v3/).
+The original [`v1`](../../data/evaluation/paired_agent_evaluation/v1/) and corrective
+[`v2`](../../data/evaluation/paired_agent_evaluation/v2/) releases are preserved unchanged as
+superseded audit history; working artifacts here support inspection but do not replace v3.
 
 ## Run status
 
@@ -25,5 +25,5 @@ superseded audit history; working artifacts here support inspection but do not r
   historical `run_validation_v1/` artifacts remain available for audit traceability.
 
 Do not infer final findings from the superseded validation run or intermediate workspaces. Use the
-[canonical sealed report](../../data/evaluation/paired_agent_evaluation/v2/report.html) for reported
+[canonical sealed report](../../data/evaluation/paired_agent_evaluation/v3/report.html) for reported
 results.
