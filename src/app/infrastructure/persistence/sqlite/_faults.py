@@ -1,4 +1,13 @@
-"""SQLite operations for deterministic case-scoped fault plans."""
+"""Persist deterministic, case-scoped tool-failure plans.
+
+One plan per (case_id, tool_name) holds a remaining-failure budget; upserting
+resets its consumed count. consume_fault decrements the budget and returns the
+1-based attempt number, so injected failures are reproducible per case.
+Core:
+    - set_fault_plan: replaces a plan for an existing case (KeyError otherwise).
+    - upsert_fault_plan: inserts or resets a plan in the current transaction.
+    - consume_fault: claims the next planned failure, if any.
+"""
 
 from __future__ import annotations
 

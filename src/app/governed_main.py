@@ -1,3 +1,12 @@
+"""Create the Phase 4 governed FastAPI application and its process-level instance.
+
+Extends the frozen Phase 3 substrate with workflow and audit persistence and
+the governed-workflow routes; composition details live on create_governed_app.
+Core:
+    - create_governed_app: validated application factory.
+    - app: module-level instance served by the ASGI server.
+"""
+
 from __future__ import annotations
 
 import logging

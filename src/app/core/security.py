@@ -1,4 +1,13 @@
-"""HTTP authentication, response hardening, and pseudonymous model identifiers."""
+"""Authenticate API callers, harden HTTP responses, and pseudonymize requesters.
+
+API keys are compared in constant time and production fails closed (503)
+without one. Middleware rejects bad Content-Length early and sets defensive
+headers. Requester IDs become HMAC-SHA256 pseudonyms before reaching the model.
+Core:
+    - require_api_key: FastAPI dependency enforcing X-API-Key.
+    - stable_safety_identifier: keyed pseudonym for the provider safety ID.
+    - security_middleware: request-size guard and response security headers.
+"""
 
 import hashlib
 import hmac

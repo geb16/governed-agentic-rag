@@ -78,11 +78,15 @@ class RiskCheckingStage:
         classification: ClassificationResult,
     ) -> None:
         """Apply security, completeness, and confidence rules to classification."""
-        if classification.security_category:
+        recognized_attack = (
+            classification.security_category is not None
+            or classification.intent == TaskIntent.SECURITY_ATTACK
+        )
+        if recognized_attack:
             builder.add(
                 "untrusted_instruction_attack",
                 RiskLevel.CRITICAL,
-                "The request was blocked by deterministic prompt-security screening.",
+                "The request was classified as a security attack.",
                 mappings=["OWASP-Agentic-ASI01", "NIST-AI-600-1"],
             )
             builder.deny = True

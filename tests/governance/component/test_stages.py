@@ -241,6 +241,22 @@ def test_stage_4_denies_an_unavailable_proposal() -> None:
     assert [flag.code for flag in result.flags] == ["proposal_unavailable"]
 
 
+def test_stage_4_denies_a_model_classified_security_attack() -> None:
+    """Never convert a recognized credential attack into human approval."""
+
+    result = RiskCheckingStage().run(
+        _classification(
+            intent=TaskIntent.SECURITY_ATTACK,
+            task_type=TaskType.UNSUPPORTED,
+            sensitivity=Sensitivity.CRITICAL,
+        ),
+        _tool_proposal("ticket_lookup", {"ticket_id": "TKT-1001"}),
+    )
+
+    assert result.deny is True
+    assert "untrusted_instruction_attack" in {flag.code for flag in result.flags}
+
+
 def test_stage_4_clarifies_incomplete_or_low_confidence_state_changes() -> None:
     """Prevent uncertain state-changing requests from proceeding automatically."""
 

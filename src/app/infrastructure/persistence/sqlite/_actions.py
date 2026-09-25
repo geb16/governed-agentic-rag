@@ -1,4 +1,12 @@
-"""SQLite operations for idempotent simulated support actions."""
+"""Persist idempotent simulated refunds and human-review requests.
+
+Each action is keyed by (case_id, idempotency_key): a repeat returns the stored
+record without writing, and an unknown ticket returns None. Results are
+(record, created) tuples; statuses are simulated and nothing leaves SQLite.
+Core:
+    - issue_refund: creates or replays a simulated refund.
+    - request_human_review: creates or replays a pending review request.
+"""
 
 from __future__ import annotations
 

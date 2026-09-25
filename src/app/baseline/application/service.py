@@ -1,4 +1,12 @@
-"""Application service coordinating validation, retrieval, and bounded turns."""
+"""Orchestrate one bounded baseline invocation through application ports.
+
+Assigns a trace ID, checks the synthetic case exists, screens the query,
+retrieves evidence, and delegates the model/tool loop to BaselineTurnRunner.
+Unexpected errors are logged and mapped to a stable failed response. Stateless
+across calls; per-request data lives in InvocationState.
+Core:
+    - BaselineAgentService: implementation of the BaselineUseCase port.
+"""
 
 from __future__ import annotations
 

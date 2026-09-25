@@ -1,4 +1,11 @@
-"""Construction of consistent public responses across baseline exit paths."""
+"""Build consistent public responses across every baseline exit path.
+
+Single owner of the BaselineResponse contract: stamps adapter metadata
+(retrieval backend, model name) and a UTC timestamp so completed, refused,
+and failed paths stay uniform.
+Core:
+    - BaselineResponseFactory: creates fully populated BaselineResponse objects.
+"""
 
 from __future__ import annotations
 
