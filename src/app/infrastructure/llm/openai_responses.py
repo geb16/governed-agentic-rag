@@ -1,4 +1,13 @@
-"""OpenAI Responses API adapter for the provider-neutral model gateway."""
+"""Adapt the OpenAI Responses API to the provider-neutral model gateway.
+
+Each turn is one unstored (store=False) responses.parse call with allowlisted
+tools, at most one sequential tool call, AgentDraft structured output, and a
+pseudonymous safety identifier. Output maps to a ModelTurn; tool turns also
+carry continuation items stripped of SDK-only fields for replay.
+Core:
+    - OpenAIResponsesModel: ModelGateway implementation.
+    - serialize_continuation_item: makes SDK output items valid replay input.
+"""
 
 from __future__ import annotations
 
