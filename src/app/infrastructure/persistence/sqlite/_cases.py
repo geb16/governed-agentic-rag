@@ -26,11 +26,16 @@ def create_case(
     """Persist one complete case fixture using the caller-owned transaction."""
 
     if replace:
-        # Refunds and escalations reference tickets without ON DELETE CASCADE, 
+        # Refunds and escalations reference tickets without ON DELETE CASCADE,
         # so they must be removed before the case cascade deletes those tickets.
         connection.execute(
-            "DELETE FROM escalations WHERE case_id = ?", (fixture.case_id,))
-        connection.execute("DELETE FROM refunds WHERE case_id = ?", (fixture.case_id,))
+            "DELETE FROM escalations WHERE case_id = ?",
+            (fixture.case_id,),
+        )
+        connection.execute(
+            "DELETE FROM refunds WHERE case_id = ?",
+            (fixture.case_id,),
+        )
         connection.execute(
             "DELETE FROM synthetic_cases WHERE case_id = ?",
             (fixture.case_id,),
