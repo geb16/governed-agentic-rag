@@ -1,38 +1,30 @@
-# Test architecture
+# Phase 3 baseline tests
 
-Executable tests are grouped first by experimental ownership and then by scope. Baseline
-architecture checks live with the Phase 3 tests whose source boundaries they protect.
+Executable contracts for the Phase 3 conventional agentic RAG baseline (`src/app/baseline`,
+`src/app/baseline_main.py`, and `scripts/baseline`). Every test is deterministic and offline: model
+calls use scripted doubles, retrieval is local, and SQLite state lives in a per-test `tmp_path`.
+
+These files are part of the Phase 3 freeze scope. Any change must be followed by a deliberate
+`scripts/baseline/verify_freeze.py --write`.
+
+## Layout
 
 ```text
-tests/
-|-- baseline/
-|   |-- architecture/  Static Phase 3 dependency and module-boundary assertions
-|   |-- integration/   Baseline API and cross-component behaviour
-|   |-- unit/          Isolated Phase 3 baseline behaviour
-|   `-- support.py     Baseline-owned test doubles and composition helpers
-|-- shared/
-|   |-- unit/          Configuration and security primitives
-|   `-- integration/   Knowledge, tools, retrieval, and persistence
-`-- conftest.py        Governance-neutral fixtures only
+tests/baseline/
+|-- architecture/   Static import and dependency-direction constraints
+|-- integration/    HTTP, SQLite, retrieval, and cross-component behaviour with real local adapters
+|-- unit/           Isolated units with in-file fakes and no persistent boundary
+`-- support.py      Baseline-owned test doubles and composition helpers
 ```
 
-Scope names have the following consistent meanings:
+Place a new test in the narrowest scope that expresses its contract. Shared fixtures come from
+`tests/conftest.py` and are requested by name; never import `conftest.py`.
 
-- `unit`: one isolated unit with no external service or persistent boundary;
-- `component`: one bounded subsystem with controlled local collaborators, when that intermediate
-  scope is needed;
-- `integration`: API, SQLite, retrieval, workflow, or cross-component behaviour;
-- `architecture`: source-structure and dependency-direction constraints.
-
-Test modules must not import `conftest.py`. Shared fixtures are requested by name;
-explicit baseline builders and doubles belong in `tests.baseline.support`. New tests must be placed
-in the narrowest ownership and scope directory that expresses their contract.
-
-Run the complete suite or one explicit boundary:
+## Running
 
 ```console
-uv run pytest
 uv run pytest tests/baseline
-uv run pytest tests/shared
-uv run pytest tests/baseline/architecture
+uv run python scripts/baseline/run_smoke_tests.py
 ```
+The smoke script runs `test_health.py`, `test_api.py`, and one grounded-agent test from this
+directory, plus the frozen tool-registry check in `tests/shared`.
