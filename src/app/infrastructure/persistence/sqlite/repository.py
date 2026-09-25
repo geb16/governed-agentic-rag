@@ -1,4 +1,11 @@
-"""SQLite adapter for case-partitioned synthetic support-domain state."""
+"""Implement the SyntheticRepository port on case-partitioned SQLite.
+
+Facade over the _cases, _records, _actions, and _faults modules. Every method
+opens its own connection; state-changing tool operations use BEGIN IMMEDIATE
+so concurrent thread-pool requests serialize their writes.
+Core:
+    - SqliteSyntheticRepository: ticket, account, action, and fault-plan state.
+"""
 
 from __future__ import annotations
 
