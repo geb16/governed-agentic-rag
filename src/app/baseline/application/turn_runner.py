@@ -6,10 +6,6 @@ tool-call limit) or a final draft that must pass the output guardrail;
 exhausting the turn limit yields a failed response.
 Core:
     - BaselineTurnRunner: loop, tool dispatch, and refusal/failure responses.
-References:
-    [1] S. Yao et al., "ReAct: Synergizing Reasoning and Acting in Language
-        Models," ICLR 2023. https://arxiv.org/abs/2210.03629
-    [2] OpenAI, "Function calling." https://platform.openai.com/docs/guides/function-calling
 """
 
 from __future__ import annotations

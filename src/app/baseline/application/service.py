@@ -6,8 +6,6 @@ Unexpected errors are logged and mapped to a stable failed response. Stateless
 across calls; per-request data lives in InvocationState.
 Core:
     - BaselineAgentService: implementation of the BaselineUseCase port.
-References:
-    [1] A. Cockburn, "Hexagonal Architecture." https://alistair.cockburn.us/hexagonal-architecture/
 """
 
 from __future__ import annotations

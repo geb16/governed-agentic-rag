@@ -7,8 +7,6 @@ Core:
     - BaselineRequest, BaselineResponse: public invocation contract.
     - ToolCallRecord: proposal, outcome, timing, and evidence of one tool call.
     - Usage, SafetyResult: token counts and the deterministic safety verdict.
-References:
-    [1] Pydantic, "Models." https://docs.pydantic.dev/latest/concepts/models/
 """
 
 from __future__ import annotations

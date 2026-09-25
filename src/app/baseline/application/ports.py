@@ -7,9 +7,6 @@ Core:
     - CaseReader, RetrievalGateway, ModelGateway, ToolGateway: outbound ports.
     - InputSafetyPolicy, OutputSafetyPolicy: guardrail ports.
     - SafetyDecision, ToolExecution: value objects crossing the boundaries.
-References:
-    [1] A. Cockburn, "Hexagonal Architecture." https://alistair.cockburn.us/hexagonal-architecture/
-    [2] PEP 544, "Protocols: Structural subtyping." https://peps.python.org/pep-0544/
 """
 
 from __future__ import annotations

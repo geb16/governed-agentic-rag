@@ -8,8 +8,6 @@ Core:
     - ExperimentRunManifest: immutable experiment identity.
     - build_experiment_manifest: derives a manifest from settings and tools.
     - record_experiment_manifest: writes once and verifies existing manifests.
-References:
-    [1] Python, "importlib.metadata." https://docs.python.org/3/library/importlib.metadata.html
 """
 
 from __future__ import annotations

@@ -6,9 +6,6 @@ compact deterministic JSON labelled as data, separating them from instructions.
 Core:
     - SYSTEM_PROMPT: frozen baseline instructions.
     - build_user_prompt: serializes the request and chunks as untrusted data.
-References:
-    [1] K. Hines et al., "Defending Against Indirect Prompt Injection Attacks
-        With Spotlighting," 2024. https://arxiv.org/abs/2403.14720
 """
 
 from __future__ import annotations

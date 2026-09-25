@@ -7,8 +7,6 @@ record an immutable run manifest. Side effects: database and manifest writes.
 Core:
     - ApplicationRuntime: frozen bundle of lifespan adapters.
     - build_runtime: wires and returns the ApplicationRuntime.
-References:
-    [1] M. Seemann, "Composition Root." https://blog.ploeh.dk/2011/07/28/CompositionRoot/
 """
 
 from __future__ import annotations

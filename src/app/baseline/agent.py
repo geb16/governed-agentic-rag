@@ -5,8 +5,6 @@ default guardrails, and delegates all orchestration to BaselineAgentService.
 Adapter attributes stay public so existing callers keep working unchanged.
 Core:
     - BaselineAgent: backward-compatible facade over BaselineAgentService.
-References:
-    [1] E. Gamma et al., "Design Patterns," Addison-Wesley, 1994 (Facade).
 """
 
 from __future__ import annotations
