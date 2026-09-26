@@ -12,9 +12,9 @@ References:
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Self
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from paired_agent_evaluation.domain.executions import StrictModel
 
@@ -67,8 +67,9 @@ class ReleaseManifest(StrictModel):
 class HarnessFreezeManifest(StrictModel):
     """Binds a reviewed harness to validation evidence and one test run ID."""
 
-    schema_version: Literal[1] = 1
+    schema_version: Literal[2] = 2
     freeze_id: str = Field(pattern=r"^paired-agent-evaluation-harness-v[1-9][0-9]*$")
+    release_version: str = Field(pattern=r"^v[1-9][0-9]*$")
     preregistered_test_run_id: str = Field(pattern=r"^run_[a-zA-Z0-9_-]+$")
     validation_run_id: str = Field(pattern=r"^run_[a-zA-Z0-9_-]+$")
     validation_run_manifest_sha256: Sha256
@@ -86,9 +87,17 @@ class HarnessFreezeManifest(StrictModel):
 class TestExecutionClaim(StrictModel):
     """Records the irreversible claim made before invoking the test provider."""
 
-    schema_version: Literal[1] = 1
+    schema_version: Literal[1, 2] = 2
     test_run_id: str = Field(pattern=r"^run_[a-zA-Z0-9_-]+$")
     harness_freeze_id: str
     harness_aggregate_sha256: Sha256
     validation_run_id: str = Field(pattern=r"^run_[a-zA-Z0-9_-]+$")
+    release_version: str | None = Field(default=None, pattern=r"^v[1-9][0-9]*$")
     claimed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+    @model_validator(mode="after")
+    def require_versioned_release(self) -> Self:
+        """Require new claims to bind the intended release destination."""
+        if self.schema_version == 2 and self.release_version is None:
+            raise ValueError("schema-v2 test claims require a release version")
+        return self
