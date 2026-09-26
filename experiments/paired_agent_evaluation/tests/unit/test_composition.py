@@ -38,7 +38,8 @@ def isolated_paths(tmp_path: Path) -> EvaluationPaths:
         repository=real.repository,
         project=real.project,
         artifacts=tmp_path / "artifacts",
-        release=tmp_path / "release",
+        releases=tmp_path / "releases",
+        harnesses=tmp_path / "harnesses",
         configs=real.configs,
     )
 

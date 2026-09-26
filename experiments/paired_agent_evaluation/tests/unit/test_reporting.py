@@ -52,7 +52,8 @@ def test_score_run_persists_derived_outputs_report_and_terminal_status(
         repository=tmp_path,
         project=tmp_path / "project",
         artifacts=tmp_path / "artifacts",
-        release=tmp_path / "release",
+        releases=tmp_path / "releases",
+        harnesses=tmp_path / "harnesses",
         configs=tmp_path / "configs",
     )
     run_root = paths.run_root("run_reporting")
