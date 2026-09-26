@@ -19,7 +19,8 @@ class EvaluationPaths:
     repository: Path
     project: Path
     artifacts: Path
-    release: Path
+    releases: Path
+    harnesses: Path
     configs: Path
 
     @classmethod
@@ -31,7 +32,8 @@ class EvaluationPaths:
             repository=repository,
             project=project,
             artifacts=repository / "artifacts" / "paired_agent_evaluation",
-            release=repository / "data" / "evaluation" / "paired_agent_evaluation" / "v1",
+            releases=repository / "data" / "evaluation" / "paired_agent_evaluation",
+            harnesses=repository / "docs" / "phase-6-experiments",
             configs=project / "config",
         )
 
@@ -48,7 +50,19 @@ class EvaluationPaths:
         """Returns a validated versioned release directory."""
         if re.fullmatch(r"v[1-9][0-9]*", version) is None:
             raise ValueError("release version must match v[1-9][0-9]*")
-        return self.release.parent / version
+        return self.releases / version
+
+    def harness_manifest(self, harness_version: int) -> Path:
+        """Return the manifest path for a positive harness version."""
+        if harness_version < 1:
+            raise ValueError("harness version must be a positive integer")
+        return self.harnesses / f"harness-freeze-manifest-v{harness_version}.json"
+
+    def test_claim(self, harness_version: int) -> Path:
+        """Return the one-time claim path for a positive harness version."""
+        if harness_version < 1:
+            raise ValueError("harness version must be a positive integer")
+        return self.releases / f"test-execution-claim-v{harness_version}.json"
 
 
 def validate_run_id(run_id: str) -> None:
