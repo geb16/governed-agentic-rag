@@ -74,7 +74,7 @@ Verify the canonical sealed release independently:
 
 ```bash
 uv run --project experiments/paired_agent_evaluation \
-  python experiments/paired_agent_evaluation/scripts/verify_release.py
+  python experiments/paired_agent_evaluation/scripts/verify_release.py --release-version v3
 ```
 
 The original v1 release and corrective v2 release remain preserved as audit history. Corrective
