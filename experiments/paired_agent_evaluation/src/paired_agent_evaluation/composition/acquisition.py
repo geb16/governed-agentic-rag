@@ -77,8 +77,8 @@ def acquire(*, run_id: str, split: DatasetSplit) -> ExperimentManifest:
     return _acquire(run_id=run_id, split=split)
 
 
-def acquire_preregistered_test(*, run_id: str) -> ExperimentManifest:
+def acquire_preregistered_test(*, run_id: str, harness_version: int) -> ExperimentManifest:
     """Consumes the preregistered test claim, then acquires the test split."""
     paths = EvaluationPaths.discover()
-    claim = claim_test_execution(paths, run_id=run_id)
+    claim = claim_test_execution(paths, harness_version=harness_version, run_id=run_id)
     return _acquire(run_id=run_id, split=DatasetSplit.TEST, test_claim=claim)
