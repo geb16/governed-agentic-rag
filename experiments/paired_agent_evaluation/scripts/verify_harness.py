@@ -6,8 +6,9 @@ rejects drift from that record. Readiness and filesystem errors produce a
 nonzero exit status.
 
 Usage:
-    python verify_harness.py [--frozen | --write --validation-run-id ID
-        --test-run-id ID]
+    python verify_harness.py --frozen --harness-version VERSION
+    python verify_harness.py --write --harness-version VERSION
+        --release-version VERSION --validation-run-id ID --test-run-id ID
 """
 
 from __future__ import annotations
@@ -29,29 +30,44 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Verify readiness or freeze the Phase 6 harness before test acquisition."
     )
-    parser.add_argument("--write", action="store_true", help="Write the preregistered freeze")
-    parser.add_argument("--frozen", action="store_true", help="Require and verify the freeze")
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument("--write", action="store_true", help="Write the preregistered freeze")
+    modes.add_argument("--frozen", action="store_true", help="Require and verify the freeze")
+    parser.add_argument("--harness-version", type=int)
+    parser.add_argument("--release-version")
     parser.add_argument("--validation-run-id")
     parser.add_argument("--test-run-id")
     args = parser.parse_args()
-    if args.write and args.frozen:
-        parser.error("--write and --frozen are mutually exclusive")
-    if args.write and (not args.validation_run_id or not args.test_run_id):
-        parser.error("--write requires --validation-run-id and --test-run-id")
-    if not args.write and (args.validation_run_id or args.test_run_id):
-        parser.error("run identifiers are accepted only with --write")
+    if args.write and (
+        not args.harness_version
+        or not args.release_version
+        or not args.validation_run_id
+        or not args.test_run_id
+    ):
+        parser.error(
+            "--write requires --harness-version, --release-version, "
+            "--validation-run-id, and --test-run-id"
+        )
+    if args.frozen and not args.harness_version:
+        parser.error("--frozen requires --harness-version")
+    if not args.write and (args.release_version or args.validation_run_id or args.test_run_id):
+        parser.error("release and run identifiers are accepted only with --write")
+    if not (args.write or args.frozen) and args.harness_version:
+        parser.error("--harness-version requires --write or --frozen")
 
     paths = EvaluationPaths.discover()
     try:
         if args.write:
             manifest = write_harness_freeze(
                 paths,
+                harness_version=int(args.harness_version),
+                release_version=str(args.release_version),
                 validation_run_id=str(args.validation_run_id),
                 test_run_id=str(args.test_run_id),
             )
             print(f"Wrote {manifest.freeze_id}: {manifest.aggregate_sha256}")
         elif args.frozen:
-            manifest = verify_harness_freeze(paths)
+            manifest = verify_harness_freeze(paths, harness_version=int(args.harness_version))
             print(f"Verified {manifest.freeze_id}: {manifest.aggregate_sha256}")
         else:
             verify_harness_readiness(paths)
