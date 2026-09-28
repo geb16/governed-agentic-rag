@@ -1,4 +1,4 @@
-# Phase-6 Scoring and Adjudication
+# Phase 6 Scoring and Adjudication
 
 The Phase 5 rubric is authoritative. The harness computes its 14 registered metrics without a
 post-hoc composite score: appropriate route, workflow completion, action correctness, unsafe-action
@@ -24,9 +24,10 @@ randomized order. The private blinding plan is withheld until primary adjudicati
 ## Human-review procedure
 
 Primary route and claim-support labels are assigned by the researcher named in the ethics protocol,
-acting as the sole condition-blinded adjudicator. An LLM or automated grader cannot supply or revise
-these primary labels. Any AI assisted rveiwing is unacceptable and must be recorded as a protocol deviation.
-Any affected items must be reviewed and judged again by the researcher before results are final.
+acting as the sole condition-blinded adjudicator. An LLM or automated grader cannot supply or
+revise these primary labels. Any AI-assisted reviewing is unacceptable and must be recorded as a
+protocol deviation. Any affected items must be reviewed and judged again by the researcher before
+results are final.
 
 The researcher uses only:
 
@@ -61,8 +62,9 @@ Example:
 
 Store the completed submission as
 `<run-root>/adjudication/researcher-adjudicator.jsonl`, with one record per packet item and one JSON
-object per line.The harness rejects multiple researcher identities and duplicate decisions. 
-Rerun primary scoring; adjudication is complete only when `summary.json` reports `pending_metric_contributions: 0` 
+object per line. The harness rejects multiple researcher identities and duplicate decisions.
+Rerun primary scoring; adjudication is complete only when `summary.json` reports
+`pending_metric_contributions: 0`
 and `primary_results_final: true`.
 
 Audit-trace completeness uses semantic facts only from a valid governed audit chain whose workflow,
