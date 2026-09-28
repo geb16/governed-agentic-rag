@@ -1,0 +1,32 @@
+{
+  "accepted_observations": 480,
+  "blinding_plan_sha256": "97279c718f8515fe0d9bf80526a2d07cf37041c1f1b196a9ef4a0dddc40a1476",
+  "completed_at": "2026-09-28T20:02:17.260148Z",
+  "configuration_sha256": "d74df69851f5a599b52c181c4b849129cebe8bbae4a5cdd73ea2da06706afa90",
+  "created_at": "2026-09-28T10:55:17.905249Z",
+  "expected_observations": 480,
+  "invalid_observations": 0,
+  "model_identifier": "gpt-5.6",
+  "package_versions": {
+    "governed-agentic-rag": "0.2.2",
+    "governed-agentic-rag-paired-evaluation": "0.1.0",
+    "ragas": "0.4.3"
+  },
+  "phase3_aggregate_sha256": "199ed67020eac95de5a67b53e84b2dd4423beedd4c20ecf8e61b136071f14552",
+  "phase3_freeze_id": "phase3-baseline-v5",
+  "phase4_aggregate_sha256": "be37ab0161b653465b36f92f117ddbc36bfd003585a9e6bd2b942e5d3d3483e1",
+  "phase4_freeze_id": "phase4-governance-v7",
+  "phase5_aggregate_sha256": "a82cc3caaa307e50a3bc6b6e4a5fc56951b6e292fd47c7b185daccc02f29eab7",
+  "phase5_freeze_id": "phase5-evaluation-v6",
+  "qdrant_collection": "phase3_enterprise_kb",
+  "qdrant_point_count": 4,
+  "qdrant_snapshot_sha256": "634794640da528584e811678aaaca0b29a345d4f424c64134331b4f4fd5f4dba",
+  "retrieval_backend": "qdrant",
+  "run_id": "run_test_v2",
+  "runtime_settings_sha256": "7da66101bf18b730f85ee83e29209e8257f5698332abec36e4395c1a80cf61f0",
+  "schedule_sha256": "529848dfdbe5d3a3a2dafc0ef16477b8979f9cc8ea04d726fc599b6632e1f676",
+  "schema_version": 2,
+  "split": "test",
+  "status": "scored",
+  "tool_schema_sha256": "1ac22c9dcd44ad8f46156136c4075407ade87f9da6eca56f3acfafd9935871f5"
+}
