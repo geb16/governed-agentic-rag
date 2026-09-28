@@ -1,0 +1,25 @@
+{
+  "aggregate_definition": "sha256(canonical_json(manifest_without_aggregate_sha256))",
+  "aggregate_sha256": "521591c4e40a0ccbca5ceeaff45f05850d1072080812f43a043a8752f0cf3afe",
+  "documentation_files": {
+    "artifacts/paired_agent_evaluation/README.md": "37a3c0ed480a78b7c0c71527ab187c81bd6e73a4b69e6e344918987017bbb278",
+    "docs/phase-6-experiments/architecture.md": "e197ea6d872e5d0b716fdbada64f86486e5f30883b31e1528023d497cd6d26db",
+    "docs/phase-6-experiments/dependency-and-composition.svg": "7ef8547c3c918d43964873960f0882efe1d1cab3634d8237ef66dc6c1490e95f",
+    "docs/phase-6-experiments/experimental-protocol.md": "fcf30f53d2573906e109bbd5e7fcb921c7b6527a527975d8eaa749240e838a8f",
+    "docs/phase-6-experiments/limitations.md": "c04140e8a2140c946ce10fb61301729644a30559797f1dbe09d98d1ae005f939",
+    "docs/phase-6-experiments/results.md": "1990efba544417bd038d06763b1f0cf5f34c09341cc45485237f0ffa07107ef7",
+    "docs/phase-6-experiments/scoring-and-adjudication.md": "98e0615eb2f059784c90d5f928d2fbeed11b8c219e70311c1402be8dd3fdd4fa",
+    "experiments/paired_agent_evaluation/README.md": "f16df7e41435d5b1d3c2524ded106480cd6996b2033fd34ca97ac10c7781c89e"
+  },
+  "documentation_id": "phase6-documentation-v4.1",
+  "harness_aggregate_sha256": "587615d92fe1b1596bdee2af48e0d65628e4e77a5345fb3ff1fda71e2bd75efb",
+  "harness_freeze_id": "paired-agent-evaluation-harness-v2",
+  "harness_manifest_sha256": "c4a3edecbb1551fd545de2e205bb2948bf2e830131213ea05482f46500f32005",
+  "release_aggregate_sha256": "017623781efbb1b37b5aec84cbe48f14c3b6bd8d9997a223c23a22f35eccfc10",
+  "release_id": "paired-agent-evaluation-v4",
+  "release_manifest_sha256": "b3dd1fd42b45195f96acfb4251f38884f9eea500062de89ea133e78ceb650140",
+  "schema_version": 1,
+  "scope": "Post-release narrative documentation only; sealed release v4 and experimental artifacts are excluded.",
+  "scientific_tag": "phase6-experimental-evaluation-v4",
+  "scientific_tag_commit": "944bc5a8c916ab37dcc9cfc0704c2dce0672be78"
+}

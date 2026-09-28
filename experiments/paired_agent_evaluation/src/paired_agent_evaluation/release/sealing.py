@@ -93,7 +93,7 @@ def seal_run(*, run_root: Path, release_root: Path) -> ReleaseManifest:
 
     Args:
         run_root: Completed test-run directory containing the closed artifact set.
-        release_root: Empty destination for the sanitized v1 release.
+        release_root: Empty destination matching the preregistered release version.
 
     Returns:
         The persisted content-addressed release manifest.
@@ -118,13 +118,15 @@ def seal_run(*, run_root: Path, release_root: Path) -> ReleaseManifest:
     )
     if claim.test_run_id != run_manifest.run_id:
         raise ValueError("Test execution claim does not match the sealed run")
+    if claim.release_version is None or claim.release_version != release_root.name:
+        raise ValueError("Release destination does not match the preregistered version")
     verify_primary_artifacts(run_root, run_manifest)
     _prepare_release_directory(release_root)
     for name in RELEASE_FILES:
         write_sanitized(run_root / name, release_root / name)
     return _write_release_manifest(
         release_root=release_root,
-        release_id="paired-agent-evaluation-v1",
+        release_id=f"paired-agent-evaluation-{claim.release_version}",
         run_id=run_manifest.run_id,
         source_run_manifest_sha256=sha256_file(run_root / "run-manifest.json"),
         filenames=RELEASE_FILES,

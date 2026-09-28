@@ -1,0 +1,15 @@
+{
+  "changed_files": [
+    "estimates.json",
+    "normalized.jsonl",
+    "paired-differences.json",
+    "report.html",
+    "scores.jsonl"
+  ],
+  "correction_id": "baseline-human-review-route-v1",
+  "schema_version": 1,
+  "source_run_manifest_sha256": "85782601e8265881954e76cbfd67458e62e40925c51756f15de722c4c5dfbbc8",
+  "summary": "Preserve a successful baseline human-review route when later final-answer citation validation records a terminal safety failure.",
+  "supersedes_aggregate_sha256": "9c8ff4a069535be78c1b76e99e28d9f71255d03ff9bec802c40fdf0b8853115b",
+  "supersedes_release_id": "paired-agent-evaluation-v2"
+}

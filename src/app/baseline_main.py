@@ -1,4 +1,15 @@
-"""FastAPI application factory and process-level application instance."""
+"""Create the FastAPI application and the process-level app instance.
+
+create_app builds the Phase 3 HTTP service from validated settings: JSON
+logging, host allowlisting (outermost middleware), request-size checks with
+security headers, and health and baseline routers under the API prefix.
+Concrete adapters are composed by build_runtime inside the lifespan and
+attached to app.state, so each instance owns its resources and tests can
+inject isolated settings. Interactive docs and OpenAPI are off in production.
+Core:
+    - create_app: application factory with lifespan-scoped runtime wiring.
+    - app: module-level instance served by the ASGI server.
+"""
 
 from __future__ import annotations
 

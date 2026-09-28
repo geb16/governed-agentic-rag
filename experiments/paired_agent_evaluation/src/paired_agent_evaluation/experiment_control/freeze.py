@@ -23,10 +23,8 @@ from paired_agent_evaluation.experiment_control.identity import (
     source_hashes,
 )
 from paired_agent_evaluation.experiment_control.policy import (
-    HARNESS_FREEZE_ID,
-    HARNESS_MANIFEST,
     RELEASE_PLACEHOLDERS,
-    TEST_EXECUTION_CLAIM,
+    harness_freeze_id,
 )
 from paired_agent_evaluation.experiment_control.readiness import verify_harness_readiness
 
@@ -34,6 +32,8 @@ from paired_agent_evaluation.experiment_control.readiness import verify_harness_
 def write_harness_freeze(
     paths: EvaluationControlPaths,
     *,
+    harness_version: int,
+    release_version: str,
     validation_run_id: str,
     test_run_id: str,
 ) -> HarnessFreezeManifest:
@@ -48,11 +48,14 @@ def write_harness_freeze(
     """
     if validation_run_id == test_run_id:
         raise ValueError("Validation and test runs require distinct identifiers")
-    if (paths.repository / TEST_EXECUTION_CLAIM).exists():
+    freeze_id = harness_freeze_id(harness_version)
+    claim_path = paths.test_claim(harness_version)
+    release_root = paths.release_root(release_version)
+    if claim_path.exists():
         raise ValueError("Test execution has already been claimed; harness cannot be refrozen")
     if paths.run_root(test_run_id).exists():
         raise ValueError("Preregistered test run directory already exists")
-    if directory_has_payload(paths.release, ignored_names=RELEASE_PLACEHOLDERS):
+    if directory_has_payload(release_root, ignored_names=RELEASE_PLACEHOLDERS):
         raise ValueError("A sealed test release already exists")
     verify_harness_readiness(paths)
     validation_manifest_hash, validation_summary_hash = completed_validation(
@@ -60,7 +63,8 @@ def write_harness_freeze(
         validation_run_id,
     )
     manifest = HarnessFreezeManifest(
-        freeze_id=HARNESS_FREEZE_ID,
+        freeze_id=freeze_id,
+        release_version=release_version,
         preregistered_test_run_id=test_run_id,
         validation_run_id=validation_run_id,
         validation_run_manifest_sha256=validation_manifest_hash,
@@ -72,11 +76,15 @@ def write_harness_freeze(
     manifest = manifest.model_copy(
         update={"aggregate_sha256": sha256_json(manifest_payload(manifest))}
     )
-    atomic_json(paths.repository / HARNESS_MANIFEST, manifest.model_dump(mode="json"))
+    atomic_json(paths.harness_manifest(harness_version), manifest.model_dump(mode="json"))
     return manifest
 
 
-def verify_harness_freeze(paths: EvaluationControlPaths) -> HarnessFreezeManifest:
+def verify_harness_freeze(
+    paths: EvaluationControlPaths,
+    *,
+    harness_version: int,
+) -> HarnessFreezeManifest:
     """Verifies the harness manifest and every identity bound by its freeze.
 
     Returns:
@@ -86,11 +94,12 @@ def verify_harness_freeze(paths: EvaluationControlPaths) -> HarnessFreezeManifes
         ValueError: If the harness is absent or any frozen identity drifted.
     """
     verify_harness_readiness(paths)
-    manifest_path = paths.repository / HARNESS_MANIFEST
+    expected_freeze_id = harness_freeze_id(harness_version)
+    manifest_path = paths.harness_manifest(harness_version)
     if not manifest_path.is_file():
         raise ValueError("Phase 6 harness is not frozen and preregistered")
     manifest = HarnessFreezeManifest.model_validate_json(manifest_path.read_text(encoding="utf-8"))
-    if manifest.freeze_id != HARNESS_FREEZE_ID:
+    if manifest.freeze_id != expected_freeze_id:
         raise ValueError("Unexpected Phase 6 harness freeze identity")
     if manifest.source_files != source_hashes(paths):
         raise ValueError("Phase 6 harness source files changed after preregistration")

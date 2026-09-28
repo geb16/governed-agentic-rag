@@ -1,4 +1,4 @@
-# Paired Agent Evaluation(Phase-6 Experimental Harness)
+# Paired Agent Evaluation (Phase 6 Experimental Harness)
 
 This isolated project compares the frozen conventional baseline and governance-aware workflow
 under identical Phase 5 cases, model, Qdrant collection, synthetic database fixture, simulated
@@ -9,12 +9,12 @@ documentation and docstrings. It is versioned independently of `src/app`. Valida
 harness defects, but the corrected harness must be frozen and bound to one completed validation
 run and one preregistered test run before the test split can execute. It also verifies the Phase 3,
 4, and 5 freeze identities it depends on; see
-[architecture](../../docs/architecture/phase6_evaluation_architecture.md) for the full design and
+[architecture](../../docs/phase-6-experiments/architecture.md) for the full design and
 [limitations](../../docs/phase-6-experiments/limitations.md) for known compromises.
 
 Mutable run output is written to the gitignored `artifacts/paired_agent_evaluation/`. Only a
-completed, adjudicated, sanitized **test**-split run can be sealed. The original v1 release is
-preserved as superseded audit history; v2 is the canonical corrective release.
+completed, adjudicated, sanitized **test**-split run can be sealed. Releases v1–v3 are preserved as
+superseded audit history; v4 is the canonical release from harness v2.
 
 `prepare_run` creates a cryptographically random `blinding-plan.json` before acquisition and pins
 its digest in the run manifest. Reviewers receive only `review-packet.jsonl`, whose opaque IDs and
@@ -90,27 +90,27 @@ regenerate an inherited manifest from this project to force a pass.
 3. Acquire the validation split:
 
    ```bash
-   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/run_validation.py --run-id run_validation_v1
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/run_validation.py --run-id run_validation_v3
    ```
 
 4. Generate normalized results and the blinded review packet:
 
    ```bash
-   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_validation_v1
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_validation_v3
    ```
 
 5. The researcher named in the ethics protocol completes the condition-blinded, field-level
    procedure in
    [scoring and adjudication](../../docs/phase-6-experiments/scoring-and-adjudication.md). Neither an
-   LLM nor an automated grader can supply primary review-labels. `review-packet.jsonl` and 
-   the two cited guidance documents should only be used while adjudicating. 
+   LLM nor an automated grader can supply primary review labels. `review-packet.jsonl` and the two
+   cited guidance documents should be the only materials used while adjudicating.
    The run directory, condition mapping, or the comparative results should not be inspected.
 
    Confirm that the submission contains each packet `blinded_id` exactly once, then rerun primary
    scoring without inspecting the condition mapping:
 
    ```bash
-   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_validation_v1
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_validation_v3
    ```
 
    Continue only when `summary.json` records `pending_metric_contributions` as `0` and
@@ -118,7 +118,7 @@ regenerate an inherited manifest from this project to force a pass.
 6. Run secondary Ragas faithfulness only after the primary human labels are fixed:
 
    ```bash
-   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_validation_v1 --ragas
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_validation_v3 --ragas
    ```
 
 7. Correct harness defects found by validation without changing the frozen metric definitions. If
@@ -127,58 +127,61 @@ regenerate an inherited manifest from this project to force a pass.
    preregister its only permitted test run ID:
 
    ```bash
-   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_harness.py --write --validation-run-id run_validation_v1 --test-run-id run_test_v1
-   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_harness.py --frozen
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_harness.py --write --harness-version 2 --release-version v4 --validation-run-id run_validation_v3 --test-run-id run_test_v2
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_harness.py --frozen --harness-version 2
    ```
 
    Commit and independently review
-   `docs/phase-6-experiments/harness-freeze-manifest.json` before test execution. Then acquire the
+   `docs/phase-6-experiments/harness-freeze-manifest-v2.json` before test execution. Then acquire the
    untouched test split and generate its initial review packet:
 
    ```bash
-   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/run_test.py --run-id run_test_v1
-   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_test_v1
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/run_test.py --run-id run_test_v2 --harness-version 2
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_test_v2
    ```
 
    Complete the same condition-blinded researcher adjudication used for validation, then rerun
    primary scoring. The secondary Ragas analysis is run only after the `primary_results_final` is true.
 
    ```bash
-   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_test_v1
-   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_test_v1 --ragas
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_test_v2
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/score_results.py --run-id run_test_v2 --ragas
    ```
 
-8. Seal exactly one final test run. The original preregistered release was created with:
+8. Seal exactly one final test run into its preregistered release:
 
    ```bash
-   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_release.py --seal-run run_test_v1
-   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_release.py --release-version v1
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_release.py --seal-run run_test_v2 --release-version v4
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_release.py --release-version v4
    ```
 
    Sealing validates the exact scheduled observation identities and independently rederives every
    primary artifact from authoritative inputs. It fails if normalized results, review artifacts,
    scores, estimates, paired differences, or the summary were altered or became stale.
 
-   A post-release normalization defect was then corrected deterministically from the same immutable
-   test evidence. The resulting v2 release preserves v1 and records its exact derivation in
-   [`correction.json`](../../data/evaluation/paired_agent_evaluation/v2/correction.json). Acquisition,
-   raw observations, human adjudication, and Ragas grades were not repeated or modified. Verify the
-   canonical release with:
+   Two defects found after the original test were corrected deterministically from the same
+   immutable evidence. Corrective v2 projects baseline safety blocks into the terminal-error field.
+   Historical v3 preserves a completed baseline human-review route when later citation validation
+   blocks the final answer. Each corrective release records its immediate predecessor and changed
+   derivatives in `correction.json`; see the
+   [v3 record](../../data/evaluation/paired_agent_evaluation/v3/correction.json). Version 3 also
+   supplied the analysis that exposed the governance-escalation defect corrected before the fresh
+   harness-v2 validation and test execution that produced v4. Verify the canonical release with:
 
    ```bash
-   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_release.py
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_release.py --release-version v4
    ```
 
-   The default verification target is v2; pass `--release-version v1` to verify the superseded
-   original independently.
+   Every verification command requires an explicit release version; no ambient canonical version
+   is selected in code.
 
 The test split is not a tuning set. Never rerun accepted observations, manually replace model
 outputs, or alter labels after viewing comparative results. Each attempt is journaled before system
 execution; only an explicitly completed pre-acceptance failure can use the configured bounded retry.
 An abandoned started or accepted attempt fails closed and requires investigation instead of an
 automatic rerun. Immediately before provider access, `run_test.py` atomically creates
-`data/evaluation/paired_agent_evaluation/test-execution-claim.json`; its existence permanently
-blocks another local test acquisition. Preserve and commit that claim with the eventual release.
+`data/evaluation/paired_agent_evaluation/test-execution-claim-v2.json`; its existence permanently
+blocks another test acquisition for harness v2. Preserve and commit that claim with the release.
 
 ## Troubleshooting
 

@@ -62,10 +62,16 @@ def _baseline_route(
     response: dict[str, Any], attempts: list[ToolAttempt]
 ) -> tuple[ObservedRoute | None, str, bool]:
     """Infers a baseline route, deferring ambiguous semantics to review."""
-    status = response.get("status")
-    if status == "refused" or bool((response.get("safety") or {}).get("blocked")):
-        return ObservedRoute.DENY, "baseline_safety_status", False
     successful = [item for item in attempts if item.status == "succeeded"]
+    status = response.get("status")
+    safety_blocked = bool((response.get("safety") or {}).get("blocked"))
+    review_succeeded = successful and all(
+        item.tool_name == "request_human_review" for item in successful
+    )
+    if review_succeeded and (status == "refused" or safety_blocked):
+        return ObservedRoute.HUMAN_REVIEW, "successful_human_review_tool", False
+    if status == "refused" or safety_blocked:
+        return ObservedRoute.DENY, "baseline_safety_status", False
     if successful and all(item.tool_name != "request_human_review" for item in successful):
         return ObservedRoute.EXECUTE, "successful_controlled_tool", False
     if any(item.tool_name == "request_human_review" for item in successful):

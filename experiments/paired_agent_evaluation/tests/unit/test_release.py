@@ -19,7 +19,12 @@ from paired_agent_evaluation.release import (
 from paired_agent_evaluation.release.artifacts import read_payload, sha256_file
 
 
-def _write_complete_run(root: Path, *, split: str = "test") -> None:
+def _write_complete_run(
+    root: Path,
+    *,
+    split: str = "test",
+    release_version: str = "v4",
+) -> None:
     """Create the minimal finalized artifact set accepted by release sealing."""
     for name in RELEASE_FILES:
         path = root / name
@@ -32,9 +37,9 @@ def _write_complete_run(root: Path, *, split: str = "test") -> None:
                 "completed_at": "2026-09-08T12:00:00Z",
                 "phase3_freeze_id": "phase3-baseline-v5",
                 "phase3_aggregate_sha256": "a" * 64,
-                "phase4_freeze_id": "phase4-governance-v6",
+                "phase4_freeze_id": "phase4-governance-v7",
                 "phase4_aggregate_sha256": "b" * 64,
-                "phase5_freeze_id": "phase5-evaluation-v5",
+                "phase5_freeze_id": "phase5-evaluation-v6",
                 "phase5_aggregate_sha256": "c" * 64,
                 "model_identifier": "test-model",
                 "retrieval_backend": "qdrant",
@@ -52,11 +57,12 @@ def _write_complete_run(root: Path, *, split: str = "test") -> None:
             }
         elif name == "test-execution-claim.json":
             payload = {
-                "schema_version": 1,
+                "schema_version": 2,
                 "test_run_id": "run_test",
                 "harness_freeze_id": "paired-agent-evaluation-harness-v1",
                 "harness_aggregate_sha256": "a" * 64,
                 "validation_run_id": "run_validation",
+                "release_version": release_version,
                 "claimed_at": "2026-09-08T12:00:00Z",
             }
         elif name == "summary.json":
@@ -79,11 +85,12 @@ def test_release_is_sanitized_closed_and_content_addressed(
 ) -> None:
     """Sanitize sensitive values, seal once, and detect post-seal mutation."""
     run_root = tmp_path / "run"
-    release_root = tmp_path / "release"
+    release_root = tmp_path / "v4"
     run_root.mkdir()
     _write_complete_run(run_root)
     monkeypatch.setattr(release_sealing, "verify_primary_artifacts", lambda *_: None)
     manifest = seal_run(run_root=run_root, release_root=release_root)
+    assert manifest.release_id == "paired-agent-evaluation-v4"
     assert manifest == verify_release(release_root)
     released = json.loads((release_root / "secondary-ragas.jsonl").read_text())
     assert released["value"]["api_key"] == "[REDACTED]"
@@ -100,7 +107,7 @@ def test_release_readme_placeholder_does_not_block_sealing(
 ) -> None:
     """Allow sealing into the versioned directory containing its tracked README."""
     run_root = tmp_path / "run"
-    release_root = tmp_path / "release"
+    release_root = tmp_path / "v4"
     run_root.mkdir()
     release_root.mkdir()
     (release_root / "README.md").write_text("placeholder\n", encoding="utf-8")
@@ -114,6 +121,16 @@ def test_release_readme_placeholder_does_not_block_sealing(
     assert manifest == verify_release(release_root)
 
 
+def test_release_destination_must_match_preregistration(tmp_path: Path) -> None:
+    """Reject sealing under a release version not bound by the test claim."""
+    run_root = tmp_path / "run"
+    run_root.mkdir()
+    _write_complete_run(run_root, release_version="v4")
+
+    with pytest.raises(ValueError, match="preregistered version"):
+        seal_run(run_root=run_root, release_root=tmp_path / "v5")
+
+
 def test_corrective_release_preserves_v1_and_records_provenance(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -123,7 +140,7 @@ def test_corrective_release_preserves_v1_and_records_provenance(
     v1_root = tmp_path / "v1"
     v2_root = tmp_path / "v2"
     run_root.mkdir()
-    _write_complete_run(run_root)
+    _write_complete_run(run_root, release_version="v1")
     monkeypatch.setattr(release_sealing, "verify_primary_artifacts", lambda *_: None)
     v1 = seal_run(run_root=run_root, release_root=v1_root)
     v1_manifest_sha256 = sha256_file(v1_root / "manifest.json")
@@ -182,7 +199,7 @@ def test_corrective_release_rejects_noop_before_writing(
     v1_root = tmp_path / "v1"
     v2_root = tmp_path / "v2"
     run_root.mkdir()
-    _write_complete_run(run_root)
+    _write_complete_run(run_root, release_version="v1")
     monkeypatch.setattr(release_sealing, "verify_primary_artifacts", lambda *_: None)
     seal_run(run_root=run_root, release_root=v1_root)
     derived_names = {
@@ -250,7 +267,7 @@ def test_derived_artifact_drift_cannot_be_sealed(
     )
 
     with pytest.raises(ValueError, match=r"Primary derived artifacts.*summary\.json"):
-        seal_run(run_root=run_root, release_root=tmp_path / "release")
+        seal_run(run_root=run_root, release_root=tmp_path / "v4")
 
 
 def test_visual_report_drift_is_detected(

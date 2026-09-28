@@ -1,4 +1,12 @@
-"""Deterministic input and output safety checks for the baseline agent."""
+"""Apply deterministic input and output safety checks for the baseline agent.
+
+Input is NFKC-normalized, then rejected on size, control characters, or known
+injection, extraction, and bypass patterns. Drafts are rejected on duplicate,
+fabricated, or missing citations, active content, secrets, or prompt leakage.
+Core:
+    - InputGuardrail: normalizes and screens untrusted caller text.
+    - OutputGuardrail: validates citations and final answer content.
+"""
 
 from __future__ import annotations
 

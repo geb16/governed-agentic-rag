@@ -1,4 +1,11 @@
-"""Request-local conversation, evidence, tool, and usage state."""
+"""Hold request-local conversation, evidence, tool, and usage state.
+
+Created from initial retrieval, mutated as model turns and tool executions
+complete, and read to build public citations and evidence. The evidence
+allowlist grows only with retrieved or tool-produced items; never shared.
+Core:
+    - InvocationState: mutable per-invocation state and citation builders.
+"""
 
 from __future__ import annotations
 

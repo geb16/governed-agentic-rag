@@ -28,9 +28,9 @@ DATASET_CASE_COUNT = 100
 DATASET_VALIDATION_CASE_COUNT = 20
 DATASET_TEST_CASE_COUNT = 80
 PHASE3_FREEZE_ID = "phase3-baseline-v5"
-PHASE3_AGGREGATE_SHA256 = "06eb0c9086b43f5581805c946b727ee5503abe6a3a293fabeed4dca0edad03dc"
-PHASE4_FREEZE_ID = "phase4-governance-v6"
-PHASE4_AGGREGATE_SHA256 = "d7591a68a9d4b711e946d1b280900e92dfa71bcb37faf3c3149a3c4f3c0b97de"
+PHASE3_AGGREGATE_SHA256 = "199ed67020eac95de5a67b53e84b2dd4423beedd4c20ecf8e61b136071f14552"
+PHASE4_FREEZE_ID = "phase4-governance-v7"
+PHASE4_AGGREGATE_SHA256 = "be37ab0161b653465b36f92f117ddbc36bfd003585a9e6bd2b942e5d3d3483e1"
 
 DATASET_ARTIFACT_NAMES = (
     "case.schema.json",
@@ -56,7 +56,7 @@ class DatasetManifest(EvaluationModel):
     test_case_count: Literal[80]
     baseline_freeze_id: Literal["phase3-baseline-v5"]
     baseline_aggregate_sha256: str
-    governance_freeze_id: Literal["phase4-governance-v6"]
+    governance_freeze_id: Literal["phase4-governance-v7"]
     governance_aggregate_sha256: str
     files: dict[str, str]
 

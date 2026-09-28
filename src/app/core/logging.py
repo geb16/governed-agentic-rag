@@ -1,4 +1,12 @@
-"""Secret-redacting operational JSON logging for the baseline service."""
+"""Emit single-line, secret-redacting JSON logs for the baseline service.
+
+Records are compact JSON; secret-like keys and inline key=value secrets are
+masked, CR/LF escaped against log forging, and only exception types kept.
+Core:
+    - JsonFormatter: redacting single-line JSON formatter.
+    - configure_logging: installs the formatter on the root logger.
+    - log_execution: emits an operational (non-audit) execution event.
+"""
 
 from __future__ import annotations
 

@@ -22,9 +22,9 @@ def _manifest() -> ExperimentManifest:
         status="acquired",
         phase3_freeze_id="phase3-baseline-v5",
         phase3_aggregate_sha256="a" * 64,
-        phase4_freeze_id="phase4-governance-v6",
+        phase4_freeze_id="phase4-governance-v7",
         phase4_aggregate_sha256="b" * 64,
-        phase5_freeze_id="phase5-evaluation-v5",
+        phase5_freeze_id="phase5-evaluation-v6",
         phase5_aggregate_sha256="c" * 64,
         model_identifier="test-model",
         retrieval_backend="qdrant",
@@ -52,7 +52,8 @@ def test_score_run_persists_derived_outputs_report_and_terminal_status(
         repository=tmp_path,
         project=tmp_path / "project",
         artifacts=tmp_path / "artifacts",
-        release=tmp_path / "release",
+        releases=tmp_path / "releases",
+        harnesses=tmp_path / "harnesses",
         configs=tmp_path / "configs",
     )
     run_root = paths.run_root("run_reporting")

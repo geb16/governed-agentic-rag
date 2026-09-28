@@ -1,4 +1,4 @@
-# Phase-6 Experimental Protocol
+# Phase 6 Experimental Protocol
 
 ## Design
 
@@ -73,5 +73,5 @@ behavior. This protocol is grounded in the following requirements:
 [Microsoft Foundry agent evaluators](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/agent-evaluators),
 and [OpenAI agent evals](https://developers.openai.com/api/docs/guides/agent-evals).
 
-> Note: The harness is local and provider-neutral. It does not depend on the legacy hosted OpenAI Evals API,
-which the official guidance marks for shutdown in November 2026.
+> Note: The harness is local and provider-neutral. It does not depend on the legacy hosted OpenAI
+> Evals API, which the official guidance marks for shutdown in November 2026.

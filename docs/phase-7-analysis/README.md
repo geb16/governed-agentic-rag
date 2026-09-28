@@ -17,7 +17,7 @@ First verify the sealed release:
 
 ```bash
 uv run --project experiments/paired_agent_evaluation \
-  python experiments/paired_agent_evaluation/scripts/verify_release.py
+  python experiments/paired_agent_evaluation/scripts/verify_release.py --release-version v3
 ```
 
 Then regenerate the Phase 7 derivatives:

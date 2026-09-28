@@ -1,4 +1,4 @@
-# Evaluation and experiment Limitations in phase-6
+# Phase 6 Evaluation and Experiment Limitations
 
 - The synthetic setting improves control and privacy but cannot establish production generalization.
 - Three stochastic repetitions estimate model variability only coarsely.

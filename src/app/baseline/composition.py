@@ -1,4 +1,13 @@
-"""Composition root for concrete Phase 3 adapters and application services."""
+"""Assemble concrete adapters and services for one application lifespan.
+
+Composition root: builds the retriever, initializes and seeds the SQLite
+synthetic repository, and, only when an OpenAI key is set, wires the model,
+tool router, fault injector, and BaselineAgent. Experiment profiles also
+record an immutable run manifest. Side effects: database and manifest writes.
+Core:
+    - ApplicationRuntime: frozen bundle of lifespan adapters.
+    - build_runtime: wires and returns the ApplicationRuntime.
+"""
 
 from __future__ import annotations
 

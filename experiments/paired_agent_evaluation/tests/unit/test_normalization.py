@@ -137,3 +137,28 @@ def test_baseline_safety_block_is_a_terminal_error() -> None:
     )
 
     assert observation.terminal_error_code == "fabricated_citation"
+
+
+def test_baseline_review_route_survives_later_citation_block() -> None:
+    """Preserve a completed escalation independently of final-answer safety."""
+    observation = normalize(
+        _raw_execution(
+            Condition.BASELINE,
+            {
+                "status": "refused",
+                "safety": {"blocked": True, "category": "fabricated_citation"},
+                "tool_calls": [
+                    {
+                        "tool_name": "request_human_review",
+                        "status": "succeeded",
+                        "outcome": {"state_changed": True},
+                    }
+                ],
+            },
+        )
+    )
+
+    assert observation.observed_route == ObservedRoute.HUMAN_REVIEW
+    assert observation.route_source == "successful_human_review_tool"
+    assert observation.route_requires_adjudication is False
+    assert observation.terminal_error_code == "fabricated_citation"

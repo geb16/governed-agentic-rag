@@ -30,7 +30,7 @@ from app.governance.version import (
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-4-governance" / "freeze-manifest.json"
 PHASE3_MANIFEST_PATH = PROJECT_ROOT / "docs" / "phase-3-baseline" / "freeze-manifest.json"
-PHASE4_FREEZE_ID = "phase4-governance-v6"
+PHASE4_FREEZE_ID = "phase4-governance-v7"
 MANIFEST_SCHEMA_VERSION = 1
 
 # Phase 5 evaluation assets must remain outside this treatment identity.
@@ -119,14 +119,16 @@ def _phase3_identity() -> dict[str, str]:
 
     freeze_id = payload.get("freeze_id")
     aggregate = payload.get("aggregate_sha256")
+    if not isinstance(freeze_id, str):
+        raise FreezeScopeError("Phase 3 freeze ID must be a string")
     if freeze_id != BASELINE_FREEZE_ID:
         raise FreezeScopeError(
             f"Unexpected Phase 3 freeze identity: {freeze_id!r}; expected {BASELINE_FREEZE_ID!r}"
         )
-    if aggregate != BASELINE_CONTROL_SHA256:
-        raise FreezeScopeError("Phase 3 aggregate does not match the governed control identity")
     if not isinstance(aggregate, str) or _SHA256_PATTERN.fullmatch(aggregate) is None:
         raise FreezeScopeError("Phase 3 aggregate is not a lowercase SHA-256 digest")
+    if aggregate != BASELINE_CONTROL_SHA256:
+        raise FreezeScopeError("Phase 3 aggregate does not match the governed control identity")
     return {
         "baseline_freeze_id": freeze_id,
         "baseline_aggregate_sha256": aggregate,

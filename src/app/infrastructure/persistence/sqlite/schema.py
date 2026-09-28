@@ -1,4 +1,13 @@
-"""SQLite schema for versioned, case-partitioned synthetic support state."""
+"""Define and initialize the versioned synthetic support schema.
+
+Every business table is partitioned by case_id and linked by foreign keys;
+refunds and escalations are unique per (case_id, idempotency_key).
+initialize_schema enables WAL, creates tables idempotently, and rejects a
+database stamped with a different DATABASE_SCHEMA_VERSION.
+Core:
+    - SUPPORT_SCHEMA_SQL: DDL for all synthetic support tables.
+    - initialize_schema: creates the schema and checks its version.
+"""
 
 from __future__ import annotations
 

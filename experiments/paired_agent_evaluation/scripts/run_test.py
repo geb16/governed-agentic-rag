@@ -5,7 +5,7 @@ system. Run it only after validation and harness verification; subsequent test
 acquisition attempts for the frozen harness are rejected.
 
 Usage:
-    python run_test.py --run-id run_2025w06_test
+    python run_test.py --run-id run_2025w06_test --harness-version 2
 """
 
 from __future__ import annotations
@@ -20,8 +20,17 @@ def main() -> int:
 
     parser = argparse.ArgumentParser(description="Acquire the untouched Phase 6 test split.")
     parser.add_argument("--run-id", required=True, help="Identity matching ^run_[A-Za-z0-9_-]+$")
+    parser.add_argument(
+        "--harness-version",
+        required=True,
+        type=int,
+        help="Positive version of the preregistered harness",
+    )
     args = parser.parse_args()
-    manifest = acquire_preregistered_test(run_id=args.run_id)
+    manifest = acquire_preregistered_test(
+        run_id=args.run_id,
+        harness_version=args.harness_version,
+    )
     print(manifest.model_dump_json(indent=2))
     return 0
 
