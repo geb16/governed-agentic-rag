@@ -1,4 +1,4 @@
-# Paired Agent Evaluation(Phase-6 Experimental Harness)
+# Paired Agent Evaluation (Phase 6 Experimental Harness)
 
 This isolated project compares the frozen conventional baseline and governance-aware workflow
 under identical Phase 5 cases, model, Qdrant collection, synthetic database fixture, simulated
@@ -9,12 +9,12 @@ documentation and docstrings. It is versioned independently of `src/app`. Valida
 harness defects, but the corrected harness must be frozen and bound to one completed validation
 run and one preregistered test run before the test split can execute. It also verifies the Phase 3,
 4, and 5 freeze identities it depends on; see
-[architecture](../../docs/architecture/phase6_evaluation_architecture.md) for the full design and
+[architecture](../../docs/phase-6-experiments/architecture.md) for the full design and
 [limitations](../../docs/phase-6-experiments/limitations.md) for known compromises.
 
 Mutable run output is written to the gitignored `artifacts/paired_agent_evaluation/`. Only a
-completed, adjudicated, sanitized **test**-split run can be sealed. The original v1 and corrective
-v2 releases are preserved as superseded audit history; v3 is the canonical corrective release.
+completed, adjudicated, sanitized **test**-split run can be sealed. Releases v1–v3 are preserved as
+superseded audit history; v4 is the canonical release from harness v2.
 
 `prepare_run` creates a cryptographically random `blinding-plan.json` before acquisition and pins
 its digest in the run manifest. Reviewers receive only `review-packet.jsonl`, whose opaque IDs and
@@ -102,8 +102,8 @@ regenerate an inherited manifest from this project to force a pass.
 5. The researcher named in the ethics protocol completes the condition-blinded, field-level
    procedure in
    [scoring and adjudication](../../docs/phase-6-experiments/scoring-and-adjudication.md). Neither an
-   LLM nor an automated grader can supply primary review-labels. `review-packet.jsonl` and 
-   the two cited guidance documents should only be used while adjudicating. 
+   LLM nor an automated grader can supply primary review labels. `review-packet.jsonl` and the two
+   cited guidance documents should be the only materials used while adjudicating.
    The run directory, condition mapping, or the comparative results should not be inspected.
 
    Confirm that the submission contains each packet `blinded_id` exactly once, then rerun primary
@@ -159,18 +159,17 @@ regenerate an inherited manifest from this project to force a pass.
    primary artifact from authoritative inputs. It fails if normalized results, review artifacts,
    scores, estimates, paired differences, or the summary were altered or became stale.
 
-   Two post-release normalization defects were corrected deterministically from the same immutable
-   test evidence. Corrective v2 projects baseline safety blocks into the terminal-error field.
+   Two defects found after the original test were corrected deterministically from the same
+   immutable evidence. Corrective v2 projects baseline safety blocks into the terminal-error field.
    Historical v3 preserves a completed baseline human-review route when later citation validation
-   blocks the final answer. Each release records its immediate predecessor and changed derivatives
-   in `correction.json`; see the canonical
-   [v3 record](../../data/evaluation/paired_agent_evaluation/v3/correction.json). Acquisition, raw
-   observations, human adjudication, and Ragas grades were not repeated or modified. It also
-   provided the analysis that exposed the governance-escalation defect corrected before v4.
-   Verify v3 independently with:
+   blocks the final answer. Each corrective release records its immediate predecessor and changed
+   derivatives in `correction.json`; see the
+   [v3 record](../../data/evaluation/paired_agent_evaluation/v3/correction.json). Version 3 also
+   supplied the analysis that exposed the governance-escalation defect corrected before the fresh
+   harness-v2 validation and test execution that produced v4. Verify the canonical release with:
 
    ```bash
-   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_release.py --release-version v3
+   uv run --project experiments/paired_agent_evaluation python experiments/paired_agent_evaluation/scripts/verify_release.py --release-version v4
    ```
 
    Every verification command requires an explicit release version; no ambient canonical version
