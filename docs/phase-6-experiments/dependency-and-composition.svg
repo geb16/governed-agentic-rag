@@ -1,0 +1,107 @@
+<!--
+Purpose: Phase 6 dependency, composition, control, and release boundaries.
+Source: docs/phase-6-experiments/architecture.md
+AI-assistance disclosure: OpenAI Codex assisted in converting the text-based
+architecture diagram into SVG. The resulting content was reviewed and approved by the author. 
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title description">
+  <title id="title">Phase 6 dependency and composition model</title>
+  <desc id="description">Three frozen experimental inputs flow into an independent Phase 6 harness. Composition and experiment control wire adapters to application ports and domain contracts. Reporting and release components produce a verified sealed release.</desc>
+  <defs>
+    <marker id="arrow-navy" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563EB"/>
+    </marker>
+    <style>
+      .title { font: 700 26px 'Segoe UI', Arial, sans-serif; fill: #0F172A; }
+      .subtitle { font: 400 15px 'Segoe UI', Arial, sans-serif; fill: #475569; }
+      .heading { font: 700 17px 'Segoe UI', Arial, sans-serif; }
+      .body { font: 400 14px 'Segoe UI', Arial, sans-serif; }
+      .small { font: 400 12.5px 'Segoe UI', Arial, sans-serif; }
+      .label { font: 600 12px 'Segoe UI', Arial, sans-serif; fill: #475569; }
+      .card { stroke-width: 1.5; }
+      .flow { fill: none; stroke: #2563EB; stroke-width: 2.5; marker-end: url(#arrow-blue); }
+      .dependency { fill: none; stroke: #334155; stroke-width: 2; stroke-dasharray: 7 5; marker-end: url(#arrow-navy); }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="#FFFFFF"/>
+  <text x="600" y="40" text-anchor="middle" class="title">Phase 6 — Dependency and Composition Model</text>
+  <text x="600" y="65" text-anchor="middle" class="subtitle">frozen inputs · independent harness · content-addressed evidence</text>
+
+  <!-- Frozen inputs -->
+  <g>
+    <rect x="90" y="95" width="300" height="72" rx="12" class="card" fill="#F1F5F9" stroke="#94A3B8"/>
+    <text x="240" y="124" text-anchor="middle" class="heading" fill="#0F172A">Baseline control</text>
+    <text x="240" y="148" text-anchor="middle" class="body" fill="#475569">phase3-baseline-v5</text>
+
+    <rect x="450" y="95" width="300" height="72" rx="12" class="card" fill="#F1F5F9" stroke="#94A3B8"/>
+    <text x="600" y="124" text-anchor="middle" class="heading" fill="#0F172A">Governed treatment</text>
+    <text x="600" y="148" text-anchor="middle" class="body" fill="#475569">phase4-governance-v7</text>
+
+    <rect x="810" y="95" width="300" height="72" rx="12" class="card" fill="#F1F5F9" stroke="#94A3B8"/>
+    <text x="960" y="124" text-anchor="middle" class="heading" fill="#0F172A">Cases + rubric</text>
+    <text x="960" y="148" text-anchor="middle" class="body" fill="#475569">phase5-evaluation-v6</text>
+  </g>
+
+  <path d="M240 167 V190 H960 V167" fill="none" stroke="#2563EB" stroke-width="2.5"/>
+  <path d="M600 167 V260" class="flow"/>
+
+  <!-- Harness boundary -->
+  <rect x="45" y="205" width="1110" height="430" rx="18" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="2"/>
+  <text x="70" y="237" class="heading" fill="#0F172A">Independent Phase 6 project</text>
+  <text x="1130" y="237" text-anchor="end" class="small" fill="#64748B">experiments/paired_agent_evaluation</text>
+
+  <!-- Control plane -->
+  <rect x="335" y="260" width="530" height="68" rx="12" class="card" fill="#EDE9FE" stroke="#8B5CF6"/>
+  <text x="600" y="287" text-anchor="middle" class="heading" fill="#4C1D95">Composition + experiment control</text>
+  <text x="600" y="311" text-anchor="middle" class="body" fill="#5B21B6">paths · identities · freeze verification · one-time test authorization</text>
+
+  <!-- Core -->
+  <rect x="400" y="365" width="400" height="86" rx="12" class="card" fill="#DBEAFE" stroke="#3B82F6"/>
+  <text x="600" y="397" text-anchor="middle" class="heading" fill="#1E3A8A">Application use cases + ports</text>
+  <text x="600" y="422" text-anchor="middle" class="body" fill="#1D4ED8">acquire · normalize · adjudicate · score · estimate</text>
+  <text x="600" y="441" text-anchor="middle" class="small" fill="#1E40AF">provider-independent orchestration</text>
+
+  <rect x="400" y="494" width="400" height="76" rx="12" class="card" fill="#ECFDF5" stroke="#10B981"/>
+  <text x="600" y="524" text-anchor="middle" class="heading" fill="#065F46">Domain contracts</text>
+  <text x="600" y="550" text-anchor="middle" class="body" fill="#047857">runs · observations · scores · manifests</text>
+
+  <!-- Outer components -->
+  <rect x="80" y="365" width="255" height="150" rx="12" class="card" fill="#FFF7ED" stroke="#F59E0B"/>
+  <text x="207" y="398" text-anchor="middle" class="heading" fill="#92400E">Adapters</text>
+  <text x="207" y="427" text-anchor="middle" class="body" fill="#9A3412">frozen systems · dataset</text>
+  <text x="207" y="451" text-anchor="middle" class="body" fill="#9A3412">storage · telemetry</text>
+  <text x="207" y="475" text-anchor="middle" class="body" fill="#9A3412">Qdrant · SQLite · Ragas</text>
+  <text x="207" y="499" text-anchor="middle" class="small" fill="#7C2D12">implements application ports</text>
+
+  <rect x="865" y="365" width="255" height="86" rx="12" class="card" fill="#FDF2F8" stroke="#EC4899"/>
+  <text x="992" y="398" text-anchor="middle" class="heading" fill="#831843">Reporting</text>
+  <text x="992" y="425" text-anchor="middle" class="body" fill="#9D174D">derive · persist · render</text>
+
+  <rect x="865" y="484" width="255" height="86" rx="12" class="card" fill="#F0FDFA" stroke="#14B8A6"/>
+  <text x="992" y="517" text-anchor="middle" class="heading" fill="#134E4A">Release</text>
+  <text x="992" y="544" text-anchor="middle" class="body" fill="#0F766E">rederive · sanitize · verify</text>
+
+  <!-- Dependencies and data flow -->
+  <path d="M600 328 V365" class="dependency"/>
+  <path d="M335 408 H400" class="dependency"/>
+  <path d="M600 451 V494" class="dependency"/>
+  <path d="M865 408 H800" class="dependency"/>
+  <path d="M865 527 H800" class="dependency"/>
+  <path d="M992 451 V484" class="flow"/>
+
+  <!-- Canonical output -->
+  <path d="M992 570 V610 H600 V665" class="flow"/>
+  <rect x="360" y="665" width="480" height="62" rx="12" class="card" fill="#0F766E" stroke="#115E59"/>
+  <text x="600" y="693" text-anchor="middle" class="heading" fill="#FFFFFF">Verified sealed release</text>
+  <text x="600" y="716" text-anchor="middle" class="body" fill="#CCFBF1">paired-agent-evaluation-v4</text>
+
+  <!-- Legend -->
+  <line x1="75" y1="682" x2="125" y2="682" class="flow"/>
+  <text x="140" y="687" class="label">evidence flow</text>
+  <line x1="75" y1="712" x2="125" y2="712" class="dependency"/>
+  <text x="140" y="717" class="label">dependency direction</text>
+</svg>
