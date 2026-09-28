@@ -21,8 +21,9 @@ and reproducibility requirements.
 | 7 — Analysis | Sealed-results analysis and evidence generation | [Phase 7 guide](docs/phase-7-analysis/README.md) | Source: [`paired-agent-evaluation-v4`](data/evaluation/paired_agent_evaluation/v4/manifest.json) |
 
 Supporting design documents are available under [`docs/`](docs/), with external sources collected
-in the [project bibliography](docs/references.md). Test ownership and scope are described in
-[`tests/README.md`](tests/README.md).
+in the [project bibliography](docs/references.md). Baseline test ownership is described in the
+[`tests/baseline/` guide](tests/baseline/README.md); the Phase 6 guide documents its independently
+packaged test suite.
 
 ### Documentation conventions
 
@@ -116,6 +117,10 @@ paired-agent-evaluation-v4
 017623781efbb1b37b5aec84cbe48f14c3b6bd8d9997a223c23a22f35eccfc10
 ```
 
+The post-release narrative is bound separately by the
+[Phase 6 publication manifest](docs/phase-6-experiments/publication-manifest-v4.1.json), which pins
+these documents to the immutable scientific tag, harness v2, and sealed release v4.
+
 These verification commands use repository-local evidence. They do not repeat provider calls,
 Ragas grading, human adjudication, or experimental acquisition.
 
@@ -133,8 +138,8 @@ Ragas grading, human adjudication, or experimental acquisition.
 - [`artifacts/paired_agent_evaluation/`](artifacts/paired_agent_evaluation/) is the supporting audit
   trail containing validation runs, the preregistered test run, blinded researcher work,
   schedules, journals, and intermediate execution state.
-- [`docs/phase-7-analysis/`](docs/phase-7-analysis/) contains the analysis, and
-  reproducible figures derived from the sealed release in phase-6 experiments.
+- [`docs/phase-7-analysis/`](docs/phase-7-analysis/) contains the analysis and reproducible
+  figures derived from the sealed Phase 6 release.
 
 All sealed releases remain bound to the exact Phase 3–6 identities recorded in their manifests.
 Working artifacts support inspection but do not replace the canonical release.
