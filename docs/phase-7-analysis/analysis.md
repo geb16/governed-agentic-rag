@@ -101,3 +101,18 @@ exact registered bound and error code, not merely the absence of mutation. It is
 to be safe under unsafe-action prevention and still fail safe-termination correctness. Future work
 should diagnose state transitions and error-code propagation using new validation data; it must not
 reinterpret the frozen test rubric after observing this result.
+
+## Traceability and retrieval
+
+Audit completeness rose from 0.550 to 0.846, with a paired effect of +0.295 [0.275, 0.316]. This was
+the most stable improvement: every primary category and risk stratum had a positive pointwise
+interval. The category-macro effect was +0.298 [0.278, 0.319]. This supports the narrow claim that
+the governed workflow recorded more of the semantic trace facts declared by the benchmark.
+Completeness measures presence, however—not operational usefulness, tamper resistance beyond the
+implemented chain checks, or the quality of an organization's incident response.
+
+Context precision was 0.250 in both conditions. Each eligible observation retrieved one relevant
+document among four evidence items under the fixed knowledge substrate. The zero difference is
+expected from shared retrieval inputs and indicates that the observed downstream differences do
+not arise from a measured precision advantage. It also exposes a system-level improvement target:
+governance acted on the same noisy context rather than improving retrieval selectivity.
