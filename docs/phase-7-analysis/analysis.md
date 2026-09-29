@@ -51,3 +51,16 @@ metric eligibility and terminal states, not missing records.
 `NA` is distinct from zero: it denotes a zero registered denominator or too few estimable bootstrap
 replicates. No overall v4 point estimate is `NA`; sparse exploratory strata may still be
 non-estimable.
+
+### Groundedness qualification
+
+Groundedness is conditional on eligible non-terminal responses. Governance produced 150 terminal
+outcomes—75 `missing_citation`, 54 `clarification_required`, 15 `governance_denied`, and six
+`approval_rejected`—leaving 90 without a terminal error and 66 groundedness-eligible. Its 1.000
+estimate means those 66 passed citation-membership and claim-support checks; it does not mean every
+request produced a grounded answer. Baseline produced 157 terminal outcomes, including 116
+`fabricated_citation` and 24 `missing_citation`, leaving 83 without a terminal error and 27 eligible.
+
+V2 and v3 corrected deterministic normalization of the earlier run. V3 analysis then exposed a
+treatment defect. Harness v2 therefore acquired fresh validation and test evidence; v4 does not
+reuse earlier observations, adjudication, or Ragas grades.
