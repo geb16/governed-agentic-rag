@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import Literal
 
-RELEASE_VERSION = "v3"
+RELEASE_VERSION = "v4"
 RELEASE_ID = f"paired-agent-evaluation-{RELEASE_VERSION}"
-RELEASE_SHA256 = "0f2c281ab19ea6a1c44bf75ad79266c1d51e9a88ee82cd8ea01850561bc7110e"
+RELEASE_SHA256 = "017623781efbb1b37b5aec84cbe48f14c3b6bd8d9997a223c23a22f35eccfc10"
 
 Condition = Literal["baseline", "governed"]
 CONDITIONS: tuple[Condition, ...] = ("baseline", "governed")
