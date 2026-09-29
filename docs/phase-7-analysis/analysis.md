@@ -132,3 +132,25 @@ baseline and 215 governed observations, with unweighted means of 0.164 and 0.163
 Because eligibility differs and the LLM grader is nondeterministic, the −0.0005 raw mean difference
 must not replace the human-adjudicated groundedness result or be described as a paired causal
 estimate.
+
+## Exploratory heterogeneity
+
+The full registered category, route, intent, and risk output is retained in
+[`generated/stratified-paired-effects.csv`](generated/stratified-paired-effects.csv). The most
+consistent finding is audit completeness: effects were positive across all six categories and all
+four risk levels. Workflow completion favoured governance in tool-failure (+0.857), refund
+(+0.833), ticket-lookup (+0.722), ticket-update (+1.000), and medium-risk (+0.909) strata whose
+pointwise intervals excluded zero.
+
+Routing was heterogeneous rather than uniformly better. Normal-category, tool-failure,
+execute-route, ticket-update, and medium-risk strata favoured governance, while security-attack
+intent favoured baseline. Some strata contained as few as two, three, or four case clusters, and all
+intervals are unadjusted across many comparisons. These results are useful for failure analysis and
+future preregistration, not for selective claims of superiority.
+
+## Adjudication and evidence quality
+
+All 216 review items were resolved through field-level, condition-blinded adjudication using opaque
+identifiers and neutral terminal wording. One researcher performed the review, so there is no
+inter-rater dataset or agreement statistic; complete resolution is not evidence of reviewer
+agreement, and judgement bias remains possible.
