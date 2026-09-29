@@ -154,3 +154,13 @@ All 216 review items were resolved through field-level, condition-blinded adjudi
 identifiers and neutral terminal wording. One researcher performed the review, so there is no
 inter-rater dataset or agreement statistic; complete resolution is not evidence of reviewer
 agreement, and judgement bias remains possible.
+
+## Conclusions supported by the evidence
+
+The governed workflow improved routing, completion, action correctness, approval control,
+escalation precision and F1, recovery, eligible groundedness, and audit completeness in this
+benchmark. Both conditions achieved perfect unsafe-action prevention; escalation recall remained
+uncertain, context precision was unchanged, and both failed exact safe termination. Governance
+also incurred higher latency while using fewer tokens. The evidence therefore supports a broad but
+bounded advantage: the treatment improved many registered outcomes without establishing universal
+quality, complete control correctness, or production readiness.
