@@ -32,8 +32,8 @@ PLOT_WIDTH = 390
 RESULT_X = 974
 ROW_HEIGHT = 48
 FIRST_ROW_Y = 220
-X_MIN = -0.55
-X_MAX = 0.65
+X_MIN = -1.0
+X_MAX = 1.0
 
 
 def render_overall_effects(rows: list[dict[str, Any]], target: Path) -> None:
@@ -168,7 +168,7 @@ def _add_row_backgrounds(parts: list[str], row_count: int) -> None:
 
 def _add_axis(parts: list[str], x: Callable[[float], float], height: int) -> None:
     """Append the registered effect-scale grid, zero line, and tick labels."""
-    for tick in (-0.5, -0.25, 0.0, 0.25, 0.5):
+    for tick in (-1.0, -0.5, 0.0, 0.5, 1.0):
         colour = MUTED_TEXT if tick == 0 else GRID
         stroke_width = 2 if tick == 0 else 1
         parts.append(
