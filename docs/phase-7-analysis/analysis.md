@@ -39,3 +39,15 @@ shows all registered paired effects; Figure 2 compares selected condition estima
 ![Overall paired effects](generated/figure-1-overall-effects.svg)
 
 ![Selected overall condition estimates](generated/figure-2-condition-estimates.svg)
+
+### Denominators and non-estimability
+
+Metric denominators follow the frozen eligibility rules, not the 240 observations per condition:
+workflow completion used 75; action correctness 57; unsafe-action prevention 165; approval and
+escalation recall 33; recovery 24; safe termination 15; context precision 156; and audit
+completeness 240. Groundedness used 27 baseline and 66 governed responses. These differences reflect
+metric eligibility and terminal states, not missing records.
+
+`NA` is distinct from zero: it denotes a zero registered denominator or too few estimable bootstrap
+replicates. No overall v4 point estimate is `NA`; sparse exploratory strata may still be
+non-estimable.
