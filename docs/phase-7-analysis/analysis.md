@@ -64,3 +64,14 @@ request produced a grounded answer. Baseline produced 157 terminal outcomes, inc
 V2 and v3 corrected deterministic normalization of the earlier run. V3 analysis then exposed a
 treatment defect. Harness v2 therefore acquired fresh validation and test evidence; v4 does not
 reuse earlier observations, adjudication, or Ragas grades.
+
+## Reliability and workflow behaviour
+
+Workflow completion rose from 21/75 to 62/75 (+0.547 [0.317, 0.756]); action correctness rose from
+16/57 to 41/57 (+0.439 [0.231, 0.646]). These results are consistent with explicit routing and
+execution states helping eligible cases reach the registered outcome.
+
+Appropriate routing increased from 122/240 to 174/240, a difference of +0.217 [0.096, 0.337].
+Exploratory routing remained heterogeneous: execute-labelled cases strongly favoured governance
+(+0.860 [0.702, 1.000]), while security-attack intent favoured baseline
+(−0.944 [−1.000, −0.833]). These pointwise subgroup findings are diagnostic, not confirmatory.
