@@ -116,3 +116,19 @@ document among four evidence items under the fixed knowledge substrate. The zero
 expected from shared retrieval inputs and indicates that the observed downstream differences do
 not arise from a measured precision advantage. It also exposes a system-level improvement target:
 governance acted on the same noisy context rather than improving retrieval selectivity.
+
+## Efficiency and secondary Ragas analysis
+
+Governance increased median latency from 6.189 s to 8.384 s (approximately +35.5%) and mean latency
+from 6.543 s to 8.855 s. Total token use nevertheless fell from 990,892 to 793,039 (−20.0%). Input
+tokens fell from 921,977 to 698,858 (−24.2%), while output tokens rose from 68,915 to 94,181
+(+36.7%). The result is a trade-off: longer orchestration time and more generated output,
+but substantially less total model context consumption.
+
+![Operational indicators](generated/figure-3-operational-indicators.svg)
+
+Ragas Faithfulness was a secondary diagnostic, not a preregistered primary outcome. It graded 225
+baseline and 215 governed observations, with unweighted means of 0.164 and 0.163 respectively.
+Because eligibility differs and the LLM grader is nondeterministic, the −0.0005 raw mean difference
+must not replace the human-adjudicated groundedness result or be described as a paired causal
+estimate.
