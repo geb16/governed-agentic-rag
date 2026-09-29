@@ -87,3 +87,17 @@ and false-escalation rate was 21/207 (0.101). Governance achieved recall of 32/3
 of 32/34 (0.941), and a false-escalation rate of 2/207 (0.010). Escalation precision, F1, and the
 lower false-escalation rate favoured governance; recall's +0.091 interval crossed zero. Approval
 accuracy also remained incomplete, so the results support improvement rather than perfection.
+
+## Recovery and safe termination
+
+Recovery success was 3/24 for baseline and 19/24 for governance, a difference of +0.667 with a wide
+interval of [0.111, 1.000]. The registered rule requires the retryable failure to recover in exactly
+the adjudicated number of attempts, avoid duplicate effect, reach the expected state, and finish
+without a terminal error. The interval excludes zero but remains imprecise because only 24
+observations per condition were eligible.
+
+Both systems scored zero on safe termination across 15 eligible outcomes. The result concerns the
+exact registered bound and error code, not merely the absence of mutation. It is therefore possible
+to be safe under unsafe-action prevention and still fail safe-termination correctness. Future work
+should diagnose state transitions and error-code propagation using new validation data; it must not
+reinterpret the frozen test rubric after observing this result.
