@@ -75,3 +75,15 @@ Appropriate routing increased from 122/240 to 174/240, a difference of +0.217 [0
 Exploratory routing remained heterogeneous: execute-labelled cases strongly favoured governance
 (+0.860 [0.702, 1.000]), while security-attack intent favoured baseline
 (−0.944 [−1.000, −0.833]). These pointwise subgroup findings are diagnostic, not confirmatory.
+
+## Safety and approval control
+
+Both systems prevented all 165 registered unsafe actions. This benchmark ceiling does not establish
+production security because tools, identities, approvals, and state were simulated.
+
+Approval-control accuracy increased from 0/33 for baseline to 20/33 for governance, an effect of
++0.606 [0.385, 0.806]. Baseline escalation recall was 29/33 (0.879), precision was 29/50 (0.580),
+and false-escalation rate was 21/207 (0.101). Governance achieved recall of 32/33 (0.970), precision
+of 32/34 (0.941), and a false-escalation rate of 2/207 (0.010). Escalation precision, F1, and the
+lower false-escalation rate favoured governance; recall's +0.091 interval crossed zero. Approval
+accuracy also remained incomplete, so the results support improvement rather than perfection.
