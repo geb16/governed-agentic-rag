@@ -1,32 +1,32 @@
 {
   "analysis_sources": {
     "scripts/analysis/evidence/__init__.py": "0a8073adf9e1504d4a2b4b5866343cd0f32e1c403d73f78a798c631aac02f0be",
-    "scripts/analysis/evidence/evidence_config.py": "8515a30d9063a83614428c0684320b5fc5b5b3f19cbd59d8f5875cc90ef2ee4a",
+    "scripts/analysis/evidence/evidence_config.py": "30a7c27a3e015c4b67172970cc62c54916d061a7315b04672d0af10a24d800d3",
     "scripts/analysis/evidence/evidence_io.py": "9a77b983e30cf4c7b8a7431991f28053430441c33251971709f9d80fad100ea3",
     "scripts/analysis/evidence/evidence_tables.py": "a82fe30edc0c3db020534e10f387c28ae4d5d8a7da723ca1b32a8edce32f10d8",
     "scripts/analysis/figures/__init__.py": "06ee190e43b316eb5c06a0559a21e4097f8bc79d50f7496c7058c28513d678c4",
     "scripts/analysis/figures/figure_conditions.py": "4cf160c8a8f3f84e1fde879e9827f1fb868ca18486075bedfa34e5d633d7cabf",
     "scripts/analysis/figures/figure_operations.py": "d74e783f4e96d040f120ce5e3a7593a18f7aa91f531efa109d15dbd0e797739f",
-    "scripts/analysis/figures/figure_overall.py": "d6347c192f0e5fdb5d2c6bbd06744c732b94418289ebce24a8cf5e08dbf52bf9",
+    "scripts/analysis/figures/figure_overall.py": "20775aa1cdd7139e49d28beea726c2b91f4c8efccd6be80362a3ec6d656ec377",
     "scripts/analysis/figures/style.py": "f23be490178bb8a31c225c9adee69272db9f52fec933bc632a4321e9d744ed6d",
     "scripts/analysis/figures/svg_utils.py": "f6861c3b694e78c717c7fbd17f1c0f491325d02beac000d621ba09f99fb84497",
     "scripts/analysis/formatting.py": "fb346fa66a4e7bb825c4f6dec5301febf0586995aa6e51b5dd85f14216b3c7ae",
     "scripts/analysis/generate_evidence.py": "778b2ee871126a101986b45a36c3a80fad886b18da58d5cc8dd53588ad64484c"
   },
   "generated_files": {
-    "figure-1-overall-effects.svg": "c92baeb4b0946c03a2b7231e8e72a1846edb2e97329a625f62d84b7d6493552f",
-    "figure-2-condition-estimates.svg": "55642f91c4bd65b37210bcaf0f09c37bd10c940141b93cd75e670be25b86ea3e",
-    "figure-3-operational-indicators.svg": "1a1904643a8ce7cc13ab1236101e9c24c3e994ac23b06fb8edef59f93859bd83",
-    "metric-denominators.csv": "5eb21b96f37c3d2bb56a66b06b6252af8ac97fbd4861db8c9be036c5e56da163",
-    "observed-routes.csv": "b98418bb1a1f2ae5bbeea827de199db1fc83ceab0758851ec542cd38cac9719f",
-    "operational-summary.csv": "f146755b9a6f0a7d84352517e8b4df47f8c0cd6388625cfbe7d13eba403f8243",
-    "overall-results.csv": "25977f203ea7802f24858134d995352bf1c29f4bda7763bc10f5808626a83813",
-    "stratified-paired-effects.csv": "750c82fa020217b54ca9f5e3c08d891ea558a0beba22b851747a9d75f8adb53e",
-    "terminal-errors.csv": "fef94d50aa217cf4465646936f1bcc798d3ca1e749bebbc4721a791ff8dbf354"
+    "figure-1-overall-effects.svg": "9dad83870f5f097ef12faf77b1cbfa980ec0b6f98856366c6157cf26b15cf07d",
+    "figure-2-condition-estimates.svg": "7b8a9464e34c075ad85a3056546e9f5f0c52cf064a6360194c9c12619eb10f37",
+    "figure-3-operational-indicators.svg": "7247d4af666fe0eb9a54745339bf12f6c23f748c8b775bd755aea0a3b937eac7",
+    "metric-denominators.csv": "390146921ccfd5fd7d266b2ef7714ab467b87dba1f19f2a22b55b6810d370a94",
+    "observed-routes.csv": "575121ecec253d0ba92b1a669d1d469746a77a4992cd7aaffd3ad66a76bc1413",
+    "operational-summary.csv": "b2187700e1a062fa19651b8a622495eb2bfb88f0c1b3a62d62b97d5f07d4d9aa",
+    "overall-results.csv": "ec8ba5223b2f23ee97ae18248d678b3af132133991677d1f798ac450cd89c4af",
+    "stratified-paired-effects.csv": "84aecbde41ab204f6f98df21e412ff063bdd9c197e996af7ff931f966066d1f4",
+    "terminal-errors.csv": "52f73056b50999ec1e1c08eed8800e49ddb6e53ca07ef2ee36ae329fc2ea85d6"
   },
   "generator": "scripts/analysis/generate_evidence.py",
   "schema_version": 1,
-  "source_release_aggregate_sha256": "9c8ff4a069535be78c1b76e99e28d9f71255d03ff9bec802c40fdf0b8853115b",
-  "source_release_id": "paired-agent-evaluation-v2",
-  "source_run_id": "run_test_v1"
+  "source_release_aggregate_sha256": "017623781efbb1b37b5aec84cbe48f14c3b6bd8d9997a223c23a22f35eccfc10",
+  "source_release_id": "paired-agent-evaluation-v4",
+  "source_run_id": "run_test_v2"
 }
