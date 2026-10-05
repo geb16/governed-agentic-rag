@@ -1,6 +1,6 @@
-# Governed Agentic RAG
+# Designing and Evaluating a Governed Agentic RAG Workflow for Enterprise Support
 
-> Design and evaluation of a governance-aware workflow layer for reliable enterprise agentic RAG
+> A reproducible, paired comparison of conventional and governance-aware agentic RAG workflows
 
 This research project compares a conventional agentic retrieval-augmented generation (RAG)
 baseline with a governance-aware workflow under the same knowledge, model configuration,
