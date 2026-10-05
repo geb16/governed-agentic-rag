@@ -25,6 +25,14 @@ in the [project bibliography](docs/references.md). Baseline test ownership is de
 [`tests/baseline/` guide](tests/baseline/README.md); the Phase 6 guide documents its independently
 packaged test suite.
 
+### Architecture diagrams
+
+- [System architecture overview](docs/architectural-diagrams/architectural_diagram.svg) presents
+  the baseline and governance-aware workflows with their shared infrastructure and paired
+  evaluation.
+- [Detailed experimental architecture](docs/architectural-diagrams/architectural_diagram_detailed.svg)
+  expands the execution paths, shared substrate, and evaluation boundary.
+
 ### Documentation conventions
 
 Following [PEP 257](https://peps.python.org/pep-0257/), simple modules in `baseline/` and
@@ -37,6 +45,12 @@ relevant and consolidated in [`docs/references.md`](docs/references.md) for revi
 Python 3.11–3.13, [uv](https://docs.astral.sh/uv/), and Docker are required for complete local
 execution. Start local configuration from [`.env.example`](.env.example); never commit `.env` or
 real credentials.
+
+Choose `lexical` or `qdrant` explicitly in `.env`, for example:
+
+```dotenv
+RAG_RETRIEVAL_BACKEND="lexical"
+```
 
 Install the baseline application environment:
 
@@ -61,6 +75,12 @@ Model-backed execution requires `RAG_OPENAI_API_KEY`. Production and experiment 
 require independent `RAG_SAFETY_IDENTIFIER_SECRET` and `RAG_GOVERNANCE_AUDIT_INTEGRITY_KEY`
 values. Full experiment reproduction requires the pinned Qdrant service and configuration
 described in the [Phase 6 guide](experiments/paired_agent_evaluation/README.md#prerequisites).
+
+> **OpenAI cost warning:** Do not run `run_test.py` or `score_results.py --ragas` merely to verify
+> the release. Full test acquisition executes 480 condition-level observations, and Ragas adds
+> model-based grading calls. The workflow can exceed 45 minutes and consume substantial API tokens
+> and account credit. Use the release-verification command below for inspection without provider
+> calls.
 
 ## Verify the Phase 6 evidence
 
