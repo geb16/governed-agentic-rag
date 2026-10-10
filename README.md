@@ -180,3 +180,10 @@ git diff --check
 
 The Phase 6 package has its own locked environment and quality gates, documented in its
 [readiness section](experiments/paired_agent_evaluation/README.md#readiness-gates).
+
+## Citation and licence
+
+Citation metadata is provided in [`CITATION.cff`](CITATION.cff). The canonical public release is
+[`v1.0.1`](https://github.com/geb16/governed-agentic-rag/tree/v1.0.3).
+
+This project is distributed under the [MIT License](LICENSE).
